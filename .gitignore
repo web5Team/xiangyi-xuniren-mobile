@@ -1,0 +1,15 @@
+node_modules
+*.log
+dist
+.output
+.nuxt
+.env
+.idea/
+.vscode
+.github
+.vscode/settings.json
+.vscode/extensions.json
+constants/index.ts
+
+# Sentry Config File
+.env.sentry-build-plugin

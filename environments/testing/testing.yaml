@@ -1,0 +1,13 @@
+apiVersion: cd.coding.net/v1alpha1
+kind: Environment
+metadata:
+  name: thisai-view-testing
+  namespace: coding-cd
+  labels:
+    forceSync: 'true'
+spec:
+  application: thisai-view
+  namespaceOverride: testing
+  cluster: {
+    }
+  autoSync: false
