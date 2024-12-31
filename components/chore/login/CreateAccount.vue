@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const props = defineProps<{
-  modelValue?: boolean
-}>()
+import SmsLogin from './sms/SmsLogin.vue'
+
+const nextComp: any = inject('nextComp')!
 
 const loginAvenues = reactive([
   {
@@ -11,12 +11,19 @@ const loginAvenues = reactive([
   {
     icon: 'i-carbon-phone',
     text: '手机验证码登录',
+    click() {
+      handleSmsLogin()
+    },
   },
   {
     icon: 'i-carbon-user',
     text: '谷歌账号登录',
   },
 ])
+
+function handleSmsLogin() {
+  nextComp(SmsLogin, '添加手机 1/3')
+}
 </script>
 
 <template>
@@ -36,7 +43,7 @@ const loginAvenues = reactive([
       </div>
 
       <div class="CreateAccount-Main-Avenue">
-        <el-button v-for="avenue in loginAvenues" :key="avenue.text" v-wave plain class="vice-button" size="large">
+        <el-button v-for="avenue in loginAvenues" :key="avenue.text" v-wave plain class="vice-button" size="large" @click="avenue?.click">
           <div mx-2 :class="avenue.icon" />
           <span>{{ avenue.text }}</span>
         </el-button>

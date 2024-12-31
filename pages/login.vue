@@ -3,34 +3,137 @@ import LoginFlower from '~/components/chore/login/LoginFlower.vue'
 import QuickRegister from '~/components/chore/login/QuickRegister.vue'
 import CreateAccount from '~/components/chore/login/CreateAccount.vue'
 
-const options = reactive<{
+interface IDispComp {
   title: string
   comp: Component
+}
+
+const options = reactive<{
+  current: IDispComp
+  stack: IDispComp[]
 }>({
-  title: '创建账户',
-  comp: CreateAccount,
+  current: {
+    title: '创建账户',
+    comp: CreateAccount,
+  },
+  stack: [],
 })
+
+const mainDom = ref<HTMLElement>()
+
+function newDispComp(option: IDispComp) {
+  options.stack.push(options.current)
+
+  Object.assign(options, {
+    current: option,
+  })
+}
+
+function backDispComp() {
+  const stack = options.stack
+  if (stack.length === 0)
+    return
+
+  const result = stack.pop()!
+
+  Object.assign(options, {
+    current: result,
+  })
+
+  return result
+}
+
+async function nextComp(component: Component, title: string) {
+  const dom = mainDom.value
+  if (!dom)
+    return
+
+  Object.assign(dom.style, {
+    transform: 'translate(-120%, 0)',
+  })
+
+  await sleep(300)
+
+  dom.style.transition = '0s all'
+
+  dom.style.opacity = '0'
+
+  await sleep(10)
+
+  Object.assign(dom.style, {
+    transform: 'translate(120%, 0)',
+  })
+
+  await sleep(100)
+
+  dom.style.transition = ''
+  dom.style.opacity = '1'
+
+  newDispComp({
+    title,
+    comp: component,
+  })
+
+  Object.assign(dom.style, {
+    transform: 'translate(0, 0)',
+  })
+}
+
+async function prevComp() {
+  const dom = mainDom.value
+  if (!dom)
+    return
+
+  Object.assign(dom.style, {
+    transform: 'translate(120%, 0)',
+  })
+
+  await sleep(300)
+
+  dom.style.transition = '0s all'
+
+  dom.style.opacity = '0'
+
+  await sleep(10)
+
+  Object.assign(dom.style, {
+    transform: 'translate(-120%, 0)',
+  })
+
+  await sleep(100)
+
+  dom.style.transition = ''
+  dom.style.opacity = '1'
+
+  backDispComp()
+
+  Object.assign(dom.style, {
+    transform: 'translate(0, 0)',
+  })
+}
+
+provide('nextComp', nextComp)
 </script>
 
 <template>
   <div class="LoginPage">
-    <div class="LoginPage-Content">
+    <div ref="mainDom" class="LoginPage-Content transition-cubic">
       <div relative w-full flex items-center justify-center class="LoginPage-Content-Header">
-        <div absolute left-0 class="arrow-icon">
+        <div v-if="options.stack.length > 0" absolute left-0 active:op-50 class="arrow-icon" @click="prevComp">
           <div i-carbon-arrow-left />
         </div>
         <p>
-          {{ options.title }}
+          {{ options.current.title }}
         </p>
       </div>
 
       <div class="LoginPage-Content-Main">
-        <component :is="options.comp" />
+        <component :is="options.current.comp" />
       </div>
     </div>
 
     <div class="LoginPage-Footer">
-      使用相一服务，代表你同意<br>条款和隐私政策
+      使用相一服务，代表你同意<br><span font-bold>条款</span>和<span font-bold>隐私政策</span>
     </div>
   </div>
 </template>
