@@ -6,6 +6,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { VRM, VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm'
+import { PoseManager, Posed } from './pose'
 
 setTimeout(() => {
   globalThis.THREE = THREE
@@ -18,6 +19,13 @@ export class ModelManager {
   renderer: any
   scene: any
   camera: any
+
+  modelLoadBus = useEventBus('ON_MODEL_LOAD')
+  modelLoadDoneBus = useEventBus('ON_MODEL_LOAD_DONE')
+  modelLoadEndBus = useEventBus('ON_MODEL_LOAD_END')
+
+  constructor() {
+  }
 
   load(container: HTMLElement) {
     const rect = container.getBoundingClientRect()
@@ -64,6 +72,8 @@ export class ModelManager {
 
       // called when the resource is loaded
       (gltf: any) => {
+        this.modelLoadDoneBus.emit(gltf)
+
         this.gltf = gltf
 
         const vrm = gltf.userData.vrm
@@ -81,12 +91,14 @@ export class ModelManager {
         })
 
         currentVrm = vrm
-        console.log({ vrm }, vrm.humanoid)
+        console.log({ vrm }, vrm.humanoid.humanBones.head, gltf)
         this.scene.add(vrm.scene)
+
+        this.modelLoadEndBus.emit()
       },
 
       // called while loading is progressing
-      progress => console.log('Loading model...', 100.0 * (progress.loaded / progress.total), '%'),
+      progress => this.modelLoadBus.emit(100.0 * (progress.loaded / progress.total), progress),
 
       // called when loading has errors
       error => console.error(error))
