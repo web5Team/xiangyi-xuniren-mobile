@@ -4,8 +4,6 @@ import GhostPage from './GhostPage.vue'
 const changeModelPage: any = inject('changeModelPage')
 
 function handleGhost() {
-  console.log('1')
-
   changeModelPage(GhostPage, false)
 }
 </script>

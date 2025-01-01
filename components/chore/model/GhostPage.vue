@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import MainPage from './MainPage.vue'
+
 const {
   ensurePermissions,
   permissionGranted,
@@ -22,6 +24,8 @@ onMounted(async () => {
     console.log(stream)
   }
 })
+
+const changeModelPage: any = inject('changeModelPage')
 </script>
 
 <template>
@@ -41,7 +45,7 @@ onMounted(async () => {
       </ClientOnly>
     </div>
 
-    <div class="ModelGhostPage-FingerPrint">
+    <div class="ModelGhostPage-FingerPrint" @click="changeModelPage(MainPage, true)">
       <IconSvgFingerPrint />
     </div>
 

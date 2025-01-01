@@ -81,10 +81,10 @@ async function changeModelPage(targetComponent: Component, modelShow: boolean = 
 
   el.style.opacity = '0'
 
+  await sleep(300)
+
   if (dom.value)
     dom.value!.style.opacity = modelShow ? '1' : '0'
-
-  await sleep(300)
 
   modelComponent.value = targetComponent
 
