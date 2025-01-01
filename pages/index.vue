@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MainPage from '~/components/chore/model/MainPage.vue'
-import { modelManager } from '~/composables/model'
+import { AnimationInterval, IAnimationInterval, modelManager } from '~/composables/model'
 import { PoseManager, Posed } from '~/composables/model/pose'
 
 const dom = ref<HTMLElement>()
@@ -29,13 +29,37 @@ onMounted(() => {
     modelManager.onAnimate((vrm) => {
       modelManager.updateEye(x.value, y.value, vrm)
 
-      // if (Date.now() - applied <= 3)
-      //   return
-
-      // applied = Date.now()
-      // console.log('hi')
-      yePoseManager.apply(modelManager.gltf.userData.vrm)
+      yePoseManager.apply(vrm)
     })
+
+    const blinkInterval = new AnimationInterval(10, (vrm: any) => {
+      const now = Date.now()
+      const lastBlink = blinkInterval.data.lastBlink || -1
+      if (now - lastBlink < 2000)
+        return
+
+      if (blinkInterval.data.closing)
+        blinkInterval.data.weight -= 8
+      else
+        blinkInterval.data.weight += 8
+
+      const expression = modelManager.useExpression('blink', vrm)
+
+      expression.weight = blinkInterval.data.weight / 100
+
+      if (expression.weight >= 0.9) {
+        blinkInterval.data.closing = true
+      }
+      else if (blinkInterval.data.closing && expression.weight <= 0.1) {
+        // console.log('blink end wait for next')
+        blinkInterval.data.lastBlink = now
+        blinkInterval.data.weight = 0
+
+        blinkInterval.data.closing = false
+      }
+    })
+    blinkInterval.data.weight = 0
+    modelManager.onInterval(blinkInterval)
 
     // modelManager.onAnimate((vrm) => {
 

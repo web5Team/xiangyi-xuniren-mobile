@@ -14,6 +14,32 @@ setTimeout(() => {
 
 export type IAnimationRefreshFn = (vrm: any) => void
 
+export abstract class IAnimationInterval {
+  _lastCall: number = -1
+  interval: number
+
+  constructor(interval: number) {
+    this.interval = interval
+  }
+
+  abstract onCall(vrm: any): void
+}
+
+export class AnimationInterval extends IAnimationInterval {
+  fn: Function
+  data: any = {}
+
+  constructor(interval: number, fn: Function) {
+    super(interval)
+
+    this.fn = fn
+  }
+
+  onCall(vrm: any) {
+    this.fn(vrm)
+  }
+}
+
 export class ModelManager {
   gltf: any
   renderer: any
@@ -124,6 +150,15 @@ export class ModelManager {
         // update animation
         for (const animateFn of this._animationList)
           animateFn(currentVrm)
+
+        // update interval
+        const now = Date.now()
+        for (const intervalFn of this._intervalList) {
+          if (now - intervalFn._lastCall > intervalFn.interval) {
+            intervalFn._lastCall = now
+            intervalFn.onCall(currentVrm)
+          }
+        }
       }
 
       // render
@@ -142,15 +177,24 @@ export class ModelManager {
   }
 
   _animationList: IAnimationRefreshFn[] = []
+  _intervalList: IAnimationInterval[] = []
 
   onAnimate(callback: IAnimationRefreshFn) {
     this._animationList.push(callback)
+  }
+
+  onInterval(callback: IAnimationInterval) {
+    this._intervalList.push(callback)
   }
 
   setBackground() {
     const color = getCssVariable('--el-bg-color-page')
 
     this.scene.background = new THREE.Color(color)
+  }
+
+  useExpression(value: string, vrm: any) {
+    return vrm.expressionManager.presetExpressionMap[value]
   }
 
   resize(container: HTMLElement) {
