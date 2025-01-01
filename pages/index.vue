@@ -71,14 +71,18 @@ onMounted(() => {
 
 const modelComponent = ref<Component>(MainPage)
 
-async function changeModelPage(targetComponent: Component) {
+async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
   const el = container.value
+  console.log({ el })
   if (!el) {
     modelComponent.value = targetComponent
     return
   }
 
   el.style.opacity = '0'
+
+  if (dom.value)
+    dom.value!.style.opacity = modelShow ? '1' : '0'
 
   await sleep(300)
 
@@ -88,6 +92,8 @@ async function changeModelPage(targetComponent: Component) {
 
   el.style.opacity = '1'
 }
+
+provide('changeModelPage', changeModelPage)
 </script>
 
 <template>
@@ -115,7 +121,7 @@ async function changeModelPage(targetComponent: Component) {
   &-Progress {
     &.hide {
       opacity: 0;
-      pointer-events: none;
+      pointer-events: none !important;
     }
 
     div {
@@ -164,6 +170,7 @@ async function changeModelPage(targetComponent: Component) {
 }
 
 .ModelPage-Container {
+  z-index: 2;
   position: absolute;
 
   top: 0;
@@ -177,6 +184,8 @@ async function changeModelPage(targetComponent: Component) {
   &-Model {
     width: 100%;
     height: 100%;
+
+    pointer-events: none;
   }
 
   width: 100%;

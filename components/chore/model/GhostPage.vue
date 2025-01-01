@@ -1,32 +1,52 @@
 <script setup lang="ts">
-import GhostPage from './GhostPage.vue'
+const {
+  ensurePermissions,
+  permissionGranted,
+  audioInputs: microphones,
+} = useDevicesList()
+const currentMicrophone = computed(() => microphones.value[0]?.deviceId)
 
-const changeModelPage: any = inject('changeModelPage')
+const { stream, start, stop } = useUserMedia({
+  constraints: reactive({
+    video: false,
+    audio: { deviceId: currentMicrophone },
+  }),
+})
 
-function handleGhost() {
-  console.log('1')
+onMounted(async () => {
+  await ensurePermissions()
 
-  changeModelPage(GhostPage, false)
-}
+  if (permissionGranted.value) {
+    await start()
+
+    console.log(stream)
+  }
+})
 </script>
 
 <template>
-  <div class="ModelMainPage">
-    <div class="ModelMainPage-Date">
+  <div class="ModelGhostPage">
+    <div class="ModelGhostPage-Date">
       <p class="day">
-        <span mr-2>11</span>天
+        <span mr-2>11</span>天1
       </p>
       <p class="desc">
         今天是烟烟与你相随
       </p>
     </div>
 
-    <div class="ModelMainPage-FingerPrint">
+    <div class="ModelGhostPage-Content">
+      <ClientOnly>
+        <ChoreWavingRecorder v-if="stream" :audio-stream="stream" />
+      </ClientOnly>
+    </div>
+
+    <div class="ModelGhostPage-FingerPrint">
       <IconSvgFingerPrint />
     </div>
 
-    <div class="ModelMainPage-Nav">
-      <IconSvgGhostSvg @click="handleGhost" />
+    <div class="ModelGhostPage-Nav">
+      <IconSvgGhostFilledSvg />
       <IconSvgButterflySvg />
       <IconSvgPlanedSvg />
       <IconSvgShareSvg />
@@ -35,7 +55,17 @@ function handleGhost() {
 </template>
 
 <style lang="scss" scoped>
-.ModelMainPage {
+.ModelGhostPage-Content {
+  position: absolute;
+  padding: 0 10%;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+}
+
+.ModelGhostPage {
   &-Date {
     position: absolute;
 
@@ -84,7 +114,7 @@ function handleGhost() {
   }
 }
 
-.ModelMainPage-FingerPrint {
+.ModelGhostPage-FingerPrint {
   position: absolute;
 
   top: 50%;
@@ -93,7 +123,7 @@ function handleGhost() {
   transform: translateY(-50%);
 }
 
-.ModelMainPage-Nav {
+.ModelGhostPage-Nav {
   position: absolute;
   display: flex;
 
@@ -101,6 +131,7 @@ function handleGhost() {
   right: 1rem;
 
   gap: 25px;
+  align-items: center;
   flex-direction: column;
 
   transform: translateY(-50%);
