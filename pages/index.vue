@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import TouchDialog from '~/components/dialog/TouchDialog.vue'
 import MainPage from '~/components/chore/model/MainPage.vue'
-import { AnimationInterval, IAnimationInterval, modelManager } from '~/composables/model'
+import { AnimationInterval, modelManager } from '~/composables/model'
 import { PoseManager, Posed } from '~/composables/model/pose'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
 const progress = ref(0)
 const { x, y } = useMouse()
+const shareDialog = ref(!false)
 
 onMounted(() => {
   modelManager.modelLoadBus.on((p: number) => {
@@ -69,7 +71,7 @@ onMounted(() => {
   useEventListener('resize', () => modelManager.resize(dom.value))
 })
 
-const modelComponent = ref<Component>(MainPage)
+const modelComponent = shallowRef<Component>(MainPage)
 
 async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
   const el = container.value
@@ -94,6 +96,7 @@ async function changeModelPage(targetComponent: Component, modelShow: boolean = 
 }
 
 provide('changeModelPage', changeModelPage)
+provide('shareDialog', shareDialog)
 </script>
 
 <template>
@@ -113,6 +116,14 @@ provide('changeModelPage', changeModelPage)
         <div class="ModelPage-Mask-Progress-Bg transition-cubic" />
       </div>
     </div>
+
+    <client-only>
+      <teleport to="body">
+        <TouchDialog v-model="shareDialog" :slider="false">
+          <ChoreModelSharePage />
+        </TouchDialog>
+      </teleport>
+    </client-only>
   </div>
 </template>
 

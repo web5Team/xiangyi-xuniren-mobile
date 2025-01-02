@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GhostPage from './GhostPage.vue'
 
+const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
 
 function handleGhost() {
@@ -27,7 +28,7 @@ function handleGhost() {
       <IconSvgGhostSvg @click="handleGhost" />
       <IconSvgButterflySvg />
       <IconSvgPlanedSvg />
-      <IconSvgShareSvg />
+      <IconSvgShareSvg @click="shareDialog = true" />
     </div>
   </div>
 </template>

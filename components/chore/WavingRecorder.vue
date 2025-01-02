@@ -133,6 +133,5 @@ export default {
   width: 120px;
 
   overflow: hidden;
-  // transform: scale(1.5);
 }
 </style>

@@ -6,6 +6,7 @@ const props = defineProps<{
   loading?: boolean
   header?: boolean
   footer?: boolean
+  slider?: boolean
 }>()
 
 const emits = defineEmits(['update:modelValue'])
@@ -177,7 +178,8 @@ const _options: Options = {
 }
 
 onMounted(() => {
-  listen(dom.value!, _options)
+  if (props.slider)
+    listen(dom.value!, _options)
 })
 </script>
 
@@ -191,7 +193,7 @@ onMounted(() => {
         <div class="TouchDialog-Close" @click="visible = false">
           <div i-carbon:close />
         </div>
-        <div ref="dom" class="slider only-pe-display" />
+        <div v-if="slider" ref="dom" class="slider only-pe-display" />
 
         <slot name="Main">
           <div v-if="header" class="TouchDialog-Title">
@@ -378,8 +380,7 @@ onMounted(() => {
 }
 
 .mobile .TouchDialog-Main.Main {
-  padding-top: 2rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
 
   top: unset;
   left: 0;
@@ -391,7 +392,9 @@ onMounted(() => {
   height: auto;
   max-height: 90%;
 
-  border-radius: 36px 36px 0 0;
+  color: #fff;
+  background: #8e6ff7;
+  border-radius: 32px 32px 0 0;
   transform: translateY(100%);
 }
 

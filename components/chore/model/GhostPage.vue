@@ -18,13 +18,11 @@ const { stream, start, stop } = useUserMedia({
 onMounted(async () => {
   await ensurePermissions()
 
-  if (permissionGranted.value) {
+  if (permissionGranted.value)
     await start()
-
-    console.log(stream)
-  }
 })
 
+const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
 </script>
 
@@ -53,7 +51,7 @@ const changeModelPage: any = inject('changeModelPage')
       <IconSvgGhostFilledSvg />
       <IconSvgButterflySvg />
       <IconSvgPlanedSvg />
-      <IconSvgShareSvg />
+      <IconSvgShareSvg @click="shareDialog = true" />
     </div>
   </div>
 </template>
