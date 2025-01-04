@@ -3,8 +3,14 @@ import type { IDataResponse } from '../index.type'
 import type { ILoginToken } from './auth.type'
 
 export default {
-  serverStatus() {
-    return endHttp.get('auth/status')
+  sendSMSCode(phone: string) {
+    return endHttp.get('user/code', { phone })
+  },
+  loginOrRegister(phone: string, code: string) {
+    return endHttp.get('user/login', {
+      phone,
+      code,
+    })
   },
   renewToken() {
     return endHttp.get('auth/renew_token') as Promise<IDataResponse<ILoginToken>>
