@@ -3,12 +3,15 @@ import TouchDialog from '~/components/dialog/TouchDialog.vue'
 import MainPage from '~/components/chore/model/MainPage.vue'
 import { AnimationInterval, modelManager } from '~/composables/model'
 import { PoseManager, Posed } from '~/composables/model/pose'
+import { toggleManager } from '~/composables/model/toggle'
+import { AnimationManager } from '~/composables/model/animations'
+import StandardWalk from '~/composables/model/animations/Talking.fbx?url'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
 const progress = ref(0)
 const { x, y } = useMouse()
-const shareDialog = ref(!false)
+const shareDialog = ref(false)
 
 onMounted(() => {
   modelManager.modelLoadBus.on((p: number) => {
@@ -25,50 +28,61 @@ onMounted(() => {
   modelManager.load(dom.value!)
 
   modelManager.modelLoadEndBus.on(() => {
-    // let applied = -1
-    const poseManager = new PoseManager(Posed.HiPose)
-    const yePoseManager = new PoseManager(Posed.YePose)
-    modelManager.onAnimate((vrm) => {
-      modelManager.updateEye(x.value, y.value, vrm)
-
-      yePoseManager.apply(vrm)
-    })
-
-    const blinkInterval = new AnimationInterval(10, (vrm: any) => {
-      const now = Date.now()
-      const lastBlink = blinkInterval.data.lastBlink || -1
-      if (now - lastBlink < 2000)
-        return
-
-      if (blinkInterval.data.closing)
-        blinkInterval.data.weight -= 8
-      else
-        blinkInterval.data.weight += 8
-
-      const expression = modelManager.useExpression('blink', vrm)
-
-      expression.weight = blinkInterval.data.weight / 100
-
-      if (expression.weight >= 0.9) {
-        blinkInterval.data.closing = true
-      }
-      else if (blinkInterval.data.closing && expression.weight <= 0.1) {
-        // console.log('blink end wait for next')
-        blinkInterval.data.lastBlink = now
-        blinkInterval.data.weight = 0
-
-        blinkInterval.data.closing = false
-      }
-    })
-    blinkInterval.data.weight = 0
-    modelManager.onInterval(blinkInterval)
-
+    // const poseManager = new PoseManager(Posed.HiPose)
+    // const yePoseManager = new PoseManager(Posed.YePose)
     // modelManager.onAnimate((vrm) => {
+    //   modelManager.updateEye(x.value, y.value, vrm)
 
+    //   yePoseManager.apply(vrm)
     // })
+
+    // const blinkInterval = new AnimationInterval(10, (vrm: any) => {
+    //   const now = Date.now()
+    //   const lastBlink = blinkInterval.data.lastBlink || -1
+    //   if (now - lastBlink < (blinkInterval.data.nextInterval || 2000)) {
+    //     blinkInterval.data.nextInterval = Math.random() * 2000 + 1500
+    //     return
+    //   }
+
+    //   if (blinkInterval.data.closing)
+    //     blinkInterval.data.weight -= 8
+    //   else
+    //     blinkInterval.data.weight += 8
+
+    //   const expression = modelManager.useExpression('blink', vrm)
+
+    //   expression.weight = blinkInterval.data.weight / 100
+
+    //   if (expression.weight >= 0.9) {
+    //     blinkInterval.data.closing = true
+    //   }
+    //   else if (blinkInterval.data.closing && expression.weight <= 0.1) {
+    //     // console.log('blink end wait for next')
+    //     blinkInterval.data.lastBlink = now
+    //     blinkInterval.data.weight = 0
+
+    //     blinkInterval.data.closing = false
+    //   }
+    // })
+    // blinkInterval.data.weight = 0
+    // modelManager.onInterval(blinkInterval)
+
+    // Animation
+    const animationManager = new AnimationManager()
+
+    console.log('animation', StandardWalk)
+
+    animationManager.apply(StandardWalk, modelManager.gltf.userData.vrm.scene)
+
+    // const animationInterval = new AnimationInterval(15000, (vrm: any) => {
+    //   console.log('animation')
+
+    //   animationManager.onAnimate(vrm, clock)
+    // })
+    modelManager.onAnimate(animationManager.onAnimate.bind(animationManager))
   })
 
-  useEventListener('resize', () => modelManager.resize(dom.value))
+  useEventListener('resize', () => modelManager.resize(dom.value!))
 })
 
 const modelComponent = shallowRef<Component>(MainPage)

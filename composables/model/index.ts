@@ -1,18 +1,20 @@
 // import * as THREE from 'three'
 // import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // import { VRMLoaderPlugin } from '@pixiv/three-vrm'
-import model from '/xyfemale.vrm'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { VRM, VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm'
+// import { VRM, VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm'
+import model from './xymalegltf/model.glb?url' // '/xyfemale.vrm'
 import { PoseManager, Posed } from './pose'
+
+console.log({ model })
 
 setTimeout(() => {
   globalThis.THREE = THREE
 })
 
-export type IAnimationRefreshFn = (vrm: any) => void
+export type IAnimationRefreshFn = (vrm: any, clock: any) => void
 
 export abstract class IAnimationInterval {
   _lastCall: number = -1
@@ -73,8 +75,8 @@ export class ModelManager {
     controls.screenSpacePanning = true
     controls.target.set(0.0, 1.0, 0.0)
     controls.update()
-    controls.enableRotate = false
-    controls.enableZoom = false
+    controls.enableRotate = !false
+    controls.enableZoom = !false
 
     // scene
     this.scene = new THREE.Scene()
@@ -90,76 +92,87 @@ export class ModelManager {
     const loader = new GLTFLoader()
     loader.crossOrigin = 'anonymous'
 
-    loader.register((parser: any) => {
-      return new VRMLoaderPlugin(parser)
-    })
+    // loader.register((parser: any) => {
+    //   return new VRMLoaderPlugin(parser)
+    // })
+
+    let mixer: any
 
     loader.load(model,
 
       // called when the resource is loaded
       (gltf: any) => {
-        this.modelLoadDoneBus.emit(gltf)
+        // this.modelLoadDoneBus.emit(gltf)
 
         this.gltf = gltf
 
-        const vrm = gltf.userData.vrm
+        // const vrm = gltf.userData.vrm
+        console.log(gltf)
 
         // calling these functions greatly improves the performance
-        VRMUtils.removeUnnecessaryVertices(gltf.scene)
-        VRMUtils.combineSkeletons(gltf.scene)
-        VRMUtils.combineMorphs(vrm)
+        // VRMUtils.removeUnnecessaryVertices(gltf.scene)
+        // VRMUtils.combineSkeletons(gltf.scene)
+        // VRMUtils.combineMorphs(vrm)
 
         // Disable frustum culling
-        vrm.scene.traverse((obj: any) => {
+        this.scene.traverse((obj: any) => {
           // console.log({ obj })
 
           obj.frustumCulled = false
         })
 
-        currentVrm = vrm
-        console.log({ vrm }, vrm.humanoid.humanBones.head, gltf)
-        this.scene.add(vrm.scene)
+        // currentVrm = vrm
+        // console.log({ vrm }, gltf)
+        this.scene.add(gltf.scene)
 
-        this.modelLoadEndBus.emit()
+        mixer = new THREE.AnimationMixer(gltf)
+        const AnimationAction = mixer.clipAction(gltf.animations[0])
+        // AnimationAction.timeScale = 1; //默认1，可以调节播放速度
+        // AnimationAction.loop = THREE.LoopOnce; //不循环播放
+        // AnimationAction.clampWhenFinished=true;//暂停在最后一帧播放的状态
+        AnimationAction.play()// 播放动画
+
+        console.log(mixer, AnimationAction)
+        // this.modelLoadEndBus.emit()
       },
 
       // called while loading is progressing
-      progress => this.modelLoadBus.emit(100.0 * (progress.loaded / progress.total), progress),
+      (progress: any) => this.modelLoadBus.emit(100.0 * (progress.loaded / progress.total), progress),
 
       // called when loading has errors
       error => console.error(error))
 
     // helpers
-    // const gridHelper = new THREE.GridHelper(10, 10)
-    // this.scene.add(gridHelper)
+    const gridHelper = new THREE.GridHelper(10, 10)
+    this.scene.add(gridHelper)
 
-    // const axesHelper = new THREE.AxesHelper(5)
-    // this.scene.add(axesHelper)
+    const axesHelper = new THREE.AxesHelper(5)
+    this.scene.add(axesHelper)
 
     // animate
     const clock = new THREE.Clock()
-    clock.start()
+    // clock.start()
 
     const animate = () => {
       requestAnimationFrame(animate)
 
       // update vrm components
-      if (currentVrm) {
+      if (currentVrm)
         currentVrm.update(clock.getDelta())
 
-        // update animation
-        for (const animateFn of this._animationList)
-          animateFn(currentVrm)
+      mixer?.update(clock.getDelta())
+      // update animation
+      // for (const animateFn of this._animationList)
+      //   animateFn(currentVrm, clock)
 
-        // update interval
-        const now = Date.now()
-        for (const intervalFn of this._intervalList) {
-          if (now - intervalFn._lastCall > intervalFn.interval) {
-            intervalFn._lastCall = now
-            intervalFn.onCall(currentVrm)
-          }
-        }
-      }
+      // // update interval
+      // const now = Date.now()
+      // for (const intervalFn of this._intervalList) {
+      //   if (now - intervalFn._lastCall > intervalFn.interval) {
+      //     intervalFn._lastCall = now
+      //     intervalFn.onCall(currentVrm)
+      //   }
+      // }
 
       // render
       this.renderer.render(this.scene, this.camera)
