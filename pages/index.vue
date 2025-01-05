@@ -23,9 +23,12 @@ const shareDialog = ref(false)
 const viewer = new Viewer()
 const loginState = useLoginState()
 
-const actions = ['idle_0', 'idle_1', 'idle_3', 'sitting', 'standing_greeting', 'idl_happy_01']
+const actions = ['idle_0', 'idle_1', 'idle_3', 'sitting', 'standing_greeting', 'idel_happy_01']
 
 function recordGranted() {
+  if (permissionGranted.value)
+    return
+
   const cb = whenever(() => loginState.data.dialogVisible === false, async () => {
     setTimeout(() => {
       cb()
@@ -37,7 +40,7 @@ function recordGranted() {
       $model.startRecord()
 
       // go action
-      actionToggle()
+      setTimeout(() => actionToggle(), 15000)
     }
     else {
       // Exit page
