@@ -5,7 +5,7 @@ import { Model } from './model'
 import { loadVRMAnimation } from '~/composables/model/lib/VRMAnimation/loadVRMAnimation'
 // import { buildUrl } from '@/utils/buildUrl'
 
-import ThinkingAnimation from '~/composables/model/thinking.fbx?url'
+import ThinkingAnimation from '~/composables/model/daily/idle_01.fbx?url'
 
 /**
  * three.jsを使った3Dビューワー
@@ -119,9 +119,9 @@ export class Viewer {
     this._renderer.setPixelRatio(window.devicePixelRatio)
 
     // camera
-    this._camera = new THREE.PerspectiveCamera(30.0, width / height, 0.1, 30.0)
-    this._camera.position.set(0, 1.5, 5.0)
-    this._cameraControls?.target.set(0, 1.0, 0)
+    this._camera = new THREE.PerspectiveCamera(20.0, width / height, 0.1, 20.0)
+    this._camera.position.set(0, 1.3, 10.0)
+    this._cameraControls?.target.set(0, 1.3, 0)
     this._cameraControls?.update()
     // camera controls
     this._cameraControls = new OrbitControls(
