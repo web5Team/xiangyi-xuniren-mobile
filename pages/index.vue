@@ -26,6 +26,12 @@ onMounted(() => {
 
   viewer.loadVrm(model)
 
+  console.log(viewer)
+
+  viewer._animationList.push(() => {
+    viewer.updateEye(x.value, y.value)
+  })
+
   const pausable = useIntervalFn(async () => {
     progress.value += Math.random() * 5
 

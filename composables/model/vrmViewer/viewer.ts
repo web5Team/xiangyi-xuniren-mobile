@@ -7,6 +7,8 @@ import { loadVRMAnimation } from '~/composables/model/lib/VRMAnimation/loadVRMAn
 
 import ThinkingAnimation from '~/composables/model/daily/idle_01.fbx?url'
 
+export type IAnimationRefreshFn = (vrm: any, clock: any) => void
+
 /**
  * three.jsを使った3Dビューワー
  *
@@ -21,6 +23,8 @@ export class Viewer {
   private _scene: THREE.Scene
   private _camera?: THREE.PerspectiveCamera
   private _cameraControls?: OrbitControls
+
+  _animationList: IAnimationRefreshFn[] = []
 
   constructor() {
     this.isReady = false
@@ -185,12 +189,28 @@ export class Viewer {
     }
   }
 
+  updateEye(x: number, y: number) {
+    const vrm = this.model?.vrm
+    if (!vrm)
+      return
+
+    const { ndcX, ndcY } = getNormalizedMousePosition({ x, y }, this._renderer!.domElement)
+    const { yaw, pitch } = calculateYawPitch(ndcX, ndcY, this._camera!.fov, this._camera!.aspect)
+
+    vrm.lookAt!.pitch = pitch * 100
+    vrm.lookAt!.yaw = yaw * 100
+  }
+
   public update = () => {
     requestAnimationFrame(this.update)
     const delta = this._clock.getDelta()
     // update vrm components
-    if (this.model)
+    if (this.model) {
       this.model.update(delta)
+
+      for (const animateFn of this._animationList)
+        animateFn(this.model.vrm, this._clock)
+    }
 
     // if (this._renderer && this._camera) {
     //     this._renderer.render(this._scene, this._camera);
@@ -211,4 +231,24 @@ export class Viewer {
       // console.log('Relative Rotation X:', relativeRotation.x, 'Y:', relativeRotation.y, 'Z:', relativeRotation.z);
     }
   }
+}
+
+function getNormalizedMousePosition(pos: { x: number, y: number }, canvas: HTMLCanvasElement) {
+  const rect = canvas.getBoundingClientRect() // 获取画布大小
+  const x = (pos.x - rect.left) / rect.width
+  const y = (pos.y - rect.top) / rect.height
+
+  const ndcX = (x - 0.5) * 2
+  const ndcY = (y - 0.5) * 2
+  return { ndcX, ndcY }
+}
+
+function calculateYawPitch(ndcX: number, ndcY: number, fov: number, aspectRatio: number) {
+  const halfFovY = (fov * Math.PI) / 360
+  const halfFovX = Math.atan(Math.tan(halfFovY) * aspectRatio)
+
+  const yaw = ndcX * halfFovX * 2
+  const pitch = ndcY * halfFovY * 2
+
+  return { yaw, pitch }
 }

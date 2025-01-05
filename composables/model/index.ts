@@ -1,21 +1,12 @@
 // import * as THREE from 'three'
 // import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 // import { VRM, VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm'
-// import * as THREE from 'three'
 
 // import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
-// import model from '/xyfemale.vrm'
-// // './xymalegltf/model.glb?url' //
-// import { PoseManager, Posed } from './pose'
-
 // console.log({ model })
 
-// setTimeout(() => {
-//   globalThis.THREE = THREE
-// })
-
-// export type IAnimationRefreshFn = (vrm: any, clock: any) => void
+//
 
 // export abstract class IAnimationInterval {
 //   _lastCall: number = -1
@@ -182,14 +173,6 @@
 //     animate()
 //   }
 
-//   updateEye(x: number, y: number, vrm: any) {
-//     const { ndcX, ndcY } = getNormalizedMousePosition({ x, y }, this.renderer.domElement)
-//     const { yaw, pitch } = calculateYawPitch(ndcX, ndcY, this.camera.fov, this.camera.aspect)
-
-//     vrm.lookAt.pitch = pitch * 100
-//     vrm.lookAt.yaw = yaw * 100
-//   }
-
 //   _animationList: IAnimationRefreshFn[] = []
 //   _intervalList: IAnimationInterval[] = []
 
@@ -222,26 +205,6 @@
 //     this.camera.aspect = width / height
 //     this.camera.updateProjectionMatrix()
 //   }
-// }
-
-// function getNormalizedMousePosition(pos: { x: number, y: number }, canvas: HTMLCanvasElement) {
-//   const rect = canvas.getBoundingClientRect() // 获取画布大小
-//   const x = (pos.x - rect.left) / rect.width
-//   const y = (pos.y - rect.top) / rect.height
-
-//   const ndcX = (x - 0.5) * 2
-//   const ndcY = (y - 0.5) * 2
-//   return { ndcX, ndcY }
-// }
-
-// function calculateYawPitch(ndcX: number, ndcY: number, fov: number, aspectRatio: number) {
-//   const halfFovY = (fov * Math.PI) / 360
-//   const halfFovX = Math.atan(Math.tan(halfFovY) * aspectRatio)
-
-//   const yaw = ndcX * halfFovX * 2
-//   const pitch = ndcY * halfFovY * 2
-
-//   return { yaw, pitch }
 // }
 
 // function getCssVariable(varName: string) {
