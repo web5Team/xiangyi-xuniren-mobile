@@ -5,7 +5,7 @@ import { Model } from './model'
 import { loadVRMAnimation } from '~/composables/model/lib/VRMAnimation/loadVRMAnimation'
 // import { buildUrl } from '@/utils/buildUrl'
 
-import ThinkingAnimation from '~/composables/model/animations/Acknowledging.fbx?url'
+import ThinkingAnimation from '~/composables/model/thinking.fbx?url'
 
 /**
  * three.jsを使った3Dビューワー
@@ -104,9 +104,10 @@ export class Viewer {
    * Reactで管理しているCanvasを後から設定する
    */
   public setup(canvas: HTMLCanvasElement) {
-    const parentElement = canvas.parentElement
-    const width = parentElement?.clientWidth || canvas.width
-    const height = parentElement?.clientHeight || canvas.height
+    const parentElement = canvas.parentElement!
+    const rect = parentElement.getBoundingClientRect()
+    const { width, height } = rect
+
     // renderer
     this._renderer = new THREE.WebGLRenderer({
       canvas,
@@ -118,9 +119,9 @@ export class Viewer {
     this._renderer.setPixelRatio(window.devicePixelRatio)
 
     // camera
-    this._camera = new THREE.PerspectiveCamera(20.0, width / height, 0.1, 20.0)
-    this._camera.position.set(0, 1.3, 1.5)
-    this._cameraControls?.target.set(0, 1.3, 0)
+    this._camera = new THREE.PerspectiveCamera(30.0, width / height, 0.1, 30.0)
+    this._camera.position.set(0, 1.5, 5.0)
+    this._cameraControls?.target.set(0, 1.0, 0)
     this._cameraControls?.update()
     // camera controls
     this._cameraControls = new OrbitControls(
@@ -157,7 +158,7 @@ export class Viewer {
     if (!this._camera)
       return
     this._camera.aspect
-            = parentElement.clientWidth / parentElement.clientHeight
+      = parentElement.clientWidth / parentElement.clientHeight
     this._camera.updateProjectionMatrix()
   }
 

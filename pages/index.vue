@@ -7,7 +7,7 @@ import { toggleManager } from '~/composables/model/toggle'
 import { AnimationManager } from '~/composables/model/animations'
 import StandardWalk from '~/composables/model/xymalegltf/Hip Hop Dancing.fbx?url'
 import { Viewer } from '~/composables/model/vrmViewer/viewer'
-import model from '/xyfemale.vrm'
+import model from '/xymale.vrm'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -15,12 +15,14 @@ const progress = ref(0)
 const { x, y } = useMouse()
 const shareDialog = ref(false)
 
+const viewer = new Viewer()
+
 onMounted(() => {
+  progress.value = 100
   dom.value?.attributes.removeNamedItem('op-0')
   container.value?.attributes.removeNamedItem('op-0')
 
   const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
-  const viewer = new Viewer()
 
   viewer.setup(canvas)
 
@@ -94,7 +96,7 @@ onMounted(() => {
   // modelManager.onAnimate(animationManager.onAnimate.bind(animationManager))
   // })
 
-  useEventListener('resize', () => modelManager.resize(dom.value!))
+  // useEventListener('resize', () => modelManager.resize(dom.value!))
 })
 
 const modelComponent = shallowRef<Component>(MainPage)
@@ -209,7 +211,7 @@ provide('shareDialog', shareDialog)
 }
 
 .ModelPage-Container {
-  z-index: 2;
+  // z-index: 2;
   position: absolute;
 
   top: 0;
@@ -224,8 +226,9 @@ provide('shareDialog', shareDialog)
     width: 100%;
     height: 100%;
 
-    pointer-events: none;
+    // pointer-events: none;
   }
+  z-index: 2;
 
   width: 100%;
   height: 100%;
