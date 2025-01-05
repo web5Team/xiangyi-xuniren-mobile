@@ -16,6 +16,7 @@
   "dependencies": {
     "@element-plus/nuxt": "^1.0.9",
     "@floating-ui/vue": "^1.1.5",
+    "@gltf-transform/core": "^4.1.1",
     "@pixiv/three-vrm": "^3.3.2",
     "@types/three": "^0.171.0",
     "axios": "^1.7.2",

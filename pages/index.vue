@@ -6,6 +6,8 @@ import { PoseManager, Posed } from '~/composables/model/pose'
 import { toggleManager } from '~/composables/model/toggle'
 import { AnimationManager } from '~/composables/model/animations'
 import StandardWalk from '~/composables/model/xymalegltf/Hip Hop Dancing.fbx?url'
+import { Viewer } from '~/composables/model/vrmViewer/viewer'
+import model from '/xyfemale.vrm'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -14,73 +16,83 @@ const { x, y } = useMouse()
 const shareDialog = ref(false)
 
 onMounted(() => {
-  modelManager.modelLoadBus.on((p: number) => {
-    progress.value = p
+  dom.value?.attributes.removeNamedItem('op-0')
+  container.value?.attributes.removeNamedItem('op-0')
 
-    if (p >= 100) {
-      setTimeout(() => {
-        dom.value?.attributes.removeNamedItem('op-0')
-        container.value?.attributes.removeNamedItem('op-0')
-      }, 200)
-    }
-  })
+  const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
+  const viewer = new Viewer()
 
-  modelManager.load(dom.value!)
+  viewer.setup(canvas)
 
-  modelManager.modelLoadEndBus.on(() => {
-    // const poseManager = new PoseManager(Posed.HiPose)
-    const yePoseManager = new PoseManager(Posed.YePose)
-    modelManager.onAnimate((vrm) => {
-      modelManager.updateEye(x.value, y.value, vrm)
+  console.log({ viewer })
+  viewer.loadVrm(model)
+  // modelManager.modelLoadBus.on((p: number) => {
+  //   progress.value = p
 
-      yePoseManager.apply(vrm)
-    })
+  //   if (p >= 100) {
+  //     setTimeout(() => {
+  //       dom.value?.attributes.removeNamedItem('op-0')
+  //       container.value?.attributes.removeNamedItem('op-0')
+  //     }, 200)
+  //   }
+  // })
 
-    const blinkInterval = new AnimationInterval(10, (vrm: any) => {
-      const now = Date.now()
-      const lastBlink = blinkInterval.data.lastBlink || -1
-      if (now - lastBlink < (blinkInterval.data.nextInterval || 2000)) {
-        blinkInterval.data.nextInterval = Math.random() * 2000 + 1500
-        return
-      }
+  // modelManager.load(dom.value!)
 
-      if (blinkInterval.data.closing)
-        blinkInterval.data.weight -= 8
-      else
-        blinkInterval.data.weight += 8
+  // modelManager.modelLoadEndBus.on(() => {
+  //   // const poseManager = new PoseManager(Posed.HiPose)
+  //   const yePoseManager = new PoseManager(Posed.YePose)
+  //   modelManager.onAnimate((vrm) => {
+  //     modelManager.updateEye(x.value, y.value, vrm)
 
-      const expression = modelManager.useExpression('blink', vrm)
+  //     yePoseManager.apply(vrm)
+  //   })
 
-      expression.weight = blinkInterval.data.weight / 100
+  //   const blinkInterval = new AnimationInterval(10, (vrm: any) => {
+  //     const now = Date.now()
+  //     const lastBlink = blinkInterval.data.lastBlink || -1
+  //     if (now - lastBlink < (blinkInterval.data.nextInterval || 2000)) {
+  //       blinkInterval.data.nextInterval = Math.random() * 2000 + 1500
+  //       return
+  //     }
 
-      if (expression.weight >= 0.9) {
-        blinkInterval.data.closing = true
-      }
-      else if (blinkInterval.data.closing && expression.weight <= 0.1) {
-        // console.log('blink end wait for next')
-        blinkInterval.data.lastBlink = now
-        blinkInterval.data.weight = 0
+  //     if (blinkInterval.data.closing)
+  //       blinkInterval.data.weight -= 8
+  //     else
+  //       blinkInterval.data.weight += 8
 
-        blinkInterval.data.closing = false
-      }
-    })
-    blinkInterval.data.weight = 0
-    modelManager.onInterval(blinkInterval)
+  //     const expression = modelManager.useExpression('blink', vrm)
 
-    // Animation
-    // const animationManager = new AnimationManager()
+  //     expression.weight = blinkInterval.data.weight / 100
 
-    // console.log('animation', StandardWalk)
+  //     if (expression.weight >= 0.9) {
+  //       blinkInterval.data.closing = true
+  //     }
+  //     else if (blinkInterval.data.closing && expression.weight <= 0.1) {
+  //       // console.log('blink end wait for next')
+  //       blinkInterval.data.lastBlink = now
+  //       blinkInterval.data.weight = 0
 
-    // animationManager.apply(StandardWalk, modelManager.gltf.userData.vrm.scene)
+  //       blinkInterval.data.closing = false
+  //     }
+  //   })
+  //   blinkInterval.data.weight = 0
+  //   modelManager.onInterval(blinkInterval)
 
-    // const animationInterval = new AnimationInterval(15000, (vrm: any) => {
-    //   console.log('animation')
+  // Animation
+  // const animationManager = new AnimationManager()
 
-    //   animationManager.onAnimate(vrm, clock)
-    // })
-    // modelManager.onAnimate(animationManager.onAnimate.bind(animationManager))
-  })
+  // console.log('animation', StandardWalk)
+
+  // animationManager.apply(StandardWalk, modelManager.gltf.userData.vrm.scene)
+
+  // const animationInterval = new AnimationInterval(15000, (vrm: any) => {
+  //   console.log('animation')
+
+  //   animationManager.onAnimate(vrm, clock)
+  // })
+  // modelManager.onAnimate(animationManager.onAnimate.bind(animationManager))
+  // })
 
   useEventListener('resize', () => modelManager.resize(dom.value!))
 })
@@ -115,7 +127,9 @@ provide('shareDialog', shareDialog)
 
 <template>
   <div class="ModelPage">
-    <div ref="dom" op-0 class="ModelPage-Model transition-cubic" />
+    <div ref="dom" op-0 class="ModelPage-Model transition-cubic">
+      <canvas />
+    </div>
 
     <div ref="container" op-0 class="ModelPage-Container transition-cubic">
       <component :is="modelComponent" />
