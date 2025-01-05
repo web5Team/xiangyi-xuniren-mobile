@@ -9,15 +9,8 @@ const loginAvenues = reactive([
     text: '苹果账号登录',
   },
   {
-    icon: 'i-carbon-phone',
-    text: '手机验证码登录',
-    click() {
-      handleSmsLogin()
-    },
-  },
-  {
-    icon: 'i-carbon-user',
-    text: '谷歌账号登录',
+    icon: 'i-carbon-email',
+    text: '邮箱登录',
   },
 ])
 
@@ -33,8 +26,8 @@ function handleSmsLogin() {
     </p>
 
     <div class="CreateAccount-Main">
-      <el-button v-wave class="major-button" size="large">
-        邮箱
+      <el-button v-wave class="major-button" size="large" @click="handleSmsLogin">
+        <div i-carbon-phone mx-2 />手机验证码登录
       </el-button>
 
       <div class="CreateAccount-Main-Divider">
@@ -43,7 +36,10 @@ function handleSmsLogin() {
       </div>
 
       <div class="CreateAccount-Main-Avenue">
-        <el-button v-for="avenue in loginAvenues" :key="avenue.text" v-wave plain class="vice-button" size="large" @click="avenue?.click">
+        <el-button
+          v-for="avenue in loginAvenues" :key="avenue.text" v-wave plain class="vice-button" size="large"
+          @click="avenue?.click"
+        >
           <div mx-2 :class="avenue.icon" />
           <span>{{ avenue.text }}</span>
         </el-button>
