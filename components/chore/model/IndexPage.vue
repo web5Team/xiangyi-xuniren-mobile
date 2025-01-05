@@ -173,20 +173,17 @@ async function handleLogin() {
   width: 100%;
   height: 100%;
 
-  opacity: 0;
-  transform: translateX(20%);
+  transform: translateX(120%);
 
   animation: popFadeIn 0.25s 0.125s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
 }
 
 @keyframes popFadeIn {
   from {
-    opacity: 0;
-    transform: translateX(20%);
+    transform: translateX(120%);
   }
 
   to {
-    opacity: 1;
     transform: translateX(0);
   }
 }

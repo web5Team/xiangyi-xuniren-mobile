@@ -23,7 +23,7 @@ const shareDialog = ref(false)
 const viewer = new Viewer()
 const loginState = useLoginState()
 
-const actions = ['idle_0', 'idle_1', 'idle_3', 'sitting', 'standing_greeting', 'idel_happy_01']
+const actions = ['idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
 
 function recordGranted() {
   if (permissionGranted.value)
@@ -53,8 +53,10 @@ function actionToggle() {
   useIntervalFn(() => {
     const action = actions[Math.floor(Math.random() * actions.length)]
 
+    console.log('current action', action)
+
     viewer.model?.loadFBX(action)
-  }, 10000)
+  }, 12000)
 }
 
 onMounted(() => {
