@@ -62,6 +62,9 @@ export function genAxios(options: CreateAxiosDefaults) {
         })(reqConfig.data)
       }
 
+      // VISIT REAL SERVER
+      reqConfig.headers.server = 'true'
+
       if (userStore.value.isLogin)
         reqConfig.headers.Authorization = `Bearer ${userStore.value.token?.accessToken}`
 

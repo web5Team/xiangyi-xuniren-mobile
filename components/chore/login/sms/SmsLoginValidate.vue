@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useLoginState } from '..'
 
+const input = ref<HTMLElement>()
 const loginState = useLoginState()
 const nextComp: any = inject('nextComp')
 
@@ -19,6 +20,10 @@ function handleSmsLogin() {
 
   nextComp()
 }
+
+onStartTyping(() => {
+  input.value?.focus()
+})
 </script>
 
 <template>
@@ -45,7 +50,7 @@ function handleSmsLogin() {
           class="SmsLoginValidate-InputDisp" v-text="[...(`${options.code}`)]?.[i - 1]"
         />
       </div>
-      <input v-model.number="options.code" :maxlength="5" op-0 class="major-input" size="large">
+      <input ref="input" v-model.number="options.code" :maxlength="5" op-0 class="major-input" size="large">
       <el-button v-wave :class="{ valid }" class="major-button" size="large" @click="handleSmsLogin">
         验证手机
       </el-button>
@@ -176,6 +181,7 @@ function handleSmsLogin() {
       font-weight: 500;
       border-radius: 12px;
       background: #b88ae8;
+      border: none !important;
       box-shadow: 0px 12px 12px -8px rgba(100, 0, 205, 0.16);
 
       &.valid {

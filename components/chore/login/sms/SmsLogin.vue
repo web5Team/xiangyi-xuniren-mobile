@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useLoginState } from '..'
 import SmsLoginValidate from './SmsLoginValidate.vue'
+import { $endApi } from '~/composables/api/base'
 
 const loginState = useLoginState()
 const nextComp: any = inject('nextComp')
 
 const options = reactive({
+  loading: false,
   phone: loginState.data.identifier || '',
   step: 1,
 })
@@ -16,11 +18,25 @@ const valid = computed(() => {
   return regex.test(options.phone)
 })
 
-function handleSmsLogin() {
+async function handleSmsLogin() {
   if (!valid.value)
     return
 
   loginState.data.identifier = options.phone
+
+  options.loading = true
+
+  // SEND CODE
+  const res = await $endApi.v1.auth.sendSMSCode(options.phone)
+
+  options.loading = false
+
+  if (res.code !== 1) {
+    return ElMessage.error({
+      message: `发送请求失败(${res.message})!`,
+      grouping: true,
+    })
+  }
 
   nextComp(SmsLoginValidate, '验证手机 2/3')
 }
@@ -37,7 +53,7 @@ function handleSmsLogin() {
         手机号
       </p>
       <input v-model.number="options.phone" class="major-input" size="large" placeholder="请输入手机号">
-      <el-button v-wave :class="{ valid }" class="major-button" size="large" @click="handleSmsLogin">
+      <el-button v-loading="options.loading" v-wave :class="{ valid }" class="major-button" size="large" @click="handleSmsLogin">
         创建账户
       </el-button>
     </div>
@@ -119,6 +135,7 @@ function handleSmsLogin() {
       font-weight: 500;
       border-radius: 12px;
       background: #b88ae8;
+      border: none !important;
       box-shadow: 0px 12px 12px -8px rgba(100, 0, 205, 0.16);
 
       &.valid {

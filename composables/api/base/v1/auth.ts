@@ -4,10 +4,10 @@ import type { ILoginToken } from './auth.type'
 
 export default {
   sendSMSCode(phone: string) {
-    return endHttp.get('user/code', { phone })
+    return endHttp.post('user/code', { phone })
   },
   loginOrRegister(phone: string, code: string) {
-    return endHttp.get('user/login', {
+    return endHttp.post('user/login', {
       phone,
       code,
     })

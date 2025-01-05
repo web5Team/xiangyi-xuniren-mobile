@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js'
+// import dae loader
+// import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js'
 
 export class AnimationManager {
   mixer: any
@@ -20,11 +22,11 @@ export class AnimationManager {
       if (fbx.animations.length > 0) {
         console.log('a', { fbx })
         this.mixer = new THREE.AnimationMixer(scene)
-        fbx.animations.forEach((clip: any) => {
-          this.mixer.clipAction(clip).play()
-        })
-        // const action = this.mixer.clipAction(fbx.animations[0])
-        // action.play()
+        // fbx.animations.forEach((clip: any) => {
+        //   this.mixer.clipAction(clip).play()
+        // })
+        const action = this.mixer.clipAction(fbx.animations[0])
+        action.play()
       }
     })
 

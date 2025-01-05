@@ -116,6 +116,7 @@ function handleSmsLogin() {
       color: #fff;
       font-weight: 500;
       border-radius: 12px;
+      border: none !important;
       background-color: #6400cd;
       box-shadow: 0px 12px 12px -8px rgba(100, 0, 205, 0.16);
     }
