@@ -37,6 +37,11 @@ export class Viewer {
     const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.4)
     scene.add(ambientLight)
 
+    const spotLight = new THREE.SpotLight(0xFFFFFF, 1.0)
+    spotLight.position.set(0, 1.5, 1)
+    spotLight.castShadow = true
+    scene.add(spotLight)
+
     // animate
     this._clock = new THREE.Clock()
     this._clock.start()
@@ -119,9 +124,9 @@ export class Viewer {
     this._renderer.setPixelRatio(window.devicePixelRatio)
 
     // camera
-    this._camera = new THREE.PerspectiveCamera(20.0, width / height, 0.1, 20.0)
-    this._camera.position.set(0, 1.3, 10.0)
-    this._cameraControls?.target.set(0, 1.3, 0)
+    this._camera = new THREE.PerspectiveCamera(25.0, width / height, 0.1, 20.0)
+    this._camera.position.set(0, 1.5, 5)
+    this._cameraControls?.target.set(0, 1.5, 0)
     this._cameraControls?.update()
     // camera controls
     this._cameraControls = new OrbitControls(
@@ -172,10 +177,10 @@ export class Viewer {
       const headWPos = headNode.getWorldPosition(new THREE.Vector3())
       this._camera?.position.set(
         this._camera.position.x,
-        headWPos.y,
+        headWPos.y / 1.5,
         this._camera.position.z,
       )
-      this._cameraControls?.target.set(headWPos.x, headWPos.y, headWPos.z)
+      this._cameraControls?.target.set(headWPos.x, headWPos.y / 1.5, headWPos.z)
       this._cameraControls?.update()
     }
   }

@@ -38,7 +38,10 @@ async function handleSmsLogin() {
     })
   }
 
-  nextComp(SmsLoginValidate, '验证手机 2/3')
+  nextComp(SmsLoginValidate, {
+    title: '验证手机 2/3',
+    canBack: true,
+  })
 }
 </script>
 

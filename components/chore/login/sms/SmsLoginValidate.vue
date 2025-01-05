@@ -1,24 +1,46 @@
 <script setup lang="ts">
 import { useLoginState } from '..'
+import CreateAccount from '../CreateAccount.vue'
+import Success from '../Success.vue'
+import { $endApi } from '~/composables/api/base'
 
+const router = useRouter()
 const input = ref<HTMLElement>()
 const loginState = useLoginState()
 const nextComp: any = inject('nextComp')
+const prevComp: any = inject('prevComp')
 
 const options = reactive({
+  loading: false,
   code: '',
   step: 2,
 })
 
 const valid = computed(() => `${options.code}`.length === 5)
 
-function handleSmsLogin() {
+async function handleSmsLogin() {
   if (!valid.value)
     return
 
-  loginState.data.identifier = options.code
+  options.loading = true
 
-  nextComp()
+  const res = await $endApi.v1.auth.loginOrRegister(loginState.data.identifier, options.code)
+
+  options.loading = false
+
+  if (responseMessage(res, {
+    success: '登录成功',
+    triggerOnDataNull: false,
+  })) {
+    userStore.value.token = { accessToken: res.data.token, refreshToken: '' }
+
+    await router.push('/')
+
+    nextComp(Success, {
+      title: '',
+      canBack: false,
+    })
+  }
 }
 
 onStartTyping(() => {
@@ -51,12 +73,15 @@ onStartTyping(() => {
         />
       </div>
       <input ref="input" v-model.number="options.code" :maxlength="5" op-0 class="major-input" size="large">
-      <el-button v-wave :class="{ valid }" class="major-button" size="large" @click="handleSmsLogin">
+      <el-button
+        v-loading="options.loading" v-wave :class="{ valid }" class="major-button" size="large"
+        @click="handleSmsLogin"
+      >
         验证手机
       </el-button>
 
       <p mt-4>
-        错误手机号？<span font-bold>发送至另一个</span>
+        错误手机号？<span font-bold @click="prevComp">发送至另一个</span>
       </p>
     </div>
   </div>
@@ -70,6 +95,7 @@ onStartTyping(() => {
     /* Focused shadow */
     box-shadow: 0px 0px 0px 4px rgba(100, 0, 205, 0.12);
   }
+
   display: flex;
 
   align-items: center;

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue?: boolean
+  animate: boolean
 }>()
 </script>
 
 <template>
-  <div class="LoginFlower">
+  <div :class="{ animate }" class="LoginFlower">
     <div v-for="i in 4" :key="i" class="LoginFlower-Item" />
     <div class="LoginFlower-Icon">
       <div i-carbon-checkmark />
@@ -14,6 +14,22 @@ const props = defineProps<{
 </template>
 
 <style lang="scss">
+.LoginFlower.animate {
+  animation: flowerBlow 0.35s ease-out;
+}
+
+@keyframes flowerBlow {
+  from {
+    opacity: 0;
+    transform: scale(0.25) rotate(-60deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
 .LoginFlower {
   &-Item {
     position: relative;

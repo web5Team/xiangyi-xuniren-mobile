@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { userStore } from '../composables/user'
+import LoginPage from '~/components/chore/login/LoginPage.vue'
 import TouchDialog from '~/components/dialog/TouchDialog.vue'
 import MainPage from '~/components/chore/model/MainPage.vue'
 import { Viewer } from '~/composables/model/vrmViewer/viewer'
 import model from '/xyfemale.vrm'
+import { useLoginState } from '~/components/chore/login'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -11,25 +14,38 @@ const { x, y } = useMouse()
 const shareDialog = ref(false)
 
 const viewer = new Viewer()
+const loginState = useLoginState()
 
 onMounted(() => {
-  progress.value = 100
-  dom.value?.attributes.removeNamedItem('op-0')
-  container.value?.attributes.removeNamedItem('op-0')
+  if (!userStore.value.isLogin)
+    loginState.data.dialogVisible = true
 
   const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
 
   viewer.setup(canvas)
 
-  console.log({ viewer })
   viewer.loadVrm(model)
+
+  const pausable = useIntervalFn(async () => {
+    progress.value += Math.random() * 5
+
+    if (progress.value >= 100) {
+      pausable.pause()
+
+      progress.value = 100
+
+      await sleep(500)
+
+      dom.value?.attributes.removeNamedItem('op-0')
+      container.value?.attributes.removeNamedItem('op-0')
+    }
+  }, 50)
 })
 
 const modelComponent = shallowRef<Component>(MainPage)
 
 async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
   const el = container.value
-  console.log({ el })
   if (!el) {
     modelComponent.value = targetComponent
     return
@@ -75,6 +91,10 @@ provide('shareDialog', shareDialog)
 
     <client-only>
       <teleport to="body">
+        <div class="LoginWrapper transition-cubic" :class="{ visible: loginState.data.dialogVisible }">
+          <LoginPage v-if="loginState.data.dialogVisible" />
+        </div>
+
         <TouchDialog v-model="shareDialog" :slider="false">
           <ChoreModelSharePage />
         </TouchDialog>
@@ -84,6 +104,23 @@ provide('shareDialog', shareDialog)
 </template>
 
 <style lang="scss">
+.LoginWrapper {
+  &.visible {
+    transform: translate(0, 0);
+    // box-shadow: unset;
+  }
+  z-index: 10;
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  border-radius: 32px;
+  transform: translate(120%, 0);
+  // box-shadow: var(--el-box-shadow);
+  background-color: var(--el-bg-color);
+}
+
 .ModelPage-Mask {
   &-Progress {
     &.hide {
@@ -137,7 +174,7 @@ provide('shareDialog', shareDialog)
 }
 
 .ModelPage-Container {
-  // z-index: 2;
+  z-index: 2;
   position: absolute;
 
   top: 0;
@@ -149,12 +186,13 @@ provide('shareDialog', shareDialog)
 
 .ModelPage {
   &-Model {
+    position: absolute;
+
     width: 100%;
     height: 100%;
 
-    // pointer-events: none;
+    pointer-events: none;
   }
-  z-index: 2;
 
   width: 100%;
   height: 100%;

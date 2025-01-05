@@ -74,7 +74,7 @@ export function responseMessage(res: IStandardResponse, options = {
   success: '操作成功',
   triggerOnDataNull: false,
 }) {
-  if (res.code === 200 && (!options.triggerOnDataNull || res.data)) {
+  if (res.code === 1 && (!options.triggerOnDataNull || res.data)) {
     if (options.success) {
       ElMessage({
         message: options.success,
@@ -88,7 +88,7 @@ export function responseMessage(res: IStandardResponse, options = {
   }
   else {
     ElMessage({
-      message: `操作失败(${res.message})！`,
+      message: `操作失败(${res.msg})！`,
       grouping: true,
       type: 'error',
       plain: true,

@@ -15,7 +15,10 @@ const loginAvenues = reactive([
 ])
 
 function handleSmsLogin() {
-  nextComp(SmsLogin, '添加手机 1/3')
+  nextComp(SmsLogin, {
+    title: '添加手机 1/3',
+    canBack: true,
+  })
 }
 </script>
 

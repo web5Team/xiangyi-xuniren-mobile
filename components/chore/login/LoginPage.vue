@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import LoginFlower from '~/components/chore/login/LoginFlower.vue'
+import type { INextCompOptions } from '.'
 import QuickRegister from '~/components/chore/login/QuickRegister.vue'
 import CreateAccount from '~/components/chore/login/CreateAccount.vue'
 
 interface IDispComp {
-  title: string
   comp: Component
+  options: INextCompOptions
 }
 
 const options = reactive<{
@@ -13,7 +13,10 @@ const options = reactive<{
   stack: IDispComp[]
 }>({
   current: {
-    title: '创建账户',
+    options: {
+      canBack: true,
+      title: '创建账户',
+    },
     comp: CreateAccount,
   },
   stack: [],
@@ -43,7 +46,7 @@ function backDispComp() {
   return result
 }
 
-async function nextComp(component: Component, title: string) {
+async function nextComp(component: Component, options: INextCompOptions) {
   const dom = mainDom.value
   if (!dom)
     return
@@ -70,7 +73,7 @@ async function nextComp(component: Component, title: string) {
   dom.style.opacity = '1'
 
   newDispComp({
-    title,
+    options,
     comp: component,
   })
 
@@ -113,17 +116,18 @@ async function prevComp() {
 }
 
 provide('nextComp', nextComp)
+provide('prevComp', prevComp)
 </script>
 
 <template>
   <div class="LoginPage">
     <div ref="mainDom" class="LoginPage-Content transition-cubic">
       <div relative w-full flex items-center justify-center class="LoginPage-Content-Header">
-        <div v-if="options.stack.length > 0" absolute left-0 active:op-50 class="arrow-icon" @click="prevComp">
+        <div v-if="options.stack.length > 0 && options.current.options.canBack" absolute left-0 active:op-50 class="arrow-icon" @click="prevComp">
           <div i-carbon-arrow-left />
         </div>
         <p>
-          {{ options.current.title }}
+          {{ options.current.options.title }}
         </p>
       </div>
 
@@ -146,9 +150,11 @@ provide('nextComp', nextComp)
       font-size: 20px;
       line-height: 28px;
     }
+
     width: 100%;
     color: #27252e;
   }
+
   position: relative;
   padding: 2rem;
   display: flex;

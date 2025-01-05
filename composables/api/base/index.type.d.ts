@@ -9,7 +9,7 @@ export * from './v1/aigc/chat.type'
 export interface IStandardResponse {
   code: number
   data: any
-  message: string
+  msg: string
 }
 
 export interface IDataResponse<T> extends IStandardResponse {
