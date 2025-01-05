@@ -53,8 +53,6 @@ function actionToggle() {
   useIntervalFn(() => {
     const action = actions[Math.floor(Math.random() * actions.length)]
 
-    console.log('current action', action)
-
     viewer.model?.loadFBX(action)
   }, 12000)
 }
@@ -71,7 +69,7 @@ onMounted(() => {
   })
 
   const pausable = useIntervalFn(async () => {
-    progress.value += Math.random() * 5
+    progress.value += Math.random() * 3
 
     if (progress.value >= 100) {
       pausable.pause()
@@ -88,7 +86,7 @@ onMounted(() => {
       dom.value?.attributes.removeNamedItem('op-0')
       container.value?.attributes.removeNamedItem('op-0')
     }
-  }, 50)
+  }, 10)
 })
 
 onBeforeUnmount(() => {
