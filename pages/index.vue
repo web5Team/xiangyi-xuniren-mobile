@@ -6,6 +6,13 @@ import MainPage from '~/components/chore/model/MainPage.vue'
 import { Viewer } from '~/composables/model/vrmViewer/viewer'
 import model from '/xyfemale.vrm'
 import { useLoginState } from '~/components/chore/login'
+import {
+  $model,
+  ensurePermissions,
+  permissionGranted,
+  result,
+} from '~/components/chore/model/model-manager'
+import IndexPage from '~/components/chore/model/IndexPage.vue'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -16,17 +23,43 @@ const shareDialog = ref(false)
 const viewer = new Viewer()
 const loginState = useLoginState()
 
-onMounted(() => {
-  if (!userStore.value.isLogin)
-    loginState.data.dialogVisible = true
+const actions = ['idle_0', 'idle_1', 'idle_3', 'sitting', 'standing_greeting', 'idl_happy_01']
 
+function recordGranted() {
+  const cb = whenever(() => loginState.data.dialogVisible === false, async () => {
+    setTimeout(() => {
+      cb()
+    })
+
+    // granted
+    await ensurePermissions()
+    if (permissionGranted.value) {
+      $model.startRecord()
+
+      // go action
+      actionToggle()
+    }
+    else {
+      // Exit page
+      location.reload()
+    }
+  }, { immediate: true })
+}
+
+function actionToggle() {
+  useIntervalFn(() => {
+    const action = actions[Math.floor(Math.random() * actions.length)]
+
+    viewer.model?.loadFBX(action)
+  }, 10000)
+}
+
+onMounted(() => {
   const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
 
   viewer.setup(canvas)
 
   viewer.loadVrm(model)
-
-  console.log(viewer)
 
   viewer._animationList.push(() => {
     viewer.updateEye(x.value, y.value)
@@ -42,10 +75,22 @@ onMounted(() => {
 
       await sleep(500)
 
+      if (!userStore.value.isLogin)
+        changeModelPage(IndexPage, true)
+
+      else recordGranted()
+
       dom.value?.attributes.removeNamedItem('op-0')
       container.value?.attributes.removeNamedItem('op-0')
     }
   }, 50)
+})
+
+onBeforeUnmount(() => {
+  $model.stopRecord()
+
+  viewer._animationList.length = 0
+  viewer.unloadVRM()
 })
 
 const modelComponent = shallowRef<Component>(MainPage)
@@ -73,6 +118,13 @@ async function changeModelPage(targetComponent: Component, modelShow: boolean = 
 
 provide('changeModelPage', changeModelPage)
 provide('shareDialog', shareDialog)
+provide('canvasDom', dom)
+provide('viewer', viewer)
+provide('recordGranted', recordGranted)
+
+$model.saidEvent.on((phrase: string) => {
+  console.log('user said', phrase)
+})
 </script>
 
 <template>

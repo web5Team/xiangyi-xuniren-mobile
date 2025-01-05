@@ -1,29 +1,11 @@
 <script setup lang="ts">
 import MainPage from './MainPage.vue'
-
-const {
-  ensurePermissions,
-  permissionGranted,
-  audioInputs: microphones,
-} = useDevicesList()
-const currentMicrophone = computed(() => microphones.value[0]?.deviceId)
-
-const { stream, start, stop } = useUserMedia({
-  constraints: reactive({
-    video: false,
-    audio: { deviceId: currentMicrophone },
-  }),
-})
-
-onMounted(async () => {
-  await ensurePermissions()
-
-  if (permissionGranted.value)
-    await start()
-})
+import { $model } from './model-manager'
 
 const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
+
+const stream = computed(() => $model.stream.value)
 </script>
 
 <template>

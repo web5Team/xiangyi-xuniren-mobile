@@ -5,7 +5,18 @@ import { Model } from './model'
 import { loadVRMAnimation } from '~/composables/model/lib/VRMAnimation/loadVRMAnimation'
 // import { buildUrl } from '@/utils/buildUrl'
 
-import ThinkingAnimation from '~/composables/model/daily/idle_01.fbx?url'
+import Idle01Animation from '~/composables/model/daily/idle_01.fbx?url'
+import Idle02Animation from '~/composables/model/daily/idle_02.fbx?url'
+import Idle03Animation from '~/composables/model/daily/idle_03.fbx?url'
+import IdleHappy01Animation from '~/composables/model/daily/idle_happy_01.fbx?url'
+import IdleHappy02Animation from '~/composables/model/daily/idle_happy_02.fbx?url'
+import IdleHappy03Animation from '~/composables/model/daily/idle_happy_03.fbx?url'
+import KissAnimation from '~/composables/model/daily/kiss_01.fbx?url'
+import SittingAnimation from '~/composables/model/daily/sitting.fbx?url'
+import StandingGreetingAnimation from '~/composables/model/daily/standing_greeting.fbx?url'
+import Talking01Animation from '~/composables/model/daily/talking_01.fbx?url'
+import Talking02Animation from '~/composables/model/daily/talking_02.fbx?url'
+import ThinkingAnimation from '~/composables/model/daily/thinking.fbx?url'
 
 export type IAnimationRefreshFn = (vrm: any, clock: any) => void
 
@@ -81,19 +92,23 @@ export class Viewer {
       this._scene.add(this.model.vrm.scene)
 
       // 加载所有人物动作
-      //   this.model.clipMap.set('idle_01', await loadMixamoAnimation(buildUrl('daily/idle_01.fbx'), this.model.vrm))
-      //   this.model.clipMap.set('idle_02', await loadMixamoAnimation(buildUrl('daily/idle_02.fbx'), this.model.vrm))
-      //   this.model.clipMap.set('idle_03', await loadMixamoAnimation(buildUrl('daily/idle_03.fbx'), this.model.vrm))
-      //   this.model.clipMap.set('idle_happy_01', await loadMixamoAnimation(buildUrl('daily/idle_happy_01.fbx'), this.model.vrm))
-      //   this.model.clipMap.set('idle_happy_02', await loadMixamoAnimation(buildUrl('daily/idle_happy_02.fbx'), this.model.vrm))
-      //   this.model.clipMap.set('idle_happy_03', await loadMixamoAnimation(buildUrl('daily/idle_happy_03.fbx'), this.model.vrm))
-      //   this.model.clipMap.set('standing_greeting', await loadMixamoAnimation(buildUrl('daily/standing_greeting.fbx'), this.model.vrm))
+      this.model.clipMap.set('idle_01', await loadMixamoAnimation(Idle01Animation, this.model.vrm))
+      this.model.clipMap.set('idle_02', await loadMixamoAnimation(Idle02Animation, this.model.vrm))
+      this.model.clipMap.set('idle_03', await loadMixamoAnimation(Idle03Animation, this.model.vrm))
       this.model.clipMap.set('thinking', await loadMixamoAnimation(ThinkingAnimation, this.model.vrm))
+      this.model.clipMap.set('talking_01', await loadMixamoAnimation(Talking01Animation, this.model.vrm))
+      this.model.clipMap.set('talking_02', await loadMixamoAnimation(Talking02Animation, this.model.vrm))
+      this.model.clipMap.set('idel_happy_01', await loadMixamoAnimation(IdleHappy01Animation, this.model.vrm))
+      this.model.clipMap.set('idel_happy_02', await loadMixamoAnimation(IdleHappy02Animation, this.model.vrm))
+      this.model.clipMap.set('idel_happy_03', await loadMixamoAnimation(IdleHappy03Animation, this.model.vrm))
+      this.model.clipMap.set('standing_greeting', await loadMixamoAnimation(StandingGreetingAnimation, this.model.vrm))
+      this.model.clipMap.set('kiss_01', await loadMixamoAnimation(KissAnimation, this.model.vrm))
+      this.model.clipMap.set('sitting', await loadMixamoAnimation(SittingAnimation, this.model.vrm))
       //   this.model.clipMap.set('excited', await loadMixamoAnimation(buildUrl('emote/excited.fbx'), this.model.vrm))
 
       // const vrma = await loadVRMAnimation(buildUrl("/idle_loop.vrma"));
       // if (vrma) this.model.loadAnimation(vrma);
-      this.model.loadFBX('thinking')
+      this.model.loadFBX('idle_01')
 
       // HACK: アニメーションの原点がずれているので再生後にカメラ位置を調整する
       requestAnimationFrame(() => {
