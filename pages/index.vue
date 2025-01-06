@@ -56,7 +56,7 @@ function actionToggle() {
     const emotion = emotions[Math.floor(Math.random() * emotions.length)]
 
     viewer.model?.loadFBX(action)
-    viewer.model?.emoteController?.playEmotion(emotion as any)
+    viewer.model?.emote(emotion as any)
   }, 15000)
 }
 
