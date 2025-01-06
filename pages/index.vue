@@ -23,7 +23,8 @@ const shareDialog = ref(false)
 const viewer = new Viewer()
 const loginState = useLoginState()
 
-const actions = ['idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
+const actions = ['idle_01', 'idle_02', 'idle_03', 'idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
+const emotions = ['happy', 'neutral', 'blinkLeft', 'blinkRight', 'blink', 'neutral', 'relaxed', 'sad', 'surprised']
 
 function recordGranted() {
   if (permissionGranted.value)
@@ -52,9 +53,11 @@ function recordGranted() {
 function actionToggle() {
   useIntervalFn(() => {
     const action = actions[Math.floor(Math.random() * actions.length)]
+    const emotion = emotions[Math.floor(Math.random() * emotions.length)]
 
     viewer.model?.loadFBX(action)
-  }, 12000)
+    viewer.model?.emoteController?.playEmotion(emotion as any)
+  }, 15000)
 }
 
 onMounted(() => {
@@ -69,7 +72,7 @@ onMounted(() => {
   })
 
   const pausable = useIntervalFn(async () => {
-    progress.value += Math.random() * 3
+    progress.value += Math.random() * 5
 
     if (progress.value >= 100) {
       pausable.pause()
@@ -86,7 +89,7 @@ onMounted(() => {
       dom.value?.attributes.removeNamedItem('op-0')
       container.value?.attributes.removeNamedItem('op-0')
     }
-  }, 10)
+  }, 50)
 })
 
 onBeforeUnmount(() => {

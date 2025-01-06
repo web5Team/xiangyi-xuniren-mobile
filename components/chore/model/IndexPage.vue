@@ -37,6 +37,7 @@ async function handleLogin() {
   changeModelPage(MainPage, true)
 
   viewer.model?.loadFBX('idel_happy_02')
+  viewer.model?.emoteController?.playEmotion('happy')
 }
 </script>
 
