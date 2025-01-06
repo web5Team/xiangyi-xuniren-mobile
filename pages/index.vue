@@ -128,8 +128,10 @@ provide('canvasDom', dom)
 provide('viewer', viewer)
 provide('recordGranted', recordGranted)
 
+const sentence = ref('')
 $model.saidEvent.on((phrase: string) => {
   console.log('user said', phrase)
+  sentence.value = phrase
 })
 </script>
 
@@ -141,6 +143,10 @@ $model.saidEvent.on((phrase: string) => {
 
     <div ref="container" op-0 class="ModelPage-Container transition-cubic">
       <component :is="modelComponent" />
+    </div>
+
+    <div class="ModelPage-Footer">
+      {{ sentence }}
     </div>
 
     <div class="ModelPage-Mask">
@@ -168,6 +174,18 @@ $model.saidEvent.on((phrase: string) => {
 </template>
 
 <style lang="scss">
+.ModelPage-Footer {
+  position: absolute;
+
+  left: 50%;
+  bottom: 1.5rem;
+
+  transform: translateX(-50%);
+
+  font-size: 0.85rem;
+  color: var(--el-text-color-secondary);
+}
+
 .LoginWrapper {
   &.visible {
     transform: translate(0, 0);
