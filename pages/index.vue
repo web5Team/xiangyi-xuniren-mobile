@@ -41,7 +41,7 @@ function recordGranted() {
       $model.startRecord()
 
       // go action
-      setTimeout(() => actionToggle(), 15000)
+      // setTimeout(() => actionToggle(), 15000)
     }
     else {
       // Exit page

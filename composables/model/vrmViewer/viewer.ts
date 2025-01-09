@@ -17,6 +17,8 @@ import StandingGreetingAnimation from '~/composables/model/daily/standing_greeti
 import Talking01Animation from '~/composables/model/daily/talking_01.fbx?url'
 import Talking02Animation from '~/composables/model/daily/talking_02.fbx?url'
 import ThinkingAnimation from '~/composables/model/daily/thinking.fbx?url'
+import AcknowledgingAnimation from '~/composables/model/daily/Acknowledging.fbx?url'
+import RumbaDancingAnimation from '~/composables/model/daily/Rumba Dancing.fbx?url'
 
 export type IAnimationRefreshFn = (vrm: any, clock: any) => void
 
@@ -104,11 +106,14 @@ export class Viewer {
       this.model.clipMap.set('standing_greeting', await loadMixamoAnimation(StandingGreetingAnimation, this.model.vrm))
       this.model.clipMap.set('kiss_01', await loadMixamoAnimation(KissAnimation, this.model.vrm))
       this.model.clipMap.set('sitting', await loadMixamoAnimation(SittingAnimation, this.model.vrm))
+      this.model.clipMap.set('AcknowledgingAnimation', await loadMixamoAnimation(AcknowledgingAnimation, this.model.vrm))
+      this.model.clipMap.set('RumbaDancing', await loadMixamoAnimation(RumbaDancingAnimation, this.model.vrm))
       //   this.model.clipMap.set('excited', await loadMixamoAnimation(buildUrl('emote/excited.fbx'), this.model.vrm))
 
       // const vrma = await loadVRMAnimation(buildUrl("/idle_loop.vrma"));
       // if (vrma) this.model.loadAnimation(vrma);
-      this.model.loadFBX('idle_01')
+
+      this.model.loadFBX('RumbaDancing')
 
       // HACK: アニメーションの原点がずれているので再生後にカメラ位置を調整する
       requestAnimationFrame(() => {
