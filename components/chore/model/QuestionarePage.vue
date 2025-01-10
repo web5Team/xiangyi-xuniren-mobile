@@ -43,8 +43,6 @@ onMounted(() => {
   viewer.model?.loadFBX('thsinking')
   viewer.model?.emote('blink' as any)
 
-  console.log(viewer)
-
   fetchData()
 })
 
@@ -59,6 +57,8 @@ async function handleDone() {
     transformOrigin: '',
     transform: '',
   })
+
+  options.actionEnable = true
 
   changeModelPage(MainPage, true)
 

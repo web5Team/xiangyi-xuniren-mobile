@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { userStore } from '../composables/user'
+import PropertyPage from '../components/chore/model/PropertyPage.vue'
 import QuestionarePage from '~/components/chore/model/QuestionarePage.vue'
 import LoginPage from '~/components/chore/login/LoginPage.vue'
 import TouchDialog from '~/components/dialog/TouchDialog.vue'
@@ -107,7 +108,7 @@ onBeforeUnmount(() => {
   viewer.unloadVRM()
 })
 
-const modelComponent = shallowRef<Component>(MainPage)
+const modelComponent = shallowRef<Component>(PropertyPage)
 
 async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
   const el = container.value

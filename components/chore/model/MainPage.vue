@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GhostPage from './GhostPage.vue'
+import PropertyPage from './PropertyPage.vue'
 
 const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
@@ -27,7 +28,7 @@ function handleGhost() {
     <div class="ModelMainPage-Nav">
       <IconSvgGhostSvg @click="handleGhost" />
       <IconSvgButterflySvg />
-      <IconSvgPlanedSvg />
+      <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
       <IconSvgShareSvg @click="shareDialog = true" />
     </div>
   </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MainPage from './MainPage.vue'
 import { $model } from './model-manager'
+import PropertyPage from './PropertyPage.vue'
 
 const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
@@ -32,7 +33,7 @@ const stream = computed(() => $model.stream.value)
     <div class="ModelGhostPage-Nav">
       <IconSvgGhostFilledSvg />
       <IconSvgButterflySvg />
-      <IconSvgPlanedSvg />
+      <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
       <IconSvgShareSvg @click="shareDialog = true" />
     </div>
   </div>
