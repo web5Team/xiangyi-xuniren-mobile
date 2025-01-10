@@ -135,6 +135,8 @@ export function genAxios(options: CreateAxiosDefaults) {
         }
       }
 
+      console.log(res.data)
+
       return res.data
     },
     async (res) => {

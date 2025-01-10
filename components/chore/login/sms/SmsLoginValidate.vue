@@ -33,6 +33,7 @@ async function handleSmsLogin() {
     triggerOnDataNull: false,
   })) {
     userStore.value.token = { accessToken: res.data.token, refreshToken: '' }
+    userStore.value.completeQuestion = !!res.data.complete_question
 
     await router.push('/')
 

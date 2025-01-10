@@ -113,7 +113,7 @@ export class Viewer {
       // const vrma = await loadVRMAnimation(buildUrl("/idle_loop.vrma"));
       // if (vrma) this.model.loadAnimation(vrma);
 
-      this.model.loadFBX('RumbaDancing')
+      this.model.loadFBX('idle_01')
 
       // HACK: アニメーションの原点がずれているので再生後にカメラ位置を調整する
       requestAnimationFrame(() => {

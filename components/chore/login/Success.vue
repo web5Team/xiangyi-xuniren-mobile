@@ -1,11 +1,22 @@
 <script setup lang="ts">
+import QuestionarePage from '../model/QuestionarePage.vue'
 import { useLoginState } from '.'
 import LoginFlower from '~/components/chore/login/LoginFlower.vue'
 
 const loginState = useLoginState()
+const changeModelPage: any = inject('changeModelPage')
 
 async function handleLoginDone() {
-  loginState.data.dialogVisible = false
+  if (!userStore.value.completeQuestion) {
+    changeModelPage(QuestionarePage, true)
+
+    whenever(() => userStore.value.completeQuestion, () => {
+      loginState.data.dialogVisible = false
+    }, { once: true })
+  }
+  else {
+    loginState.data.dialogVisible = false
+  }
 }
 </script>
 
@@ -47,6 +58,7 @@ async function handleLoginDone() {
 
     z-index: 0;
   }
+
   p {
     /* 自动布局子元素 */
     position: static;
@@ -100,10 +112,12 @@ async function handleLoginDone() {
 
     opacity: 0;
     animation: fadeIn 0.35s 0.125s ease-in-out forwards;
+
     @keyframes fadeIn {
       0% {
         opacity: 0;
       }
+
       100% {
         opacity: 1;
       }

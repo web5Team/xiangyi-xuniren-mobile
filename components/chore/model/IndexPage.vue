@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { $model } from './model-manager'
-import MainPage from './MainPage'
+import MainPage from './MainPage.vue'
+import QuestionarePage from './QuestionarePage.vue'
 import { useLoginState } from '~/components/chore/login/index'
 import type { Viewer } from '~/composables/model/vrmViewer/viewer'
 
@@ -97,6 +98,7 @@ async function handleLogin() {
 
         outline: none !important;
       }
+
       display: flex;
       padding: 1rem;
       margin: 2rem 0;
@@ -166,6 +168,7 @@ async function handleLogin() {
     border-radius: 23px;
     background: #852b38;
   }
+
   position: absolute;
 
   top: 0;

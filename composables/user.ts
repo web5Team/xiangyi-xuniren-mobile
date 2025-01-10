@@ -13,6 +13,8 @@ export interface AccountDetail {
     refreshToken: string
   }
 
+  completeQuestion: boolean
+
   // isAdmin: boolean
   isLogin: boolean
 }

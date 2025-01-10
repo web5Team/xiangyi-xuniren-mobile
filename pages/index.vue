@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { userStore } from '../composables/user'
+import QuestionarePage from '~/components/chore/model/QuestionarePage.vue'
 import LoginPage from '~/components/chore/login/LoginPage.vue'
 import TouchDialog from '~/components/dialog/TouchDialog.vue'
 import MainPage from '~/components/chore/model/MainPage.vue'
@@ -23,6 +24,9 @@ const shareDialog = ref(false)
 const viewer = new Viewer()
 const loginState = useLoginState()
 
+const options = reactive({
+  actionEnable: true,
+})
 const actions = ['idle_01', 'idle_02', 'idle_03', 'idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
 const emotions = ['happy', 'neutral', 'blinkLeft', 'blinkRight', 'blink', 'neutral', 'relaxed', 'sad', 'surprised']
 
@@ -30,7 +34,7 @@ function recordGranted() {
   if (permissionGranted.value)
     return
 
-  const cb = whenever(() => loginState.data.dialogVisible === false, async () => {
+  const cb = whenever(() => loginState.data.dialogVisible === false && userStore.value.completeQuestion, async () => {
     setTimeout(() => {
       cb()
     })
@@ -41,7 +45,7 @@ function recordGranted() {
       $model.startRecord()
 
       // go action
-      // setTimeout(() => actionToggle(), 15000)
+      setTimeout(() => actionToggle(), 15000)
     }
     else {
       // Exit page
@@ -52,6 +56,9 @@ function recordGranted() {
 
 function actionToggle() {
   useIntervalFn(() => {
+    if (!options.actionEnable)
+      return
+
     const action = actions[Math.floor(Math.random() * actions.length)]
     const emotion = emotions[Math.floor(Math.random() * emotions.length)]
 
@@ -99,7 +106,7 @@ onBeforeUnmount(() => {
   viewer.unloadVRM()
 })
 
-const modelComponent = shallowRef<Component>(MainPage)
+const modelComponent = shallowRef<Component>(QuestionarePage)
 
 async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
   const el = container.value
@@ -127,6 +134,7 @@ provide('shareDialog', shareDialog)
 provide('canvasDom', dom)
 provide('viewer', viewer)
 provide('recordGranted', recordGranted)
+provide('options', options)
 
 const sentence = ref('')
 $model.saidEvent.on((phrase: string) => {
@@ -165,6 +173,10 @@ $model.saidEvent.on((phrase: string) => {
           <LoginPage v-if="loginState.data.dialogVisible" />
         </div>
 
+        <!-- <div class="QuestionareWrapper transition-cubic" :class="{ visible: !userStore.completeQuestion }">
+          <QuestionarePage v-if="!userStore.completeQuestion" />
+        </div> -->
+
         <TouchDialog v-model="shareDialog" :slider="false">
           <ChoreModelSharePage />
         </TouchDialog>
@@ -186,7 +198,8 @@ $model.saidEvent.on((phrase: string) => {
   color: var(--el-text-color-secondary);
 }
 
-.LoginWrapper {
+.LoginWrapper,
+.QuestionareWrapper {
   &.visible {
     transform: translate(0, 0);
     // box-shadow: unset;
