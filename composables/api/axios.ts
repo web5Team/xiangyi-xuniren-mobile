@@ -66,7 +66,7 @@ export function genAxios(options: CreateAxiosDefaults) {
       reqConfig.headers.server = 'true'
 
       if (userStore.value.isLogin)
-        reqConfig.headers.Authorization = `Bearer ${userStore.value.token?.accessToken}`
+        reqConfig.headers.Authorization = `${userStore.value.token?.accessToken}`
 
       if (!refreshOptions.pending) {
         if (refreshOptions.queue.length > 0) {

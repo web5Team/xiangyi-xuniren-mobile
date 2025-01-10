@@ -14,6 +14,7 @@ import {
   result,
 } from '~/components/chore/model/model-manager'
 import IndexPage from '~/components/chore/model/IndexPage.vue'
+import { getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -106,7 +107,7 @@ onBeforeUnmount(() => {
   viewer.unloadVRM()
 })
 
-const modelComponent = shallowRef<Component>(QuestionarePage)
+const modelComponent = shallowRef<Component>(MainPage)
 
 async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
   const el = container.value
@@ -136,10 +137,22 @@ provide('viewer', viewer)
 provide('recordGranted', recordGranted)
 provide('options', options)
 
+let lastSignal: any
+
 const sentence = ref('')
 $model.saidEvent.on((phrase: string) => {
   console.log('user said', phrase)
   sentence.value = phrase
+
+  lastSignal?.abort()
+
+  lastSignal = getAIGCCompletionStream(phrase, (message: string) => {
+    console.log(message)
+  }, (error: any) => {
+    console.warn(error)
+  }, () => {
+    console.log('======= COMPLETED =======')
+  })
 })
 </script>
 

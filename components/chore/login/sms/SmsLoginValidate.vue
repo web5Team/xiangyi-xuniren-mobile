@@ -42,6 +42,9 @@ async function handleSmsLogin() {
       canBack: false,
     })
   }
+  else {
+    options.code = ''
+  }
 }
 
 onStartTyping(() => {
