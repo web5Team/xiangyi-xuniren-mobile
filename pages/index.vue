@@ -15,7 +15,7 @@ import {
   result,
 } from '~/components/chore/model/model-manager'
 import IndexPage from '~/components/chore/model/IndexPage.vue'
-import { getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
+import { TextAggregator, getAIGCCompletionStream, speechStream } from '~/composables/api/base/v1/aigc/completion'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -108,7 +108,7 @@ onBeforeUnmount(() => {
   viewer.unloadVRM()
 })
 
-const modelComponent = shallowRef<Component>(PropertyPage)
+const modelComponent = shallowRef<Component>(MainPage)
 
 async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
   const el = container.value
@@ -145,16 +145,39 @@ $model.saidEvent.on((phrase: string) => {
   console.log('user said', phrase)
   sentence.value = phrase
 
-  lastSignal?.abort()
+  handleConversationStart(sentence.value)
+})
 
-  lastSignal = getAIGCCompletionStream(phrase, (message: string) => {
-    console.log(message)
+async function handleConversationStart(sentence: string) {
+  speechStream.stop()
+  lastSignal?.abort?.()
+
+  speechStream.clearCache()
+  speechStream.start()
+  const aggregator = new TextAggregator((wholeSentence: string) => {
+    console.log('wholeSentence', wholeSentence)
+    console.log(speechStream.getQueue())
+    speechStream.appendText(wholeSentence)
+  })
+
+  lastSignal = getAIGCCompletionStream(sentence, (message: any) => {
+    const { event, data } = message
+    if (event !== 'conversation.message.delta')
+      return
+
+    const { content, type } = data
+    if (type !== 'answer')
+      return
+
+    aggregator.appendText(content)
   }, (error: any) => {
     console.warn(error)
   }, () => {
-    console.log('======= COMPLETED =======')
+    console.warn('======= COMPLETED =======')
   })
-})
+}
+
+window.$handleConversationStart = handleConversationStart
 </script>
 
 <template>
