@@ -149,6 +149,8 @@ $model.saidEvent.on((phrase: string) => {
 })
 
 async function handleConversationStart(sentence: string) {
+  $model.stopRecord()
+
   speechStream.stop()
   lastSignal?.abort?.()
 
@@ -156,7 +158,6 @@ async function handleConversationStart(sentence: string) {
   speechStream.start()
   const aggregator = new TextAggregator((wholeSentence: string) => {
     console.log('wholeSentence', wholeSentence)
-    console.log(speechStream.getQueue())
     speechStream.appendText(wholeSentence)
   })
 
@@ -174,6 +175,10 @@ async function handleConversationStart(sentence: string) {
     console.warn(error)
   }, () => {
     console.warn('======= COMPLETED =======')
+
+    setTimeout(() => {
+      $model.startRecord()
+    }, 1000)
   })
 }
 
