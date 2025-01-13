@@ -5,6 +5,12 @@ import { $endApi } from './api/base'
 import { $event } from './events'
 import type { QuotaModel } from './api/base/v1/aigc/completion-types'
 
+export interface Bot {
+  key: string
+  num: number
+  text: string
+}
+
 export interface AccountDetail {
   id: number
 
@@ -12,6 +18,12 @@ export interface AccountDetail {
     accessToken: string
     refreshToken: string
   }
+
+  avatar: string
+  name: string
+  bot: Bot[]
+  days: number
+  userid: number
 
   completeQuestion: boolean
 

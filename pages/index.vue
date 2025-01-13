@@ -16,6 +16,7 @@ import {
 } from '~/components/chore/model/model-manager'
 import IndexPage from '~/components/chore/model/IndexPage.vue'
 import { TextAggregator, getAIGCCompletionStream, speechStream } from '~/composables/api/base/v1/aigc/completion'
+import { $endApi } from '~/composables/api/base'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -90,10 +91,18 @@ onMounted(() => {
 
       await sleep(500)
 
-      if (!userStore.value.isLogin)
-        changeModelPage(IndexPage, true)
+      if (!userStore.value.isLogin) { changeModelPage(IndexPage, true) }
 
-      else recordGranted()
+      else {
+        setTimeout(async () => {
+          const res = await $endApi.v1.initial.modelInfo()
+
+          if (res.code === 1)
+            Object.assign(userStore.value, res.data)
+        })
+
+        recordGranted()
+      }
 
       dom.value?.attributes.removeNamedItem('op-0')
       container.value?.attributes.removeNamedItem('op-0')
@@ -148,6 +157,12 @@ $model.saidEvent.on((phrase: string) => {
   handleConversationStart(sentence.value)
 })
 
+speechStream.onSpeechEnd(() => {
+  setTimeout(() => {
+    $model.startRecord()
+  }, 5000)
+})
+
 async function handleConversationStart(sentence: string) {
   $model.stopRecord()
 
@@ -175,10 +190,6 @@ async function handleConversationStart(sentence: string) {
     console.warn(error)
   }, () => {
     console.warn('======= COMPLETED =======')
-
-    setTimeout(() => {
-      $model.startRecord()
-    }, 1000)
   })
 }
 

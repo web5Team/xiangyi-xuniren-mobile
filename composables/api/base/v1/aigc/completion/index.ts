@@ -167,6 +167,8 @@ export class VoiceSynthesizer {
         else {
           this.isPlaying = false // 如果队列为空，停止播放
           console.log('Audio playback finished.')
+
+          this._sppechEndCallback?.()
         }
       }
     }
@@ -213,6 +215,12 @@ export class VoiceSynthesizer {
     this.textQueue = []
     this.isPlaying = false
     console.log('Audio cache cleared.')
+  }
+
+  _sppechEndCallback: any
+
+  public onSpeechEnd(callback: () => void) {
+    this._sppechEndCallback = callback
   }
 }
 

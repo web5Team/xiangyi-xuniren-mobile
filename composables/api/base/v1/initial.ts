@@ -18,5 +18,5 @@ export default {
   },
   saveModelStats() {
     return endHttp.post('user/stats') as Promise<IDataResponse<any>>
-  }
+  },
 }

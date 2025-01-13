@@ -14,10 +14,10 @@ function handleGhost() {
   <div class="ModelMainPage">
     <div class="ModelMainPage-Date">
       <p class="day">
-        <span mr-2>11</span>天
+        <span mr-2>{{ userStore.days || 0 }}</span>天
       </p>
       <p class="desc">
-        今天是烟烟与你相随
+        今天是{{ userStore.name }}与你相随
       </p>
     </div>
 
