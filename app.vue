@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { appName, globalOptions } from '~/constants'
+// import { appName, globalOptions } from '~/constants'
 // import 'element-plus/theme-chalk/dark/css-vars.css'
 
 useHead({
-  title: appName,
+  title: "xiangyi-xnr",
 })
 
 onMounted(() => {

@@ -77,21 +77,6 @@ const router = useRouter()
 }
 
 .NotFound {
-  &::before {
-    z-index: -2;
-    content: '';
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100%;
-
-    background-image: url('/background_pro.png');
-    background-position: center;
-    background-size: cover;
-  }
   position: absolute;
 
   width: 100%;
