@@ -15,7 +15,7 @@ import {
   result,
 } from '~/components/chore/model/model-manager'
 import IndexPage from '~/components/chore/model/IndexPage.vue'
-import { TextAggregator, getAIGCCompletionStream, speechStream } from '~/composables/api/base/v1/aigc/completion'
+import { TextAggregator, VoiceSynthesizer, getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
 import { $endApi } from '~/composables/api/base'
 
 const dom = ref<HTMLElement>()
@@ -32,6 +32,8 @@ const options = reactive({
 })
 const actions = ['idle_01', 'idle_02', 'idle_03', 'idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
 const emotions = ['happy', 'neutral', 'blinkLeft', 'blinkRight', 'blink', 'neutral', 'relaxed', 'sad', 'surprised']
+
+const speechStream = new VoiceSynthesizer()
 
 function recordGranted() {
   if (permissionGranted.value)

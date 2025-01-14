@@ -224,14 +224,6 @@ export class VoiceSynthesizer {
   }
 }
 
-// 使用示例
-export const speechStream = new VoiceSynthesizer()
-
-window.$speechStream = speechStream
-
-// 停止播放
-// speechStream.stop();
-
 export class TextAggregator {
   private textBuffer: string = '' // 用来存储累积的文本
   private lastAppendTime: number = Date.now() // 最后一次追加的时间
