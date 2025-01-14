@@ -10,6 +10,8 @@ import Step1Model from '~/composables/model/daily/guide/1.vrm?url'
 import Step2Model from '~/composables/model/daily/guide/2.vrm?url'
 import Step3Model from '~/composables/model/daily/guide/34.vrm?url'
 
+import StandardModel from '/xyfemale.vrm'
+
 const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
 const viewer: Viewer = inject('viewer') as unknown as any
 const recordGranted: Function = inject('recordGranted') as unknown as any
@@ -49,7 +51,7 @@ onMounted(() => {
 async function handleDone() {
   await sleep(200)
 
-  recordGranted()
+  await recordGranted()
 
   await sleep(200)
 
@@ -58,12 +60,18 @@ async function handleDone() {
     transform: '',
   })
 
-  options.actionEnable = true
-
-  changeModelPage(MainPage, true)
+  viewer.model?.loadVRM(StandardModel)
 
   viewer.model?.loadFBX('idel_happy_02')
   viewer.model?.emote('happy')
+
+  setTimeout(() => {
+    options.actionEnable = true
+
+    console.log({ options })
+
+    changeModelPage(MainPage, true)
+  }, 1500)
 }
 
 async function handleAnswerQuestion(option: string) {

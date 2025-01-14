@@ -8,11 +8,9 @@ const changeModelPage: any = inject('changeModelPage')
 
 async function handleLoginDone() {
   if (!userStore.value.completeQuestion) {
-    changeModelPage(QuestionarePage, true)
+    loginState.data.dialogVisible = false
 
-    whenever(() => userStore.value.completeQuestion, () => {
-      loginState.data.dialogVisible = false
-    }, { once: true })
+    changeModelPage(QuestionarePage, true)
   }
   else {
     loginState.data.dialogVisible = false

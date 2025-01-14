@@ -46,9 +46,6 @@ function recordGranted() {
     await ensurePermissions()
     if (permissionGranted.value) {
       $model.startRecord()
-
-      // go action
-      setTimeout(() => actionToggle(), 15000)
     }
     else {
       // Exit page
@@ -61,6 +58,8 @@ function actionToggle() {
   useIntervalFn(() => {
     if (!options.actionEnable)
       return
+
+    console.log('action toggle')
 
     const action = actions[Math.floor(Math.random() * actions.length)]
     const emotion = emotions[Math.floor(Math.random() * emotions.length)]
@@ -89,6 +88,9 @@ onMounted(() => {
 
       progress.value = 100
 
+      // go action
+      setTimeout(() => actionToggle(), 1000)
+
       await sleep(500)
 
       if (!userStore.value.isLogin) { changeModelPage(IndexPage, true) }
@@ -99,6 +101,10 @@ onMounted(() => {
 
           if (res.code === 1)
             Object.assign(userStore.value, res.data)
+
+          if (!userStore.value.completeQuestion)
+
+            changeModelPage(QuestionarePage, true)
         })
 
         recordGranted()
