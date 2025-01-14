@@ -17,7 +17,6 @@
 import axios, { type AxiosResponse, type CreateAxiosDefaults } from 'axios'
 import { $event } from '../events'
 import type { IStandardResponse } from './base/index.type'
-import { globalOptions } from '~/constants'
 
 const refreshOptions: {
   pending: boolean
@@ -225,6 +224,6 @@ export function genAxios(options: CreateAxiosDefaults) {
 }
 
 export const endHttp = genAxios({
-  baseURL: `${globalOptions.getEndsUrl()}api`,
+  baseURL: `https://xiangyi-xuniren.harmony-dev.com/api`,
   withCredentials: false,
 })
