@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import type { IStandardResponse } from './api/base/index.type'
-import { globalOptions } from '~/constants'
 
 dayjs.extend(duration)
 
@@ -103,85 +102,10 @@ export function formatNumber(num: string) {
   return `${num}`.replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
 }
 
-function isCrossOriginUrl(url: string) {
+export function isCrossOriginUrl(url: string) {
   const origin = location.host
 
   return url.indexOf('data:') !== 0 && !url.includes(origin)
-}
-/**
- *
- * @param url url -> image
- */
-function loadImage(url) {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-
-    if (isCrossOriginUrl(url))
-      img.crossOrigin = 'Anonymous'
-
-    img.onload = () => {
-      resolve(img)
-    }
-
-    img.onerror = function () {
-      const msg = `Image load error: ${url}`
-
-      reject(new Error(msg))
-    }
-
-    img.src = url
-  })
-}
-/**
- * image元素 -> base64 Data
- * @param image image node
- */
-export function imageToPng(image: HTMLImageElement) {
-  const canvas = document.createElement('canvas')
-  const ctx = canvas.getContext('2d')
-  canvas.width = image.width
-  canvas.height = image.height
-  ctx.drawImage(image, 0, 0, image.width, image.height)
-  return canvas.toDataURL('image/png')
-}
-
-/**
- *
- * @param xml svg 的xml内容
- */
-export async function svgToPng(xml: string) {
-  const base64 = window.btoa(unescape(encodeURIComponent(xml)))
-  const image64 = `data:image/svg+xml;base64,${base64}`
-  const image = await loadImage(image64)
-  return imageToPng(image)
-}
-
-/**
- *
- * @param 读取文件内容
- */
-export function readFile(file, dataType = 'DataURL') {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    const fnName = `readAs${dataType}`
-
-    if (!reader[fnName])
-      throw new Error('File read error, dataType not support')
-
-    reader.onerror = () => {
-      reject(new Error('File read error'))
-    }
-
-    reader.onload = () => {
-      resolve(reader.result)
-    }
-
-    reader[fnName](file)
-  })
-}
-
-export function svgFile2Png(file) {
-  return readFile(file, 'Text').then(svgToPng)
 }
 
 export function withResolvers<T>(): {
@@ -202,16 +126,6 @@ export function withResolvers<T>(): {
     resolve,
     reject,
   }
-}
-
-export function formatEndsImage(url: string) {
-  if (!url)
-    return ''
-
-  if (url.startsWith('http'))
-    return url
-
-  return globalOptions.getEndsUrl() + url
 }
 
 export function useTypedRef<T extends abstract new (...args: any) => any>(_comp: T) {
