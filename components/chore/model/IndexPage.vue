@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { $model } from './model-manager'
 import MainPage from './MainPage.vue'
-import QuestionarePage from './QuestionarePage.vue'
 import { useLoginState } from '~/components/chore/login/index'
 import type { Viewer } from '~/composables/model/vrmViewer/viewer'
+import GuideIntroduction from '~/components/chore/guide/GuideIntroduction.vue'
 
 // loginState.data.dialogVisible = true
 const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
@@ -11,14 +10,21 @@ const viewer: Viewer = inject('viewer') as unknown as any
 const recordGranted: Function = inject('recordGranted') as unknown as any
 const changeModelPage: Function = inject('changeModelPage') as unknown as any
 const loginState = useLoginState()
+const options: any = inject('options') as unknown as any
 
 onMounted(() => {
+  options.actionEnable = false
+
   Object.assign(canvasDom.value!.style, {
-    transformOrigin: 'left center',
-    transform: 'scale(0.85) translateX(-10%)',
+    transformOrigin: 'center center',
+    transform: 'scale(0.85)',
   })
 
   viewer.model?.loadFBX('standing_greeting')
+
+  setTimeout(() => {
+    nextGuide(GuideIntroduction, 217)
+  })
 })
 
 async function handleLogin() {
@@ -35,111 +41,127 @@ async function handleLogin() {
     transform: '',
   })
 
-  changeModelPage(MainPage, true)
+  options.actionEnable = true
 
   viewer.model?.loadFBX('idel_happy_02')
   viewer.model?.emote('happy')
+
+  changeModelPage(MainPage, true)
 }
+
+const dom = ref<HTMLElement>()
+const currentComponent = ref()
+
+async function nextGuide(component: Component, height: number) {
+  const el = dom.value
+  if (!el)
+    return
+
+  const wrapper: HTMLElement = el.querySelector('.ModelIndexPage-MainWrapper')!
+
+  Object.assign(wrapper.style, {
+    transform: 'translateX(-150%)',
+  })
+
+  await sleep(300)
+
+  if (!component) {
+    Object.assign(el.style, {
+      height: `0`,
+      opacity: '0',
+      transform: 'scaleY(0)',
+    })
+
+    await sleep(300)
+
+    handleLogin()
+
+    return
+  }
+
+  Object.assign(wrapper.style, {
+    transition: 'none',
+    transform: 'translateX(150%)',
+  })
+
+  currentComponent.value = component
+
+  Object.assign(el.style, {
+    height: `${height}px`,
+  })
+
+  await sleep(100)
+
+  Object.assign(wrapper.style, {
+    transition: '',
+    transform: 'translateX(0)',
+  })
+}
+
+provide('nextGuide', nextGuide)
 </script>
 
 <template>
   <div class="ModelIndexPage">
-    <div class="ModelIndexPage-Aside">
-      <div class="ModelIndexPage-Aside-Title">
-        <P>悠伴</P>
-        <p>与您同行</p>
+    <div ref="dom" class="ModelIndexPage-Main transition-cubic">
+      <div class="ModelIndexPage-MainWrapper transition-cubic">
+        <component :is="currentComponent" v-if="currentComponent" />
       </div>
+    </div>
 
-      <div class="ModelIndexPage-Aside-SubTitle">
-        <P>为你的伙伴</P>
-        <p>起个名字吧</p>
-      </div>
-
-      <div class="ModelIndexPage-Aside-Input">
-        <input v-model="loginState.data.name">
-      </div>
-
-      <div class="ModelIndexPage-Aside-Button">
-        <button v-wave @click="handleLogin">
-          注册
-        </button>
-        <button v-wave>
-          登录
-        </button>
+    <div class="ModelIndexPage-Copyright">
+      <h1>悠伴与你同行</h1>
+      <div class="ModelIndexPage-Copyright-Content">
+        <p>
+          Nexo Technology (Hong Kong) Limited
+        </p>
+        <p>2025</p>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.ModelIndexPage-Copyright {
+  h1 {
+    font-family: Alibaba PuHuiTi 3;
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 20px;
+    text-align: center;
+    letter-spacing: 0px;
+
+    font-variation-settings: 'opsz' auto;
+    font-feature-settings: 'kern' on;
+    color: #8e6ff7;
+  }
+
+  &-Content {
+    font-family: Alibaba PuHuiTi 3;
+    font-size: 10px;
+    font-weight: normal;
+    line-height: 16px;
+    text-align: center;
+    letter-spacing: 0px;
+
+    font-variation-settings: 'opsz' auto;
+    font-feature-settings: 'kern' on;
+    color: #8e6ff7;
+  }
+  position: absolute;
+
+  left: 50%;
+
+  max-width: 90%;
+
+  text-align: center;
+  bottom: 1rem;
+
+  transform: translateX(-50%);
+}
+
 .ModelIndexPage {
-  &-Aside {
-    &-Title {
-      margin: 2rem 0;
-
-      /* 悠伴与你同行 */
-      font-family: Source Han Sans;
-      font-weight: 900;
-      font-size: 18px;
-      font-variation-settings: 'opsz' auto;
-    }
-
-    &-SubTitle {
-      /* 为你的伙伴起个名字吧 */
-      font-family: Source Han Sans;
-      font-weight: 400;
-      font-size: 18px;
-      font-variation-settings: 'opsz' auto;
-    }
-
-    &-Input {
-      input {
-        width: 100%;
-
-        outline: none !important;
-      }
-
-      display: flex;
-      padding: 1rem;
-      margin: 2rem 0;
-
-      width: 100%;
-      height: 20%;
-
-      align-items: center;
-      justify-content: center;
-
-      color: #852b38;
-      background-color: #fff;
-    }
-
-    &-Button {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-
-      width: 75%;
-
-      button {
-        width: 100%;
-        height: 40px;
-
-        font-family: Source Han Sans;
-        font-size: 18px;
-        font-weight: normal;
-        line-height: 43px;
-        text-align: center;
-        letter-spacing: 0px;
-
-        font-variation-settings: 'opsz' auto;
-        color: #ffffff;
-
-        border-radius: 13px;
-        color: #852b38;
-        background: #ffffff;
-      }
-    }
-
+  &-Main {
     font-family: Source Han Sans;
     font-size: 18px;
     font-weight: normal;
@@ -148,25 +170,26 @@ async function handleLogin() {
     letter-spacing: 0px;
 
     font-variation-settings: 'opsz' auto;
-    color: #ffffff;
-
     position: absolute;
     padding: 1rem 0;
     display: flex;
 
-    top: 10%;
-    right: 1rem;
+    top: 50%;
+    left: 50%;
 
-    height: 80%;
-    width: 40%;
+    // height: 25%;
+    width: 100%;
 
     align-items: center;
     flex-direction: column;
+    justify-content: center;
 
     gap: 1rem;
     opacity: 1;
-    border-radius: 23px;
-    background: #852b38;
+    background: #f6f6f6e0;
+    backdrop-filter: blur(18px) saturate(180%);
+
+    transform: translate(-50%, -50%);
   }
 
   position: absolute;
@@ -177,18 +200,18 @@ async function handleLogin() {
   width: 100%;
   height: 100%;
 
-  transform: translateX(120%);
+  transform: scale(1.2);
 
   animation: popFadeIn 0.25s 0.125s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
 }
 
 @keyframes popFadeIn {
   from {
-    transform: translateX(120%);
+    transform: scale(1.2);
   }
 
   to {
-    transform: translateX(0);
+    transform: scale(1);
   }
 }
 </style>
