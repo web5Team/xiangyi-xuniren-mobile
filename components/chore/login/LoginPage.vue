@@ -156,7 +156,7 @@ provide('prevComp', prevComp)
   }
 
   position: relative;
-  padding: 2rem;
+  padding: 4rem 2rem;
   display: flex;
 
   width: 100%;

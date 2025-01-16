@@ -49,10 +49,6 @@ export default defineNuxtConfig({
         target: 'esnext',
       },
     },
-    prerender: {
-      crawlLinks: false,
-      ignore: ['/'],
-    },
   },
 
   app: {
@@ -100,4 +96,6 @@ export default defineNuxtConfig({
       'gl-matrix',
     ],
   },
+
+  ssr: false,
 })
