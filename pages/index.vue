@@ -18,6 +18,8 @@ import IndexPage from '~/components/chore/model/IndexPage.vue'
 import { TextAggregator, VoiceSynthesizer, getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
 import { $endApi } from '~/composables/api/base'
 
+import { SpeechRecognition } from "@capacitor-community/speech-recognition";
+
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
 const progress = ref(0)
@@ -36,6 +38,7 @@ const emotions = ['happy', 'neutral', 'blinkLeft', 'blinkRight', 'blink', 'neutr
 const speechStream = new VoiceSynthesizer()
 
 function recordGranted() {
+  console.log('permissionGranted.value', permissionGranted.value)
   if (permissionGranted.value)
     return
 
@@ -72,6 +75,17 @@ function actionToggle() {
 }
 
 onMounted(() => {
+  // TODO: SpeechRecognition 插件申请麦克风权限
+  SpeechRecognition.checkPermissions().then(response => {
+    if (!['denied', 'granted'].includes(response.speechRecognition)) {
+      SpeechRecognition.requestPermissions().then(response => {
+        if (response.speechRecognition === 'granted') {
+          console.log('Request permission success')
+        }
+      })
+    }
+  })
+
   const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
 
   viewer.setup(canvas)
