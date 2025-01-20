@@ -9,10 +9,16 @@ import type { Viewer } from '~/composables/model/vrmViewer/viewer'
 // loginState.data.dialogVisible = true
 const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
 const viewer: Viewer = inject('viewer') as unknown as any
-const recordGranted: Function = inject('recordGranted') as unknown as any
 const changeModelPage: Function = inject('changeModelPage') as unknown as any
-const loginState = useLoginState()
 const shareDialog: any = inject('shareDialog')
+
+const property = reactive({
+  profession: 1,
+  impromptu: 2,
+  memory: 3,
+  consciousness: -1,
+  humor: -2,
+})
 
 onMounted(() => {
   setTimeout(() => {
@@ -67,13 +73,145 @@ function handleGhost() {
       </div>
 
       <div class="ModelPropertyPage-Main-Inner">
-        READY FOR DEV
+        <div class="ModelPropertyPage-Main-InnerItem">
+          <el-slider
+            v-model="property.humor" :class="{ hide: property.humor < -2 }" :min="-3" :max="3" :step="1"
+            vertical height="200px"
+          />
+          <span>幽默感</span>
+        </div>
+        <div class="ModelPropertyPage-Main-InnerItem">
+          <el-slider
+            v-model="property.profession" :class="{ hide: property.profession < -2 }" :min="-3" :max="3"
+            :step="1" vertical height="200px"
+          />
+          <span>专业化</span>
+        </div>
+        <div class="ModelPropertyPage-Main-InnerItem">
+          <el-slider
+            v-model="property.impromptu" :class="{ hide: property.impromptu < -2 }" :min="-3" :max="3"
+            :step="1" vertical height="200px"
+          />
+          <span>即兴度</span>
+        </div>
+        <div class="ModelPropertyPage-Main-InnerItem">
+          <el-slider
+            v-model="property.memory" :class="{ hide: property.memory < -2 }" :min="-3" :max="3" :step="1"
+            vertical height="200px"
+          />
+          <span>记忆度</span>
+        </div>
+        <div class="ModelPropertyPage-Main-InnerItem">
+          <el-slider
+            v-model="property.consciousness" :class="{ hide: property.consciousness < -2 }" :min="-3" :max="3"
+            :step="1" vertical height="200px"
+          />
+          <span>自我意识</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.ModelPropertyPage-Main-Inner {
+  &Item {
+    :deep(.el-slider) {
+      .el-slider__runway {
+        margin: 0;
+
+        background-color: transparent;
+      }
+
+      .el-slider__bar {
+        border-radius: 35px;
+        background: #8e6ff7;
+      }
+
+      padding: 17px 1px 17px 1px;
+
+      .el-slider__button-wrapper {
+        .el-slider__button {
+          width: 32px;
+          height: 32px;
+
+          background: #8e6ff7;
+
+          border-radius: 50%;
+          border: 3px solid #ffffff;
+
+          transform: scale(1.1);
+          box-shadow: 0px 7px 18px 5px #ffffff;
+        }
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+
+        bottom: 1px;
+        left: 1px;
+
+        width: calc(100% - 2px);
+        height: 30px;
+
+        background: #8e6ff7;
+
+        border: 2px solid #8e6ff7;
+
+        border-radius: 0 0 35px 35px;
+      }
+
+      &.hide {
+        &::after {
+          opacity: 0;
+        }
+      }
+
+      background: #ffffff;
+
+      border: 2px solid #8e6ff7;
+
+      border-radius: 35px;
+      box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.3);
+
+      // --el-slider-border-radius: 35px;
+      --el-slider-height: 30px;
+      // --el-slider-button-size: 30px;
+      --el-slider-button-wrapper-size: 30px;
+      --el-slider-button-wrapper-offset: -1px;
+    }
+
+    span {
+      margin: 2rem 0;
+
+      font-family: Alibaba PuHuiTi 3;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 22px;
+      text-align: center;
+      letter-spacing: 0px;
+
+      font-variation-settings: 'opsz' auto;
+      font-feature-settings: 'kern' on;
+      color: #737373;
+    }
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  display: flex;
+
+  gap: 1rem;
+
+  width: calc(100% - 90px);
+
+  justify-content: space-between;
+}
+
 .ModelPropertyPage-Mask {
   position: absolute;
 
