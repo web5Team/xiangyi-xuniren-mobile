@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TikTok from '/svg/share/tiktok.svg'
-import Telegram from '/svg/share/telegram.svg'
+import Xhs from '/svg/share/xhs.svg'
 import WeChat from '/svg/share/wechat.svg'
 import Twitter from '/svg/share/twitter.svg'
 import Gallery from '/svg/share/gallery.svg'
@@ -13,14 +13,14 @@ const shareDialog: any = inject('shareDialog')
 const shareAvenus = [
   {
     svg: TikTok,
-    name: 'TikTok',
+    name: '抖音',
     click() {
 
     },
   },
   {
-    svg: Telegram,
-    name: 'Telegram',
+    svg: Xhs,
+    name: '小红书',
     click() {
     },
   },
