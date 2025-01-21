@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">xiangyi</string>
-    <string name="title_activity_main">xiangyi</string>
-    <string name="package_name">com.tagzxia.xiangyi</string>
-    <string name="custom_url_scheme">com.tagzxia.xiangyi</string>
-</resources>

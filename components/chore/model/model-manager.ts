@@ -14,7 +14,7 @@ export const {
 } = useSpeechRecognition({
   interimResults: false,
   lang: 'zh-Hans',
-  continuous: true,
+  continuous: false,
 })
 
 // export const audioContext = new AudioContext()

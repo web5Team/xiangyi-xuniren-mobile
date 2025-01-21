@@ -3,7 +3,7 @@
 // import 'element-plus/theme-chalk/dark/css-vars.css'
 
 useHead({
-  title: "xiangyi-xnr",
+  title: 'xiangyi-xnr',
 })
 
 onMounted(() => {
@@ -26,7 +26,7 @@ body,
 
   height: 100%;
   width: 100%;
-  
+
   margin: 0;
   padding: 0;
 

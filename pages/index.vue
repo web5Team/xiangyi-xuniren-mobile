@@ -17,6 +17,7 @@ import {
 import IndexPage from '~/components/chore/model/IndexPage.vue'
 import { TextAggregator, VoiceSynthesizer, getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
 import { $endApi } from '~/composables/api/base'
+import { SpeechTranscriptionService } from '~/composables/nls'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -33,7 +34,27 @@ const options = reactive({
 const actions = ['idle_01', 'idle_02', 'idle_03', 'idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
 const emotions = ['happy', 'neutral', 'blinkLeft', 'blinkRight', 'blink', 'neutral', 'relaxed', 'sad', 'surprised']
 
+const stream = computed(() => $model.stream.value)
 const speechStream = new VoiceSynthesizer()
+
+watch(stream, async (stream) => {
+  if (!stream)
+    return
+
+  console.log('start transcription')
+
+  $model.startRecord()
+
+  const speechTranscription = new SpeechTranscriptionService(stream)
+
+  await sleep(3000)
+
+  $model.stopRecord()
+
+  const res = await speechTranscription.transcribe()
+
+  console.log('res', res)
+}, { once: true })
 
 function recordGranted() {
   if (permissionGranted.value)
