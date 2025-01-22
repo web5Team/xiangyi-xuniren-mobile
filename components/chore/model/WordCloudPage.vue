@@ -31,9 +31,8 @@ const changeModelPage: any = inject('changeModelPage')
 
     <div class="WordCloudPage-Nav">
       <IconSvgGhostSvg @click="changeModelPage(GhostPage, false)" />
-      <IconSvgButterflySvg />
-      <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
       <IconSvgShareSvg @click="shareDialog = true" />
+      <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
     </div>
   </div>
 </template>
@@ -50,6 +49,7 @@ const changeModelPage: any = inject('changeModelPage')
 
 .WordCloudPage {
   &-Date {
+    z-index: 1;
     position: absolute;
 
     top: 3rem;
@@ -111,13 +111,12 @@ const changeModelPage: any = inject('changeModelPage')
   position: absolute;
   display: flex;
 
-  top: 50%;
-  right: 1rem;
+  top: 3rem;
+  right: 2rem;
 
-  gap: 25px;
+  gap: 4rem;
   align-items: center;
-  flex-direction: column;
 
-  transform: translateY(-50%);
+  filter: brightness(500%);
 }
 </style>
