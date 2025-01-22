@@ -163,18 +163,18 @@ let lastSignal: any
 const sentence = ref('')
 
 speechNls.sentenceCacheBus.on((payload) => {
-  if (!speechNls.cacheSentence) {
-    $model.stopRecord()
+  // if (!speechNls.cacheSentence) {
+  //   $model.stopRecord()
 
-    lastSignal?.abort?.()
-  }
+  //   lastSignal?.abort?.()
+  // }
   sentence.value = payload.result
 })
 
 const voiceSynthesizer = new VoiceSynthesizer()
 
 async function handleConversationStart(sentence: string) {
-  $model.stopRecord()
+  // $model.stopRecord()
 
   lastSignal?.abort?.()
 
@@ -194,7 +194,6 @@ async function handleConversationStart(sentence: string) {
     if (type !== 'answer')
       return
 
-    console.log(content)
     aggregator.appendText(content)
   }, (error: any) => {
     console.warn(error)

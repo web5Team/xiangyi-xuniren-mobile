@@ -35,8 +35,6 @@ export class ModelManager {
     this.media.start()
 
     whenever(() => this.stream.value, () => {
-      console.log('stream', this.stream.value)
-
       speechNls.startRecording(this.stream.value!)
     }, { immediate: true, once: true })
   }

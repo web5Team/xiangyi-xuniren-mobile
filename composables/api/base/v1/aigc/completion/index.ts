@@ -1,3 +1,4 @@
+import { Howl, Howler } from 'howler' // 引入 Howler.js
 import { endHttp } from '~/composables/api/axios'
 import { ENDS_URL, globalOptions } from '~/constants'
 
@@ -94,7 +95,7 @@ export async function getAIGCCompletionStream(
 
 // 实现一个语音合成流 传入文本 然后返回一个播放和停止的方法 可以一边下载一边播放
 export class VoiceSynthesizer {
-  private audio: HTMLAudioElement
+  private audio: Howl | null // 修改: 将 HTMLAudioElement 改为 Howl
   private streamController: AbortController
   private isPlaying: boolean
   private textQueue: string[]
@@ -106,7 +107,7 @@ export class VoiceSynthesizer {
   }
 
   constructor() {
-    this.audio = new Audio()
+    this.audio = null // 修改: 初始化为 null
     this.streamController = new AbortController()
     this.isPlaying = false
     this.textQueue = []
@@ -151,26 +152,39 @@ export class VoiceSynthesizer {
     try {
       const audioUrl = await this.fetchAudioStream(text) // 获取音频文件 URL
 
-      // 使用音频 URL 播放
-      this.audio.src = audioUrl
+      // 使用 Howler.js 播放
+      this.audio = new Howl({
+        src: [audioUrl],
+        html5: true,
+        onplay: () => {
+          console.log('Audio is playing')
+        },
+        onend: async () => {
+          await sleep(1200)
+
+          if (this.textQueue.length > 0) {
+            const nextText = this.textQueue.shift()!
+            setTimeout(() => {
+              this.playAudioStream(nextText) // 播放下一个文本
+            }, 3000)
+          }
+          else {
+            this.isPlaying = false // 如果队列为空，停止播放
+            console.log('Audio playback finished.')
+
+            this._sppechEndCallback?.()
+          }
+        },
+        onstop: () => {
+          console.log('Audio playback stopped.')
+        },
+        onloaderror: (id, err) => {
+          console.error('Error loading audio:', err)
+          this.isPlaying = false
+        },
+      })
+
       this.audio.play()
-
-      // 等待音频播放结束后，播放下一个
-      this.audio.onended = () => {
-        if (this.textQueue.length > 0) {
-          const nextText = this.textQueue.shift()!
-
-          setTimeout(() => {
-            this.playAudioStream(nextText) // 播放下一个文本
-          }, 200)
-        }
-        else {
-          this.isPlaying = false // 如果队列为空，停止播放
-          console.log('Audio playback finished.')
-
-          this._sppechEndCallback?.()
-        }
-      }
     }
     catch (error) {
       console.error('Error during audio playback:', error)
@@ -200,7 +214,10 @@ export class VoiceSynthesizer {
   public stop(): void {
     if (this.isPlaying) {
       this.streamController.abort() // 终止流的下载
-      this.audio.pause() // 停止当前播放
+      if (this.audio) {
+        this.audio.stop() // 停止当前播放
+        this.audio.unload() // 释放音频资源
+      }
       this.isPlaying = false
       this.textQueue = [] // 清空缓存队列
       console.log('Audio playback stopped.')

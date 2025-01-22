@@ -2,7 +2,7 @@ import { createTapTip } from '../tip'
 
 const END_URL = 'wss://nls-gateway.cn-shanghai.aliyuncs.com/ws/v1'
 const APPKEY = 'ckxnZMvhbPN4jD6g' // 获取Appkey请前往控制台：https://nls-portal.console.aliyun.com/applist
-const TOKEN = 'c63b5f4f89a44ce7b5defb391f837630' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
+const TOKEN = '6a38d4fe38c94abba2bce34d3cc04c9b' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
 
 export enum SpeechStatus {
   CONNECTING = 'Connecting',
