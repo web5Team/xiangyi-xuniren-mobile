@@ -19,7 +19,6 @@
     "@gltf-transform/core": "^4.1.1",
     "@pixiv/three-vrm": "^3.3.2",
     "@types/three": "^0.171.0",
-    "alibabacloud-nls": "^1.0.4",
     "axios": "^1.7.2",
     "cropic": "^1.0.8",
     "dayjs": "^1.11.11",

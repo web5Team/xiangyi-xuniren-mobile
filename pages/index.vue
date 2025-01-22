@@ -12,12 +12,11 @@ import {
   $model,
   ensurePermissions,
   permissionGranted,
-  result,
+  speechNls,
 } from '~/components/chore/model/model-manager'
 import IndexPage from '~/components/chore/model/IndexPage.vue'
 import { TextAggregator, VoiceSynthesizer, getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
 import { $endApi } from '~/composables/api/base'
-import { SpeechTranscriptionService } from '~/composables/nls'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -33,28 +32,6 @@ const options = reactive({
 })
 const actions = ['idle_01', 'idle_02', 'idle_03', 'idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
 const emotions = ['happy', 'neutral', 'blinkLeft', 'blinkRight', 'blink', 'neutral', 'relaxed', 'sad', 'surprised']
-
-const stream = computed(() => $model.stream.value)
-const speechStream = new VoiceSynthesizer()
-
-watch(stream, async (stream) => {
-  if (!stream)
-    return
-
-  console.log('start transcription')
-
-  $model.startRecord()
-
-  const speechTranscription = new SpeechTranscriptionService(stream)
-
-  await sleep(3000)
-
-  $model.stopRecord()
-
-  const res = await speechTranscription.transcribe()
-
-  console.log('res', res)
-}, { once: true })
 
 function recordGranted() {
   if (permissionGranted.value)
@@ -81,8 +58,6 @@ function actionToggle() {
   useIntervalFn(() => {
     if (!options.actionEnable)
       return
-
-    console.log('action toggle')
 
     const action = actions[Math.floor(Math.random() * actions.length)]
     const emotion = emotions[Math.floor(Math.random() * emotions.length)]
@@ -142,6 +117,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   $model.stopRecord()
 
+  speechNls.disconnect()
+
   viewer._animationList.length = 0
   viewer.unloadVRM()
 })
@@ -176,33 +153,36 @@ provide('viewer', viewer)
 provide('recordGranted', recordGranted)
 provide('options', options)
 
+speechNls.sentenceBus.on((payload) => {
+  console.log('user said', payload.result)
+
+  handleConversationStart(payload.result)
+})
+
 let lastSignal: any
-
 const sentence = ref('')
-$model.saidEvent.on((phrase: string) => {
-  console.log('user said', phrase)
-  sentence.value = phrase
 
-  handleConversationStart(sentence.value)
+speechNls.sentenceCacheBus.on((payload) => {
+  if (!speechNls.cacheSentence) {
+    $model.stopRecord()
+
+    lastSignal?.abort?.()
+  }
+  sentence.value = payload.result
 })
 
-speechStream.onSpeechEnd(() => {
-  setTimeout(() => {
-    $model.startRecord()
-  }, 5000)
-})
+const voiceSynthesizer = new VoiceSynthesizer()
 
 async function handleConversationStart(sentence: string) {
   $model.stopRecord()
 
-  speechStream.stop()
   lastSignal?.abort?.()
 
-  speechStream.clearCache()
-  speechStream.start()
+  voiceSynthesizer.clearCache()
+  voiceSynthesizer.start()
   const aggregator = new TextAggregator((wholeSentence: string) => {
     console.log('wholeSentence', wholeSentence)
-    speechStream.appendText(wholeSentence)
+    voiceSynthesizer.appendText(wholeSentence)
   })
 
   lastSignal = getAIGCCompletionStream(sentence, (message: any) => {
@@ -214,6 +194,7 @@ async function handleConversationStart(sentence: string) {
     if (type !== 'answer')
       return
 
+    console.log(content)
     aggregator.appendText(content)
   }, (error: any) => {
     console.warn(error)
@@ -222,7 +203,7 @@ async function handleConversationStart(sentence: string) {
   })
 }
 
-window.$handleConversationStart = handleConversationStart
+// window.$handleConversationStart = handleConversationStart
 </script>
 
 <template>
@@ -286,6 +267,7 @@ window.$handleConversationStart = handleConversationStart
     transform: translate(0, 0);
     // box-shadow: unset;
   }
+
   z-index: 10;
   position: absolute;
 
