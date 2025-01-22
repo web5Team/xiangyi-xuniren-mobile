@@ -3,6 +3,7 @@ import { $model } from './model-manager'
 import MainPage from './MainPage.vue'
 import QuestionarePage from './QuestionarePage.vue'
 import GhostPage from './GhostPage.vue'
+import WordCloudPage from './WordCloudPage.vue'
 import { useLoginState } from '~/components/chore/login/index'
 import type { Viewer } from '~/composables/model/vrmViewer/viewer'
 
@@ -48,6 +49,10 @@ async function handleLeave(page: Component, show: boolean) {
 function handleGhost() {
   handleLeave(GhostPage, false)
 }
+
+function handleWordCloud() {
+  handleLeave(WordCloudPage, false)
+}
 </script>
 
 <template>
@@ -61,7 +66,7 @@ function handleGhost() {
 
     <div class="ModelPropertyPage-Nav">
       <IconSvgGhostSvg @click="handleGhost" />
-      <IconSvgButterflySvg />
+      <IconSvgButterflySvg @click="handleWordCloud" />
       <IconSvgPlanedSvg />
       <IconSvgShareSvg @click="shareDialog = true" />
     </div>

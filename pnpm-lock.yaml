@@ -32,6 +32,9 @@ importers:
       dayjs:
         specifier: ^1.11.11
         version: 1.11.11
+      echarts:
+        specifier: ^5.6.0
+        version: 5.6.0
       element-plus:
         specifier: ^2.7.6
         version: 2.7.6(vue@3.4.27(typescript@5.4.5))
@@ -62,6 +65,9 @@ importers:
       vite-plugin-version-date-mark:
         specifier: ^0.1.0
         version: 0.1.0(vite@5.2.11(@types/node@20.12.11)(sass@1.77.6)(terser@5.31.0))
+      vue-echarts:
+        specifier: ^7.0.3
+        version: 7.0.3(@vue/runtime-core@3.4.27)(echarts@5.6.0)(vue@3.4.27(typescript@5.4.5))
       vue3-lottie:
         specifier: ^3.3.1
         version: 3.3.1(vue@3.4.27(typescript@5.4.5))
@@ -128,7 +134,7 @@ importers:
         version: 3.11.2(@opentelemetry/api@1.9.0)(@parcel/watcher@2.4.1)(@types/node@20.12.11)(@unocss/reset@0.60.0)(async-validator@4.2.5)(axios@1.7.2)(bufferutil@4.0.9)(encoding@0.1.13)(eslint@9.2.0)(floating-vue@5.2.2(@nuxt/kit@3.13.0(magicast@0.3.4)(rollup@4.17.2))(vue@3.4.27(typescript@5.4.5)))(ioredis@5.4.1)(optionator@0.9.4)(qrcode@1.5.3)(rollup@4.17.2)(sass@1.77.6)(terser@5.31.0)(typescript@5.4.5)(unocss@0.60.0(@unocss/webpack@0.60.0(rollup@4.17.2)(webpack@5.88.2(esbuild@0.20.2)))(postcss@8.4.38)(rollup@4.17.2)(vite@5.2.11(@types/node@20.12.11)(sass@1.77.6)(terser@5.31.0)))(utf-8-validate@5.0.10)(vite@5.2.11(@types/node@20.12.11)(sass@1.77.6)(terser@5.31.0))(vue-tsc@2.0.17(typescript@5.4.5))
       nuxt-echarts:
         specifier: ^0.1.0
-        version: 0.1.0(echarts@5.5.1)(magicast@0.3.4)(rollup@4.17.2)
+        version: 0.1.0(echarts@5.6.0)(magicast@0.3.4)(rollup@4.17.2)
       nuxt-lodash:
         specifier: ^2.5.3
         version: 2.5.3(magicast@0.3.4)(rollup@4.17.2)
@@ -3708,8 +3714,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  echarts@5.5.1:
-    resolution: {integrity: sha512-Fce8upazaAXUVUVsjgV6mBnGuqgO+JNDlcgF79Dksy4+wgGpQB2lmYoO4TSweFg/mZITdpGHomw/cNBJZj1icA==}
+  echarts@5.6.0:
+    resolution: {integrity: sha512-oTbVTsXfKuEhxftHqL5xprgLoc0k7uScAwtryCgWF6hPYFLRwOUHiFmHGCBKP5NPFNkDVopOieyUqYGH8Fa3kA==}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -6923,6 +6929,17 @@ packages:
   vue-bundle-renderer@2.1.0:
     resolution: {integrity: sha512-uZ+5ZJdZ/b43gMblWtcpikY6spJd0nERaM/1RtgioXNfWFbjKlUwrS8HlrddN6T2xtptmOouWclxLUkpgcVX3Q==}
 
+  vue-demi@0.13.11:
+    resolution: {integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==}
+    engines: {node: '>=12'}
+    hasBin: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   vue-demi@0.14.10:
     resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
     engines: {node: '>=12'}
@@ -6947,6 +6964,16 @@ packages:
 
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
+
+  vue-echarts@7.0.3:
+    resolution: {integrity: sha512-/jSxNwOsw5+dYAUcwSfkLwKPuzTQ0Cepz1LxCOpj2QcHrrmUa/Ql0eQqMmc1rTPQVrh2JQ29n2dhq75ZcHvRDw==}
+    peerDependencies:
+      '@vue/runtime-core': ^3.0.0
+      echarts: ^5.5.1
+      vue: ^2.7.0 || ^3.1.1
+    peerDependenciesMeta:
+      '@vue/runtime-core':
+        optional: true
 
   vue-eslint-parser@9.4.2:
     resolution: {integrity: sha512-Ry9oiGmCAK91HrKMtCrKFWmSFWvYkpGglCeFAIqDdr9zdXmMMpJOmUJS7WWsW7fX81h6mwHmUZCQQ1E0PkSwYQ==}
@@ -7209,8 +7236,8 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
-  zrender@5.6.0:
-    resolution: {integrity: sha512-uzgraf4njmmHAbEUxMJ8Oxg+P3fT04O+9p7gY+wJRVxo8Ge+KmYv0WJev945EH4wFuc4OY2NLXz46FZrWS9xJg==}
+  zrender@5.6.1:
+    resolution: {integrity: sha512-OFXkDJKcrlx5su2XbzJvj/34Q3m6PvyCZkVPHGYpcCJ52ek4U/ymZyfuV1nKE23AyBJ51E/6Yr0mhZ7xGTO4ag==}
 
 snapshots:
 
@@ -11664,10 +11691,10 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  echarts@5.5.1:
+  echarts@5.6.0:
     dependencies:
       tslib: 2.3.0
-      zrender: 5.6.0
+      zrender: 5.6.1
 
   ee-first@1.1.1: {}
 
@@ -13567,10 +13594,10 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  nuxt-echarts@0.1.0(echarts@5.5.1)(magicast@0.3.4)(rollup@4.17.2):
+  nuxt-echarts@0.1.0(echarts@5.6.0)(magicast@0.3.4)(rollup@4.17.2):
     dependencies:
       '@nuxt/kit': 3.12.4(magicast@0.3.4)(rollup@4.17.2)
-      echarts: 5.5.1
+      echarts: 5.6.0
     transitivePeerDependencies:
       - magicast
       - rollup
@@ -15409,6 +15436,10 @@ snapshots:
     dependencies:
       ufo: 1.5.3
 
+  vue-demi@0.13.11(vue@3.4.27(typescript@5.4.5)):
+    dependencies:
+      vue: 3.4.27(typescript@5.4.5)
+
   vue-demi@0.14.10(vue@3.4.27(typescript@5.4.5)):
     dependencies:
       vue: 3.4.27(typescript@5.4.5)
@@ -15418,6 +15449,16 @@ snapshots:
       vue: 3.4.27(typescript@5.4.5)
 
   vue-devtools-stub@0.1.0: {}
+
+  vue-echarts@7.0.3(@vue/runtime-core@3.4.27)(echarts@5.6.0)(vue@3.4.27(typescript@5.4.5)):
+    dependencies:
+      echarts: 5.6.0
+      vue: 3.4.27(typescript@5.4.5)
+      vue-demi: 0.13.11(vue@3.4.27(typescript@5.4.5))
+    optionalDependencies:
+      '@vue/runtime-core': 3.4.27
+    transitivePeerDependencies:
+      - '@vue/composition-api'
 
   vue-eslint-parser@9.4.2(eslint@9.2.0):
     dependencies:
@@ -15781,6 +15822,6 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.5.2
 
-  zrender@5.6.0:
+  zrender@5.6.1:
     dependencies:
       tslib: 2.3.0

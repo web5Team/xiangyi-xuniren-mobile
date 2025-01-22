@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import GhostPage from './GhostPage.vue'
 import PropertyPage from './PropertyPage.vue'
+import WordCloudPage from './WordCloudPage.vue'
 
 const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
 
 function handleGhost() {
   changeModelPage(GhostPage, false)
+}
+
+function handleWordCloud() {
+  changeModelPage(WordCloudPage, false)
 }
 </script>
 
@@ -27,7 +32,7 @@ function handleGhost() {
 
     <div class="ModelMainPage-Nav">
       <IconSvgGhostSvg @click="handleGhost" />
-      <IconSvgButterflySvg />
+      <IconSvgButterflySvg @click="handleWordCloud" />
       <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
       <IconSvgShareSvg @click="shareDialog = true" />
     </div>

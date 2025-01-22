@@ -1,4 +1,3 @@
-import { Howl, Howler } from 'howler' // 引入 Howler.js
 import { endHttp } from '~/composables/api/axios'
 import { ENDS_URL, globalOptions } from '~/constants'
 
@@ -95,7 +94,7 @@ export async function getAIGCCompletionStream(
 
 // 实现一个语音合成流 传入文本 然后返回一个播放和停止的方法 可以一边下载一边播放
 export class VoiceSynthesizer {
-  private audio: Howl | null // 修改: 将 HTMLAudioElement 改为 Howl
+  private audio: SpeechSynthesisUtterance | null // 修改: 使用 SpeechSynthesisUtterance
   private streamController: AbortController
   private isPlaying: boolean
   private textQueue: string[]
@@ -115,31 +114,6 @@ export class VoiceSynthesizer {
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
   }
 
-  // 请求合成并返回音频文件 URL
-  private async fetchAudioStream(text: string): Promise<string> {
-    try {
-      const response = await endHttp.$http({
-        url: 'bot/tts', // 修改接口为 bot/tts
-        method: 'POST',
-        data: { text },
-        headers: { server: 'true' },
-        adapter: 'fetch',
-        responseType: 'json', // 这里返回 JSON 格式
-        signal: this.streamController.signal,
-      })
-
-      // 确保响应格式正确
-      if (response.code === 1 && response.data && response.data.url)
-        return response.data.url
-      else
-        throw new Error('Failed to get valid audio URL')
-    }
-    catch (error) {
-      console.error('Error fetching audio stream:', error)
-      throw error
-    }
-  }
-
   // 将新文本追加到队列中
   public appendText(text: string): void {
     this.textQueue.push(text) // 将新文本加入队列
@@ -150,41 +124,34 @@ export class VoiceSynthesizer {
   // 播放音频流
   private async playAudioStream(text: string): Promise<void> {
     try {
-      const audioUrl = await this.fetchAudioStream(text) // 获取音频文件 URL
+      if (this.audio) {
+        speechSynthesis.cancel() // 停止之前的语音合成
+      }
 
-      // 使用 Howler.js 播放
-      this.audio = new Howl({
-        src: [audioUrl],
-        html5: true,
-        onplay: () => {
-          console.log('Audio is playing')
-        },
-        onend: async () => {
-          await sleep(1200)
+      this.audio = new SpeechSynthesisUtterance(text)
+      this.audio.onend = async () => {
+        await sleep(1200)
 
-          if (this.textQueue.length > 0) {
-            const nextText = this.textQueue.shift()!
-            setTimeout(() => {
-              this.playAudioStream(nextText) // 播放下一个文本
-            }, 3000)
-          }
-          else {
-            this.isPlaying = false // 如果队列为空，停止播放
-            console.log('Audio playback finished.')
+        if (this.textQueue.length > 0) {
+          const nextText = this.textQueue.shift()!
+          setTimeout(() => {
+            this.playAudioStream(nextText) // 播放下一个文本
+          }, 3000)
+        }
+        else {
+          this.isPlaying = false // 如果队列为空，停止播放
+          console.log('Audio playback finished.')
 
-            this._sppechEndCallback?.()
-          }
-        },
-        onstop: () => {
-          console.log('Audio playback stopped.')
-        },
-        onloaderror: (id, err) => {
-          console.error('Error loading audio:', err)
-          this.isPlaying = false
-        },
-      })
+          this._sppechEndCallback?.()
+        }
+      }
 
-      this.audio.play()
+      this.audio.onerror = (event) => {
+        console.error('Speech synthesis error:', event)
+        this.isPlaying = false
+      }
+
+      speechSynthesis.speak(this.audio)
     }
     catch (error) {
       console.error('Error during audio playback:', error)
@@ -215,8 +182,7 @@ export class VoiceSynthesizer {
     if (this.isPlaying) {
       this.streamController.abort() // 终止流的下载
       if (this.audio) {
-        this.audio.stop() // 停止当前播放
-        this.audio.unload() // 释放音频资源
+        speechSynthesis.cancel() // 停止当前播放
       }
       this.isPlaying = false
       this.textQueue = [] // 清空缓存队列

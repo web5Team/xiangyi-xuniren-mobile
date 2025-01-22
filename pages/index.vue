@@ -174,9 +174,13 @@ speechNls.sentenceCacheBus.on((payload) => {
 const voiceSynthesizer = new VoiceSynthesizer()
 
 async function handleConversationStart(sentence: string) {
-  // $model.stopRecord()
+  $model.stopRecord()
 
   lastSignal?.abort?.()
+
+  voiceSynthesizer.onSpeechEnd(() => {
+    $model.startRecord()
+  })
 
   voiceSynthesizer.clearCache()
   voiceSynthesizer.start()
