@@ -12,6 +12,11 @@ export default {
       code,
     })
   },
+  setPassword(password: string) {
+    return endHttp.post('user/setPassword', {
+      password,
+    })
+  },
   renewToken() {
     return endHttp.get('auth/renew_token') as Promise<IDataResponse<ILoginToken>>
   },

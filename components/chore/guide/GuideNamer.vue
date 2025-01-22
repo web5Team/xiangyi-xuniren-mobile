@@ -1,19 +1,25 @@
 <script setup>
+import { useLoginState } from '../login'
 import GuideAuth from './GuideAuth.vue'
 
 const name = ref('')
-
+const loginState = useLoginState()
 const nextGuide = inject('nextGuide')
 
 function handleNext() {
+  if (!name.value)
+    return
+
   nextGuide(GuideAuth, 150)
+
+  loginState.data.name = name.value
 }
 </script>
 
 <template>
   <div class="GuideNamer flex items-center">
     <div class="GuideNamer-Input" mt-4>
-      <input v-model="name">
+      <input v-model="name" autofocus>
       <div
         :style="`${name?.length ? 'opacity: 0' : ''}`"
         class="GuideNamer-Input-Placeholder transition-cubic pointer-events-none"
@@ -22,11 +28,15 @@ function handleNext() {
         <span>|</span>
       </div>
     </div>
-    <IconSvgFingerPrint mx-auto @click="handleNext" />
+    <IconSvgFingerPrint :class="{ fade: !name }" class="transition-cubic" mx-auto @click="handleNext" />
   </div>
 </template>
 
 <style lang="scss" scoped>
+.fade {
+  opacity: 0.25;
+}
+
 @keyframes blink {
   0% {
     opacity: 0;

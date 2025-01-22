@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useLoginState } from '..'
 import CreateAccount from '../CreateAccount.vue'
+import QuickRegister from '../QuickRegister.vue'
 import Success from '../Success.vue'
 import { $endApi } from '~/composables/api/base'
 
@@ -27,6 +28,26 @@ async function handleSmsLogin() {
   const res = await $endApi.v1.auth.loginOrRegister(loginState.data.identifier, options.code)
 
   options.loading = false
+
+  if (loginState.data.mode === 'register') {
+    if (responseMessage(res, {
+      success: '',
+      triggerOnDataNull: false,
+    })) {
+      loginState.data.stashedToken = res.data.token
+      userStore.value.completeQuestion = !!res.data.complete_question
+
+      nextComp(QuickRegister, {
+        title: '创建密码 3/3',
+        canBack: true,
+      })
+    }
+    else {
+      options.code = ''
+    }
+
+    return
+  }
 
   if (responseMessage(res, {
     success: '登录成功',

@@ -1,8 +1,11 @@
 export const useLoginState = createGlobalState(() => {
   const data = reactive({
+    mode: 'login',
     dialogVisible: false,
     identifier: '',
+    certificate: '',
     name: '相一',
+    stashedToken: '',
   })
 
   return {

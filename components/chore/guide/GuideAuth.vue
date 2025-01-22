@@ -1,19 +1,28 @@
 <script setup>
-import GuideNamer from './GuideNamer.vue'
+import { useLoginState } from '~/components/chore/login/index'
 
 const nextGuide = inject('nextGuide')
+const loginState = useLoginState()
 
-function handleClick() {
+function handleRegister() {
+  loginState.data.mode = 'register'
+
+  nextGuide()
+}
+
+function handleLogin() {
+  loginState.data.mode = 'login'
+
   nextGuide()
 }
 </script>
 
 <template>
-  <div class="GuideAuth flex items-center gap-4" @click="handleClick">
-    <button v-wave>
+  <div class="GuideAuth flex items-center gap-4">
+    <button v-wave @click="handleRegister">
       注册
     </button>
-    <button v-wave>
+    <button v-wave @click="handleLogin">
       登录
     </button>
     <p v-wave>

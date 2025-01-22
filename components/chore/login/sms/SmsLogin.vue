@@ -55,8 +55,8 @@ async function handleSmsLogin() {
       <p text-start>
         手机号
       </p>
-      <input autofocus v-model.number="options.phone" class="major-input" size="large" placeholder="请输入手机号">
-      <el-button  v-loading="options.loading" v-wave :class="{ valid }" class="major-button" size="large" @click="handleSmsLogin">
+      <input v-model.number="options.phone" autofocus class="major-input" size="large" placeholder="请输入手机号">
+      <el-button v-loading="options.loading" v-wave :class="{ valid }" class="major-button" size="large" @click="handleSmsLogin">
         创建账户
       </el-button>
     </div>
