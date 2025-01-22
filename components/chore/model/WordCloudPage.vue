@@ -20,9 +20,11 @@ const changeModelPage: any = inject('changeModelPage')
     </div>
 
     <div class="WordCloudPage-Content">
-      <ClientOnly>
-        <ChartWordCloud />
-      </ClientOnly>
+      <div>
+        <ClientOnly>
+          <ChartWordCloud />
+        </ClientOnly>
+      </div>
     </div>
 
     <div class="WordCloudPage-FingerPrint" @click="changeModelPage(MainPage, true)">
@@ -39,6 +41,15 @@ const changeModelPage: any = inject('changeModelPage')
 
 <style lang="scss" scoped>
 .WordCloudPage-Content {
+  & > div {
+    position: absolute;
+
+    top: 50%;
+    height: 80%;
+    width: 100%;
+
+    transform: translateY(-50%);
+  }
   position: absolute;
 
   width: 100%;
