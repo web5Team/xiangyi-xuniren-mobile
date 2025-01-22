@@ -19,16 +19,19 @@ const changeModelPage: any = inject('changeModelPage')
       </p>
     </div>
 
+    <div class="WordCloudPage-Title">
+      <div class="WordCloudPage-FingerPrint" @click="changeModelPage(MainPage, true)">
+        <IconSvgFingerPrint />
+      </div>
+      <el-input placeholder="请选择日期" />
+    </div>
+
     <div class="WordCloudPage-Content">
       <div>
         <ClientOnly>
           <ChartWordCloud />
         </ClientOnly>
       </div>
-    </div>
-
-    <div class="WordCloudPage-FingerPrint" @click="changeModelPage(MainPage, true)">
-      <IconSvgFingerPrint />
     </div>
 
     <div class="WordCloudPage-Nav">
@@ -45,7 +48,7 @@ const changeModelPage: any = inject('changeModelPage')
     position: absolute;
 
     top: 50%;
-    height: 80%;
+    height: 65%;
     width: 100%;
 
     transform: translateY(-50%);
@@ -56,6 +59,21 @@ const changeModelPage: any = inject('changeModelPage')
   height: 100%;
 
   background-color: #100c2a;
+}
+
+.WordCloudPage-Title {
+  z-index: 1;
+  position: absolute;
+  padding: 0 1.5rem;
+  display: flex;
+
+  gap: 1rem;
+  top: 7rem;
+  left: 0;
+
+  width: 100%;
+
+  justify-content: space-between;
 }
 
 .WordCloudPage {
@@ -110,12 +128,13 @@ const changeModelPage: any = inject('changeModelPage')
 }
 
 .WordCloudPage-FingerPrint {
-  position: absolute;
+  // position: absolute;
 
-  top: 50%;
-  left: 1rem;
+  // top: 50%;
+  // left: 1rem;
 
-  transform: translateY(-50%);
+  // transform: translateY(-50%);
+  filter: brightness(500%);
 }
 
 .WordCloudPage-Nav {
