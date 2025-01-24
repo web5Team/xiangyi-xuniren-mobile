@@ -1,8 +1,8 @@
-import { createTapTip } from '../tip'
+import { createTapTip, forWikiDialogTip } from '../tip'
 
 const END_URL = 'wss://nls-gateway.cn-shanghai.aliyuncs.com/ws/v1'
 const APPKEY = 'ckxnZMvhbPN4jD6g' // 获取Appkey请前往控制台：https://nls-portal.console.aliyun.com/applist
-const TOKEN = '6a38d4fe38c94abba2bce34d3cc04c9b' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
+const TOKEN = '175aa93b99b54ab6a0a25cc6b9b9320e' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
 
 export enum SpeechStatus {
   CONNECTING = 'Connecting',
@@ -147,6 +147,17 @@ export class SpeechNls {
       this.updateStatus(SpeechStatus.Error)
 
       console.error('WebSocket error observed:', event)
+
+      forWikiDialogTip('语音连接已断开', '无法连接至远程服务器', [{
+        content: '重新链接',
+        type: TipType.INFO,
+        onClick: async () => {
+          this.disconnect()
+          await this.connect()
+
+          return true
+        },
+      }])
     }
 
     websocket.onclose = () => {

@@ -17,6 +17,7 @@ import {
 import IndexPage from '~/components/chore/model/IndexPage.vue'
 import { TextAggregator, VoiceSynthesizer, getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
 import { $endApi } from '~/composables/api/base'
+import { forWikiDialogTip } from '~/composables/tip'
 
 const dom = ref<HTMLElement>()
 const container = ref<HTMLElement>()
@@ -45,6 +46,7 @@ function recordGranted() {
     // granted
     await ensurePermissions()
     if (permissionGranted.value) {
+      speechNls.connect()
       $model.startRecord()
     }
     else {
@@ -68,17 +70,32 @@ function actionToggle() {
 }
 
 onMounted(() => {
+  // forWikiDialogTip('语音链接已断开', '与远程服务器断开链接，请重新链接...')
+
   const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
 
   viewer.setup(canvas)
 
-  viewer.loadVrm(model)
+  const promise = viewer.loadVrm(model)
 
   viewer._animationList.push(() => {
     viewer.updateEye(x.value, y.value)
   })
 
+  let done = false
+
+  promise.then(() => done = true).catch(() => {
+    forWikiDialogTip('加载模型失败', '请检查网络连接，或刷新重试...')
+  })
+
   const pausable = useIntervalFn(async () => {
+    if (progress.value >= 80) {
+      if (!done) {
+        console.warn('waiting model loading')
+        return
+      }
+    }
+
     progress.value += Math.random() * 5
 
     if (progress.value >= 100) {
@@ -231,6 +248,9 @@ async function handleConversationStart(sentence: string) {
         <div class="ModelPage-Mask-Progress-Inner transition-cubic" />
         <div class="ModelPage-Mask-Progress-Bg transition-cubic" />
       </div>
+      <div :class="{ hide: progress >= 100 }" class="ModelPage-Mask-Progress-Tip transition-cubic">
+        <span>模型文件较大，下载需要3分钟左右的时间...</span>
+      </div>
     </div>
 
     <client-only>
@@ -284,6 +304,27 @@ async function handleConversationStart(sentence: string) {
 }
 
 .ModelPage-Mask {
+  .ModelPage-Mask-Progress-Tip {
+    &.hide {
+      opacity: 0;
+      pointer-events: none !important;
+    }
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 80%;
+    height: 20px;
+
+    overflow: hidden;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+    transform: translate(-50%, -50%) translateY(-22px);
+  }
+
   &-Progress {
     &.hide {
       opacity: 0;

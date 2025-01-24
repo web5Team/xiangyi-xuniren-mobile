@@ -27,8 +27,6 @@ export class ModelManager {
 
     this.stream = result.stream
     this.media = result
-
-    speechNls.connect()
   }
 
   startRecord() {

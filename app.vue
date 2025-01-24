@@ -8,6 +8,17 @@ useHead({
 
 onMounted(() => {
   document.body.classList.add('mobile')
+
+  // get width & height
+  nextTick(() => {
+    const width = document.body.clientWidth
+    const height = document.body.clientHeight
+
+    Object.assign(document.body.style, {
+      width: `${width}px`,
+      height: `${height}px`,
+    })
+  })
 })
 </script>
 

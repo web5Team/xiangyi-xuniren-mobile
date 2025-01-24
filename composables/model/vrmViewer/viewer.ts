@@ -65,14 +65,18 @@ export class Viewer {
   }
 
   public loadVrm(url: string) {
+    const { resolve, reject, promise } = withResolvers()
+
     if (this.model?.vrm)
       this.unloadVRM()
 
     // gltf and vrm
     this.model = new Model(this._camera || new THREE.Object3D())
     this.model.loadVRM(url).then(async () => {
-      if (!this.model?.vrm)
+      if (!this.model?.vrm) {
+        reject?.()
         return
+      }
 
       // 在这里设置模型面向相机
       if (this._camera) {
@@ -115,11 +119,15 @@ export class Viewer {
 
       this.model.loadFBX('idle_01')
 
+      resolve()
+
       // HACK: アニメーションの原点がずれているので再生後にカメラ位置を調整する
       requestAnimationFrame(() => {
         this.resetCamera()
       })
     })
+
+    return promise
   }
 
   public unloadVRM(): void {
