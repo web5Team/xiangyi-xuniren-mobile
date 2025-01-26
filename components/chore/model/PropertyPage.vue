@@ -51,7 +51,7 @@ function handleGhost() {
 }
 
 function handleWordCloud() {
-  handleLeave(WordCloudPage, false)
+  handleLeave(WordCloudPage, true)
 }
 </script>
 

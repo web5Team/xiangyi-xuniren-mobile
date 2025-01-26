@@ -6,10 +6,47 @@ import PropertyPage from './PropertyPage.vue'
 
 const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
+const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
+
+const orienated = ref(false)
+
+onMounted(() => {
+  $model.stopRecord()
+
+  Object.assign(canvasDom.value!.style, {
+    transformOrigin: 'center bottom',
+    transform: 'scale(0.75)',
+  })
+})
+
+async function handleLeave(page: Component, show: boolean) {
+  if (!canvasDom.value)
+    return
+
+  Object.assign(canvasDom.value.style, {
+    transformOrigin: '',
+    transform: '',
+  })
+
+  await sleep(200)
+
+  $model.startRecord()
+
+  changeModelPage(page, show)
+}
+
+const { alpha, beta, gamma } = useDeviceOrientation()
+// 监听这三个参数 如果用户横屏
+watchEffect(() => {
+  if (+alpha.value > 0 || +beta.value > 0 || +gamma.value > 0)
+    orienated.value = true
+  else
+    orienated.value = false
+})
 </script>
 
 <template>
-  <div class="WordCloudPage">
+  <div class="WordCloudPage" :class="{ orienated }">
     <div class="WordCloudPage-Date">
       <p class="day">
         <span mr-2>{{ userStore.days || 0 }}</span>天
@@ -20,39 +57,77 @@ const changeModelPage: any = inject('changeModelPage')
     </div>
 
     <div class="WordCloudPage-Title">
-      <div class="WordCloudPage-FingerPrint" @click="changeModelPage(MainPage, true)">
+      <div class="WordCloudPage-FingerPrint" @click="handleLeave(MainPage, true)">
         <IconSvgFingerPrint />
       </div>
-      <el-input placeholder="请选择日期" />
+      <input
+        class="absolute right-0 w-[80%] border-r-[0px] border-[#755BCE] rounded-bl-[4px] rounded-tl-[4px] text-white !outline-none" border bg-transparent
+        p-2 placeholder="请选择日期"
+      >
     </div>
 
     <div class="WordCloudPage-Content">
-      <div>
+      <div class="transition-cubic">
         <ClientOnly>
           <ChartWordCloud />
         </ClientOnly>
       </div>
     </div>
 
+    <div class="WordCloudPage-Orienation" flex items-center gap-2>
+      <IconSvgOrienationSvg />
+      横屏体验更佳哦~
+    </div>
+
     <div class="WordCloudPage-Nav">
-      <IconSvgGhostSvg @click="changeModelPage(GhostPage, false)" />
+      <IconSvgGhostSvg @click="handleLeave(GhostPage, false)" />
       <IconSvgShareSvg @click="shareDialog = true" />
-      <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
+      <IconSvgPlanedSvg @click="handleLeave(PropertyPage, true)" />
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.WordCloudPage-Orienation {
+  z-index: 1;
+  position: absolute;
+
+  left: 10%;
+  bottom: 10%;
+
+  font-family: Alibaba PuHuiTi 3;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: normal;
+  letter-spacing: 0em;
+
+  font-variation-settings: 'opsz' auto;
+  font-feature-settings: 'kern' on;
+  color: #c5c5c5;
+}
+
+.orienated .WordCloudPage-Content {
+  & > div {
+    z-index: 2;
+    position: absolute;
+
+    bottom: 0%;
+    height: 100vw;
+    width: 100vh;
+
+    transform: rotateZ(90deg);
+  }
+}
+
 .WordCloudPage-Content {
   & > div {
     position: absolute;
 
-    top: 50%;
-    height: 65%;
+    bottom: 0%;
+    height: 80%;
     width: 100%;
-
-    transform: translateY(-50%);
   }
+
   position: absolute;
 
   width: 100%;

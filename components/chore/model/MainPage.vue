@@ -12,7 +12,7 @@ function handleGhost() {
 }
 
 function handleWordCloud() {
-  changeModelPage(WordCloudPage, false)
+  changeModelPage(WordCloudPage, true)
 }
 </script>
 
