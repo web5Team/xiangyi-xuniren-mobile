@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import GhostPage from './GhostPage.vue'
+import InputPage from './InputPage.vue'
 import PropertyPage from './PropertyPage.vue'
 import WordCloudPage from './WordCloudPage.vue'
 
@@ -27,13 +28,13 @@ function handleWordCloud() {
     </div>
 
     <div class="ModelMainPage-FingerPrint">
-      <IconSvgFingerPrint />
+      <IconSvgFingerPrint @click="changeModelPage(PropertyPage, true)" />
     </div>
 
     <div class="ModelMainPage-Nav">
       <IconSvgGhostSvg @click="handleGhost" />
-      <IconSvgButterflySvg @click="handleWordCloud" />
-      <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
+      <IconSvgButterflySvg @click="changeModelPage(InputPage, true)" />
+      <IconSvgPlanedSvg @click="handleWordCloud" />
       <IconSvgShareSvg @click="shareDialog = true" />
     </div>
   </div>
@@ -105,7 +106,7 @@ function handleWordCloud() {
   top: 50%;
   right: 1rem;
 
-  gap: 25px;
+  gap: 45px;
   flex-direction: column;
 
   transform: translateY(-50%);

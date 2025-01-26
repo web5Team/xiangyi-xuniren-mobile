@@ -29,6 +29,7 @@ const viewer = new Viewer()
 const loginState = useLoginState()
 
 const options = reactive({
+  voiceEnable: true,
   actionEnable: true,
 })
 const actions = ['idle_01', 'idle_02', 'idle_03', 'idle_01', 'idle_02', 'idle_03', 'sitting', 'standing_greeting', 'idel_happy_01']
@@ -175,6 +176,7 @@ provide('canvasDom', dom)
 provide('viewer', viewer)
 provide('recordGranted', recordGranted)
 provide('options', options)
+provide('handleConversationStart', handleConversationStart)
 
 speechNls.sentenceBus.on((payload) => {
   handleConversationStart(payload.result)
@@ -206,7 +208,6 @@ async function handleConversationStart(sentence: string) {
   voiceSynthesizer.clearCache()
   voiceSynthesizer.start()
   const aggregator = new TextAggregator((wholeSentence: string) => {
-    console.log('wholeSentence', wholeSentence)
     voiceSynthesizer.appendText(wholeSentence)
   })
 
@@ -226,8 +227,6 @@ async function handleConversationStart(sentence: string) {
     console.warn('======= COMPLETED =======')
   })
 }
-
-// window.$handleConversationStart = handleConversationStart
 </script>
 
 <template>

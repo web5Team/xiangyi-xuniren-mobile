@@ -1,17 +1,13 @@
 <script setup lang="ts">
+import InputPage from './InputPage.vue'
 import MainPage from './MainPage.vue'
 import { $model } from './model-manager'
-import PropertyPage from './PropertyPage.vue'
 import WordCloudPage from './WordCloudPage.vue'
 
 const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
 
 const stream = computed(() => $model.stream.value)
-
-function handleWordCloud() {
-  changeModelPage(WordCloudPage, false)
-}
 </script>
 
 <template>
@@ -37,8 +33,8 @@ function handleWordCloud() {
 
     <div class="ModelGhostPage-Nav">
       <IconSvgGhostFilledSvg />
-      <IconSvgButterflySvg @click="handleWordCloud" />
-      <IconSvgPlanedSvg @click="changeModelPage(PropertyPage, true)" />
+      <IconSvgButterflySvg @click="changeModelPage(InputPage, true)" />
+      <IconSvgPlanedSvg @click="changeModelPage(WordCloudPage, true)" />
       <IconSvgShareSvg @click="shareDialog = true" />
     </div>
   </div>
@@ -120,7 +116,7 @@ function handleWordCloud() {
   top: 50%;
   right: 1rem;
 
-  gap: 25px;
+  gap: 45px;
   align-items: center;
   flex-direction: column;
 

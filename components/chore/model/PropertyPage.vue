@@ -27,7 +27,7 @@ onMounted(() => {
       transformOrigin: 'top center',
       transform: 'scale(0.85) translateY(5%)',
     })
-  }, 500)
+  }, 300)
 
   viewer.model?.loadFBX('standing_greeting')
 })
@@ -384,7 +384,7 @@ function handleWordCloud() {
   top: 50%;
   right: 1rem;
 
-  gap: 25px;
+  gap: 45px;
   align-items: center;
   flex-direction: column;
 
