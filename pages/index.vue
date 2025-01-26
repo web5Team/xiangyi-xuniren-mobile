@@ -25,6 +25,23 @@ const progress = ref(0)
 const { x, y } = useMouse()
 const shareDialog = ref(false)
 
+const { share, isSupported } = useShare()
+
+watch(shareDialog, (val) => {
+  if (!isSupported)
+    return
+
+  if (val) {
+    share({
+      title: '相一APP',
+      text: 'XiangYi',
+      url: location.href,
+    })
+
+    shareDialog.value = false
+  }
+})
+
 const viewer = new Viewer()
 const loginState = useLoginState()
 
@@ -266,9 +283,9 @@ async function handleConversationStart(sentence: string) {
           <QuestionarePage v-if="!userStore.completeQuestion" />
         </div> -->
 
-        <TouchDialog v-model="shareDialog" :slider="false">
+        <!-- <TouchDialog v-model="shareDialog" :slider="false">
           <ChoreModelSharePage />
-        </TouchDialog>
+        </TouchDialog> -->
       </teleport>
     </client-only>
   </div>
