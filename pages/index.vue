@@ -28,8 +28,10 @@ const shareDialog = ref(false)
 const { share, isSupported } = useShare()
 
 watch(shareDialog, (val) => {
-  if (!isSupported)
+  if (!isSupported) {
+    forWikiDialogTip('无法创建分享', '当前设备不支持分享')
     return
+  }
 
   if (val) {
     share({
