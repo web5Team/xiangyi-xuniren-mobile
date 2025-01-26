@@ -32,8 +32,6 @@ async function handleLogin() {
 
   loginState.data.dialogVisible = true
 
-  recordGranted()
-
   await sleep(200)
 
   Object.assign(canvasDom.value!.style, {
@@ -174,7 +172,7 @@ provide('nextGuide', nextGuide)
     padding: 1rem 0;
     display: flex;
 
-    top: 50%;
+    top: 55%;
     left: 50%;
 
     // height: 25%;

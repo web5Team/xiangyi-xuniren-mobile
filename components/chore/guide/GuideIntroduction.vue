@@ -12,9 +12,9 @@ function handleClick() {
   <div class="GuideIntroduction">
     <IconSvgFingerPrint mx-auto @click="handleClick" />
 
-    <P mt-4>
+    <p mt-4>
       理解你、记住你、帮助你
-    </P>
+    </p>
     <p>也是你</p>
 
     <p class="desc">

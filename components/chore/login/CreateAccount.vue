@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import AppleIcon from '/svg/apple.svg'
 import SmsLogin from './sms/SmsLogin.vue'
 
 const nextComp: any = inject('nextComp')!
 
 const loginAvenues = reactive([
   {
-    icon: 'i-carbon-apple',
-    text: '苹果账号登录',
+    icon: AppleIcon,
+    text: '苹果登录',
+    click: () => void 0,
   },
   {
-    icon: 'i-carbon-email',
+    icon: '',
     text: '邮箱登录',
+    click: () => void 0,
   },
 ])
 
@@ -24,13 +27,14 @@ function handleSmsLogin() {
 
 <template>
   <div class="CreateAccount">
-    <p>
+    <p font-medium>
       开始创建新账户，这也是通往数字世界的钥匙
     </p>
 
     <div class="CreateAccount-Main">
       <el-button v-wave class="major-button" size="large" @click="handleSmsLogin">
-        <div i-carbon-phone mx-2 />手机验证码登录
+        <!-- <div i-carbon-phone mx-2 /> -->
+        手机
       </el-button>
 
       <div class="CreateAccount-Main-Divider">
@@ -43,7 +47,9 @@ function handleSmsLogin() {
           v-for="avenue in loginAvenues" :key="avenue.text" v-wave plain class="vice-button" size="large"
           @click="avenue?.click"
         >
-          <div mx-2 :class="avenue.icon" />
+          <div mx-2>
+            <img :src="avenue.icon">
+          </div>
           <span>{{ avenue.text }}</span>
         </el-button>
       </div>
@@ -58,6 +64,7 @@ function handleSmsLogin() {
     &:hover {
       background-color: var(--theme-color-light);
     }
+
     height: 60px;
     border-radius: 4px;
     opacity: 1;
@@ -74,6 +81,7 @@ function handleSmsLogin() {
     box-sizing: border-box;
     border: 1px solid #ffffff;
   }
+
   display: flex;
 
   gap: 0.5rem;
@@ -88,6 +96,7 @@ function handleSmsLogin() {
     top: 0;
     left: 50%;
 
+    color: var(--el-text-color-secondary);
     transform: translate(-50%, -50%);
     background-color: var(--el-bg-color);
   }

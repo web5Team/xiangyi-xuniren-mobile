@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import MainPage from '../model/MainPage.vue'
 import QuestionarePage from '../model/QuestionarePage.vue'
 import { useLoginState } from '.'
 import LoginFlower from '~/components/chore/login/LoginFlower.vue'
+import type { Viewer } from '~/composables/model/vrmViewer/viewer'
 
 const loginState = useLoginState()
 const changeModelPage: any = inject('changeModelPage')
+const viewer: Viewer = inject('viewer') as unknown as any
+const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
+const recordGranted: Function = inject('recordGranted') as unknown as any
+const options: any = inject('options') as unknown as any
 
 async function handleLoginDone() {
   if (!userStore.value.completeQuestion) {
@@ -14,6 +20,22 @@ async function handleLoginDone() {
   }
   else {
     loginState.data.dialogVisible = false
+
+    recordGranted()
+
+    await sleep(200)
+
+    Object.assign(canvasDom.value!.style, {
+      transformOrigin: '',
+      transform: '',
+    })
+
+    options.actionEnable = true
+
+    viewer.model?.loadFBX('idel_happy_02')
+    viewer.model?.emote('happy')
+
+    changeModelPage(MainPage, true)
   }
 }
 </script>

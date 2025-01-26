@@ -69,9 +69,15 @@ function actionToggle() {
   }, 15000)
 }
 
-onMounted(() => {
-  // forWikiDialogTip('语音链接已断开', '与远程服务器断开链接，请重新链接...')
+function handleToggle() {
+  const action = actions[Math.floor(Math.random() * actions.length)]
+  const emotion = emotions[Math.floor(Math.random() * emotions.length)]
 
+  viewer.model?.loadFBX(action)
+  viewer.model?.emote(emotion as any)
+}
+
+onMounted(() => {
   const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
 
   viewer.setup(canvas)
@@ -171,8 +177,6 @@ provide('recordGranted', recordGranted)
 provide('options', options)
 
 speechNls.sentenceBus.on((payload) => {
-  console.log('user said', payload.result)
-
   handleConversationStart(payload.result)
 })
 
@@ -227,7 +231,7 @@ async function handleConversationStart(sentence: string) {
 </script>
 
 <template>
-  <div class="ModelPage">
+  <div class="ModelPage" @click.stop="handleToggle">
     <div ref="dom" op-0 class="ModelPage-Model transition-cubic">
       <canvas />
     </div>

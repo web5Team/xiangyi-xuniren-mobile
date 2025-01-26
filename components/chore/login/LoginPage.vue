@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import type { INextCompOptions } from '.'
+import IndexPage from '../model/IndexPage.vue'
+import { type INextCompOptions, useLoginState } from '.'
 import QuickRegister from '~/components/chore/login/QuickRegister.vue'
 import CreateAccount from '~/components/chore/login/CreateAccount.vue'
+
+const changeModelPage: any = inject('changeModelPage')
 
 interface IDispComp {
   comp: Component
@@ -115,6 +118,15 @@ async function prevComp() {
   })
 }
 
+const loginState = useLoginState()
+async function backToGuide() {
+  changeModelPage(IndexPage, true)
+
+  await sleep(300)
+
+  loginState.data.dialogVisible = false
+}
+
 provide('nextComp', nextComp)
 provide('prevComp', prevComp)
 </script>
@@ -123,7 +135,16 @@ provide('prevComp', prevComp)
   <div class="LoginPage">
     <div ref="mainDom" class="LoginPage-Content transition-cubic">
       <div relative w-full flex items-center justify-center class="LoginPage-Content-Header">
-        <div v-if="options.stack.length > 0 && options.current.options.canBack" absolute left-0 active:op-50 class="arrow-icon" @click="prevComp">
+        <div
+          v-if="options.stack.length > 0 && options.current.options.canBack" absolute left-0 active:op-50
+          class="arrow-icon" @click="prevComp"
+        >
+          <div i-carbon-arrow-left />
+        </div>
+        <div
+          v-else absolute left-0 active:op-50
+          class="arrow-icon" @click="backToGuide"
+        >
           <div i-carbon-arrow-left />
         </div>
         <p>
