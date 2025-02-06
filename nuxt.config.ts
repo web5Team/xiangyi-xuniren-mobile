@@ -114,7 +114,7 @@ export default defineNuxtConfig({
           manualChunks: {
             three: ['three'],
             vrm: ['@pixiv/three-vrm'],
-            animation: ['~/composables/animations'],
+            animation: ['~/composables/model/daily'],
           },
         },
       },
