@@ -11,83 +11,85 @@ export async function getAIGCCompletionStream(
 
   const controller = new AbortController()
 
-  try {
-    const response: ReadableStream = await endHttp.$http({
-      url: 'bot/chat',
-      method: 'POST',
-      data: {
-        message: question,
-      },
-      headers: {
-        server: 'true',
-        Accept: 'text/event-stream',
-      },
-      adapter: 'fetch',
-      responseType: 'stream',
-      signal: controller.signal,
-    })
-    // const response = await fetch(url, {
-    //   method: 'POST',
-    //   headers: {
-    //     'server': 'true',
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `${userStore.value.token?.accessToken}`,
-    //   },
-    //   body: JSON.stringify({
-    //     message: question,
-    //   }),
-    //   signal: controller.signal,
-    // })
+  setTimeout(async () => {
+    try {
+      const response: ReadableStream = await endHttp.$http({
+        url: 'bot/chat',
+        method: 'POST',
+        data: {
+          message: question,
+        },
+        headers: {
+          server: 'true',
+          Accept: 'text/event-stream',
+        },
+        adapter: 'fetch',
+        responseType: 'stream',
+        signal: controller.signal,
+      })
+      // const response = await fetch(url, {
+      //   method: 'POST',
+      //   headers: {
+      //     'server': 'true',
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `${userStore.value.token?.accessToken}`,
+      //   },
+      //   body: JSON.stringify({
+      //     message: question,
+      //   }),
+      //   signal: controller.signal,
+      // })
 
-    // if (!response.ok) {
-    //   const error = await response.json()
-    //   onError(error)
-    //   return
-    // }
+      // if (!response.ok) {
+      //   const error = await response.json()
+      //   onError(error)
+      //   return
+      // }
 
-    const reader = response.pipeThrough(new TextDecoderStream()).getReader()
-    if (!reader) {
-      onError(new Error('No reader available'))
-      return
-    }
-
-    // const decoder = new TextDecoder()
-    let buffer = ''
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) {
-        onComplete()
-        break
+      const reader = response.pipeThrough(new TextDecoderStream()).getReader()
+      if (!reader) {
+        onError(new Error('No reader available'))
+        return
       }
 
-      buffer += value
-      const messages = buffer.split('\n\n')
-      buffer = messages.pop() || ''
+      // const decoder = new TextDecoder()
+      let buffer = ''
 
-      messages.forEach((message) => {
-        if (message.startsWith('data: ')) {
-          const data = message.slice(6)
-          if (data === '[DONE]') {
-            onComplete()
-          }
-          else {
-            try {
-              const json = JSON.parse(data)
-              if (json.data)
-                onMessage(json)
-            }
-            catch (parseError) {
-              onError(parseError)
-            }
-          }
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+          onComplete()
+          break
         }
-      })
+
+        buffer += value
+        const messages = buffer.split('\n\n')
+        buffer = messages.pop() || ''
+
+        messages.forEach((message) => {
+          if (message.startsWith('data: ')) {
+            const data = message.slice(6)
+            if (data === '[DONE]') {
+              onComplete()
+            }
+            else {
+              try {
+                const json = JSON.parse(data)
+                if (json.data)
+                  onMessage(json)
+              }
+              catch (parseError) {
+                onError(parseError)
+              }
+            }
+          }
+        })
+      }
     }
-  }
-  catch (error) {
-    onError(error)
-  }
+    catch (error) {
+      onError(error)
+    }
+  })
 
   return controller
 }
@@ -124,9 +126,8 @@ export class VoiceSynthesizer {
   // 播放音频流
   private async playAudioStream(text: string): Promise<void> {
     try {
-      if (this.audio) {
+      if (this.audio)
         speechSynthesis.cancel() // 停止之前的语音合成
-      }
 
       this.audio = new SpeechSynthesisUtterance(text)
       this.audio.onend = async () => {
@@ -181,9 +182,9 @@ export class VoiceSynthesizer {
   public stop(): void {
     if (this.isPlaying) {
       this.streamController.abort() // 终止流的下载
-      if (this.audio) {
+      if (this.audio)
         speechSynthesis.cancel() // 停止当前播放
-      }
+
       this.isPlaying = false
       this.textQueue = [] // 清空缓存队列
       console.log('Audio playback stopped.')
