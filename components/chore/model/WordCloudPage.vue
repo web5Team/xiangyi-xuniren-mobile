@@ -9,6 +9,7 @@ const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
 const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
 
+const date = ref(['', ''])
 const orienated = ref(false)
 
 onMounted(() => {
@@ -46,7 +47,15 @@ watchEffect(() => {
 })
 
 const visible = ref(false)
+
+function handleChange(dates: [string, string]) {
+
+  date.value = dates
+
+  console.log("changed", dates)
+}
 </script>
+
 
 <template>
   <div class="WordCloudPage" :class="{ orienated }">
@@ -89,7 +98,7 @@ const visible = ref(false)
       <IconSvgPlanedSvg @click="handleLeave(PropertyPage, true)" />
     </div>
 
-     <DateSelector v-model="visible" />
+     <DateSelector @change="handleChange" v-model="visible" />
   </div>
 </template>
 
