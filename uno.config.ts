@@ -2,17 +2,11 @@ import {
   defineConfig,
   presetAttributify,
   presetIcons,
-  presetTypography,
   presetUno,
   presetWebFonts,
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss'
-
-import FontCarbon from './constants/carbon.json'
-import FontMaterialSymbol from './constants/material-symbols.json'
-// import FontRemix from './constants/ri.json'
-// import FontLineMd from './constants/line-md.json'
 
 export default defineConfig({
   shortcuts: [
@@ -26,9 +20,6 @@ export default defineConfig({
     presetIcons({
       scale: 1.2,
     }),
-    presetTypography({
-      selectorName: 'ProseMirror',
-    }),
     presetWebFonts({
       fonts: {
         sans: 'DM Sans',
@@ -41,5 +32,4 @@ export default defineConfig({
     transformerDirectives(),
     transformerVariantGroup(),
   ],
-  safelist: [...FontCarbon, ...FontMaterialSymbol],
 })
