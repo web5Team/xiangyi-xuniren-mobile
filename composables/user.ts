@@ -1,9 +1,4 @@
 import './index'
-import { getAccountDetail, getPermissionList, getUserSubscription } from './api/account'
-import { endHttp } from './api/axios'
-import { $endApi } from './api/base'
-import { $event } from './events'
-import type { QuotaModel } from './api/base/v1/aigc/completion-types'
 
 export interface Bot {
   key: string
