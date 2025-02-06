@@ -6,9 +6,9 @@ import type { Viewer } from '~/composables/model/vrmViewer/viewer'
 import { $endApi } from '~/composables/api/base'
 import type { IQuestion } from '~/composables/api/base/v1/initial.type'
 
-import Step1Model from '~/composables/model/daily/guide/1.vrm?url'
-import Step2Model from '~/composables/model/daily/guide/2.vrm?url'
-import Step3Model from '~/composables/model/daily/guide/34.vrm?url'
+import Step1Model from '/model/daily/guide/1.vrm'
+import Step2Model from '/model/daily/guide/2.vrm'
+import Step3Model from '/model/daily/guide/34.vrm'
 
 import StandardModel from '/xyfemale.vrm'
 
