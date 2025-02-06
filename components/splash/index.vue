@@ -1,68 +1,69 @@
 <script lang="ts" setup>
-import { useDownloadModel, useDownloadModels } from ".";
-import Copyright from "~/components/chore/Copyright.vue";
+import { useDownloadModel, useDownloadModels } from '.'
+import Copyright from '~/components/chore/Copyright.vue'
 
-const actionList = Object.keys(import.meta.glob("~/composables/model/daily/*.fbx"));
-const modelList = ["/xyfemale.vrm", "/xymale.vrm"];
-const totalList = [...actionList, ...modelList];
+const actionList = Object.keys(import.meta.glob('~/composables/model/daily/*.fbx'))
+const modelList = ['/xyfemale.vrm', '/xymale.vrm']
+const totalList = [...actionList, ...modelList]
 
-const globalProgress = ref(0);
+const globalProgress = ref(0)
 
-const globalError = ref(false);
-const loading = ref(!false);
-const visible = ref(false);
+const globalError = ref(false)
+const loading = ref(!false)
+const visible = ref(false)
 
 async function handleDownloadModel() {
-  loading.value = true;
+  loading.value = true
 
-  globalProgress.value = 0;
-  globalError.value = false;
+  globalProgress.value = 0
+  globalError.value = false
 
   const { progress, isDownloading, error, download, abort } = useDownloadModels(
     totalList,
-    1
-  );
+    1,
+  )
 
-  const scope = effectScope();
+  const scope = effectScope()
 
   scope.run(() => {
     watch(progress, (val) => {
-      globalProgress.value = val;
-    });
+      globalProgress.value = val
+    })
 
     watch(isDownloading, (val) => {
-      if (val) loading.value = val;
+      if (val)
+        loading.value = val
 
       if (val === false) {
         nextTick(async () => {
           if (globalProgress.value === 100 && !globalError.value) {
-            scope.stop();
+            scope.stop()
 
-            await sleep(500);
+            await sleep(500)
 
-            loading.value = false;
+            loading.value = false
 
-            await sleep(500);
+            await sleep(500)
 
-            visible.value = true;
+            visible.value = true
           }
-        });
+        })
       }
-    });
+    })
 
     watch(error, (val) => {
       if (val) {
-        globalError.value = true;
+        globalError.value = true
 
-        abort?.();
+        abort?.()
       }
-    });
-  });
+    })
+  })
 
-  download();
+  download()
 }
 
-onMounted(handleDownloadModel);
+onMounted(handleDownloadModel)
 </script>
 
 <template>
@@ -78,7 +79,7 @@ onMounted(handleDownloadModel);
       />
     </div>
     <div
-      class="SplashModule-Copyright transition-cubic absolute-layout pointer-events-none z-10"
+      class="SplashModule-Copyright transition-cubic pointer-events-none absolute-layout z-10"
     >
       <Copyright />
     </div>

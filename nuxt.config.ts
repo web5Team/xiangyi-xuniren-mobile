@@ -109,15 +109,15 @@ export default defineNuxtConfig({
   vite: {
     build: {
       assetsInlineLimit: 4096,
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            three: ['three'],
-            vrm: ['@pixiv/three-vrm'],
-            animation: ['~/composables/model/daily'],
-          },
-        },
-      },
+      // rollupOptions: {
+      //   output: {
+      //     manualChunks: {
+      //       // three: ['three'],
+      //       // vrm: ['@pixiv/three-vrm'],
+      //       // animation: ['~/composables/model/daily'],
+      //     },
+      //   },
+      // },
       chunkSizeWarningLimit: 1000, // 提高警告阈值
     },
     assetsInclude: ['**/*.fbx'],
