@@ -3,13 +3,11 @@ import GhostPage from './GhostPage.vue'
 import MainPage from './MainPage.vue'
 import { $model } from './model-manager'
 import PropertyPage from './PropertyPage.vue'
+import DateSelector from '~/components/selector/DateSelector.vue'
 
 const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
 const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
-
-const value1 = ref('')
-const value2 = ref('')
 
 const orienated = ref(false)
 
@@ -46,6 +44,8 @@ watchEffect(() => {
   else
     orienated.value = false
 })
+
+const visible = ref(false)
 </script>
 
 <template>
@@ -63,20 +63,10 @@ watchEffect(() => {
       <div class="WordCloudPage-FingerPrint" @click="handleLeave(MainPage, true)">
         <IconSvgFingerPrint />
       </div>
-      <input
+      <input @click="visible = true" @focus="visible = true"
         class="absolute right-0 w-[80%] border-r-[0px] border-[#755BCE] rounded-bl-[4px] rounded-tl-[4px] text-white !outline-none" border bg-transparent
         p-2 placeholder="请选择日期"
       >
-    </div>
-
-    <div class="WordCloudPage-DateModal absolute-layout z-10">
-    <el-date-picker
-        v-model="value1"
-        type="daterange"
-        range-separator="To"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-      />
     </div>
 
 
@@ -98,19 +88,12 @@ watchEffect(() => {
       <IconSvgShareSvg @click="shareDialog = true" />
       <IconSvgPlanedSvg @click="handleLeave(PropertyPage, true)" />
     </div>
+
+     <DateSelector v-model="visible" />
   </div>
 </template>
 
 <style lang="scss" scoped>
-.WordCloudPage-DateModal {
-  position: absolute;
-
-  top: 0;
-  left: 0;
-
-  pointer-events: none;
-}
-
 .WordCloudPage-Orienation {
   z-index: 1;
   position: absolute;
