@@ -49,6 +49,10 @@ export default defineNuxtConfig({
         target: 'esnext',
       },
     },
+    compressPublicAssets: {
+      gzip: true,
+      brotli: true,
+    },
   },
 
   app: {
@@ -85,11 +89,6 @@ export default defineNuxtConfig({
     },
   },
 
-  sourcemap: {
-    server: true,
-    client: 'hidden',
-  },
-
   build: {
     transpile: [
       /^@antv/,
@@ -99,7 +98,28 @@ export default defineNuxtConfig({
 
   ssr: false,
 
+  components: [
+    {
+      path: '~/components',
+      extensions: ['.vue'], // 优先使用Vue组件
+      pathPrefix: false,
+    },
+  ],
+
   vite: {
+    build: {
+      assetsInlineLimit: 4096,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            three: ['three'],
+            vrm: ['@pixiv/three-vrm'],
+            animation: ['~/composables/animations'],
+          },
+        },
+      },
+      chunkSizeWarningLimit: 1000, // 提高警告阈值
+    },
     assetsInclude: ['**/*.fbx'],
   },
 })
