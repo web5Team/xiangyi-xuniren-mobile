@@ -4,12 +4,12 @@ import MainPage from './MainPage.vue'
 import QuestionarePage from './QuestionarePage.vue'
 import GhostPage from './GhostPage.vue'
 import WordCloudPage from './WordCloudPage.vue'
-import { useLoginState } from '~/components/chore/login/index'
 import type { Viewer } from '~/composables/model/vrmViewer/viewer'
-
+import { $endApi } from '~/composables/api/base'
 // loginState.data.dialogVisible = true
 const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
 const viewer: Viewer = inject('viewer') as unknown as any
+
 const changeModelPage: Function = inject('changeModelPage') as unknown as any
 const shareDialog: any = inject('shareDialog')
 
@@ -21,7 +21,19 @@ const property = reactive({
   humor: -2,
 })
 
-onMounted(() => {
+onMounted(async () => {
+  $endApi.v1.initial.modelInfo().then((res) => {
+    const { code, data } = res
+    if ( code === 1 ) {
+      const list = data.bot
+
+      list.forEach((item: any) => {
+        property[item.key] = item.num
+      })
+    }
+  })
+
+
   setTimeout(() => {
     Object.assign(canvasDom.value!.style, {
       transformOrigin: 'top center',
@@ -53,10 +65,19 @@ function handleGhost() {
 function handleWordCloud() {
   handleLeave(WordCloudPage, true)
 }
+
+onBeforeMount(() => {
+  $endApi.v1.initial.saveModelStats({
+    ...property,
+  }).then((res) => {
+    console.log(res)
+  })
+})
 </script>
 
 <template>
   <div class="ModelPropertyPage">
+
     <div class="ModelPropertyPage-Mask" />
     <div class="ModelPropertyPage-MaskStroke" />
 
