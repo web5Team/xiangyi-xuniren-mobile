@@ -157,6 +157,14 @@ export class SpeechNls {
 
           return true
         },
+      }, {
+        content: '关闭',
+        type: TipType.INFO,
+        onClick: async () => {
+          this.disconnect()
+
+          return true
+        },
       }])
     }
 

@@ -1,32 +1,35 @@
 <script setup lang="ts">
 // import { appName, globalOptions } from '~/constants'
 // import 'element-plus/theme-chalk/dark/css-vars.css'
+import SplashModule from "~/components/splash/index.vue";
 
 useHead({
-  title: 'xiangyi-xnr',
-})
+  title: "xiangyi-xnr",
+});
 
 onMounted(() => {
-  document.body.classList.add('mobile')
+  document.body.classList.add("mobile");
 
   // get width & height
   nextTick(() => {
-    const width = document.body.clientWidth
-    const height = document.body.clientHeight
+    const width = document.body.clientWidth;
+    const height = document.body.clientHeight;
 
     Object.assign(document.body.style, {
       width: `${width}px`,
       height: `${height}px`,
-    })
-  })
-})
+    });
+  });
+});
 </script>
 
 <template>
   <VitePwaManifest />
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <SplashModule>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </SplashModule>
 </template>
 
 <style style="scss">
@@ -135,7 +138,7 @@ div.el-dialog {
 
 span.premium {
   &:before {
-    content: 'PRO';
+    content: "PRO";
     position: relative;
     padding: 2px 4px;
     margin-right: 2px;
@@ -169,7 +172,7 @@ span.premium-normal {
 
 span.premium-end {
   &:after {
-    content: 'PRO';
+    content: "PRO";
     position: relative;
     padding: 2px 4px;
     margin-left: 2px;
@@ -214,7 +217,7 @@ span.premium-end {
     }
 
     &:after {
-      content: '';
+      content: "";
       position: absolute;
 
       right: -20%;
@@ -356,7 +359,7 @@ span.premium-end {
 span.air-dot {
   &.loading {
     &:after {
-      content: '';
+      content: "";
       position: absolute;
 
       left: -18px;
@@ -373,7 +376,7 @@ span.air-dot {
   }
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
 
     left: -18px;
@@ -405,7 +408,7 @@ span.air-dot {
 .el-tabs.flat-linear {
   .el-tabs__item {
     &:after {
-      content: '';
+      content: "";
       position: absolute;
 
       top: -1px;
@@ -457,7 +460,7 @@ span.air-dot {
   .el-tabs__nav {
     .el-tabs__active-bar {
       &:before {
-        content: '';
+        content: "";
         position: absolute;
 
         top: 20%;
@@ -511,7 +514,7 @@ font.immersive-translate-target-wrapper {
 
 .fake-background::after {
   z-index: -1;
-  content: '';
+  content: "";
   position: absolute;
 
   top: 0;
@@ -558,7 +561,7 @@ font.immersive-translate-target-wrapper {
   gap: 0.125rem;
   grid-template-columns: auto 1fr;
   grid-template-rows: 1fr 1fr;
-  grid-template-areas: 'image title' 'image subtitle';
+  grid-template-areas: "image title" "image subtitle";
 
   align-items: center;
 }
