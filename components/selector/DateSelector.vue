@@ -1,38 +1,38 @@
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue: string
-  size?: 'default' | 'small' | 'large'
-}>()
+  modelValue: boolean;
+  size?: "default" | "small" | "large";
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-  (e: 'change', dates: [string, string]): void
-}>()
+  (e: "update:modelValue", value: string): void;
+  (e: "change", dates: [string, string]): void;
+}>();
 
-const visible = useVModel(props, 'modelValue', emit)
+const visible = useVModel(props, "modelValue", emit);
 
 // 添加开始和结束日期
-const startDate = ref('')
-const endDate = ref('')
+const startDate = ref("");
+const endDate = ref("");
 
 // 格式化日期函数
-const formatDate = (date: string) => {
-  if (!date) return ''
-  return new Date(date).toLocaleDateString('zh-CN').replace(/\//g, '/')
+function formatDate(date: string) {
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("zh-CN").replace(/\//g, "/");
 }
 
 // 监听日期变化
 watch([startDate, endDate], ([newStart, newEnd]) => {
   if (newStart && newEnd) {
-    emit('change', [formatDate(newStart), formatDate(newEnd)])
+    emit("change", [formatDate(newStart), formatDate(newEnd)]);
     // 选择完成后关闭弹窗
-    visible.value = false
+    visible.value = false;
   }
-})
+});
 </script>
 
 <template>
-  <div :class="{ visible }" class="absolute-layout DateSelector">
+  <div :class="{ visible }" class="DateSelector absolute-layout">
     <div class="DateSelector-Content">
       <div class="DateSelector-Content-Date w-full">
         <el-date-picker
@@ -55,6 +55,12 @@ watch([startDate, endDate], ([newStart, newEnd]) => {
 
 <style lang="scss" scoped>
 .DateSelector {
+  :deep(.el-input__wrapper) {
+    color: #fff;
+    font-weight: 600;
+    background-color: #0000;
+  }
+
   z-index: 10;
   opacity: 0;
   pointer-events: none;

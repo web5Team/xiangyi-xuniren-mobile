@@ -1,83 +1,89 @@
 <script setup lang="ts">
-import GhostPage from './GhostPage.vue'
-import MainPage from './MainPage.vue'
-import { $model } from './model-manager'
-import PropertyPage from './PropertyPage.vue'
-import DateSelector from '~/components/selector/DateSelector.vue'
+import GhostPage from "./GhostPage.vue";
+import MainPage from "./MainPage.vue";
+import { $model } from "./model-manager";
+import PropertyPage from "./PropertyPage.vue";
+import DateSelector from "~/components/selector/DateSelector.vue";
 
-const shareDialog: any = inject('shareDialog')
-const changeModelPage: any = inject('changeModelPage')
-const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
+import ChartWordCloud from "~/components/chart/WordCloud.vue";
 
-const date = ref(['', ''])
-const orienated = ref(false)
+import IconSvgGhostSvg from "~/components/icon/svg/GhostSvg.vue";
+import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
+import IconSvgShareSvg from "~/components/icon/svg/ShareSvg.vue";
+import IconSvgPlanedSvg from "~/components/icon/svg/PlanedSvg.vue";
+import IconSvgOrienationSvg from "~/components/icon/svg/OrienationSvg.vue";
+
+const shareDialog: any = inject("shareDialog");
+const changeModelPage: any = inject("changeModelPage");
+const canvasDom: Ref<HTMLElement> = (inject("canvasDom") as unknown) as any;
+
+const date = ref(["", ""]);
+const orienated = ref(false);
 
 onMounted(() => {
-  $model.stopRecord()
+  $model.stopRecord();
 
   Object.assign(canvasDom.value!.style, {
-    transformOrigin: 'center bottom',
-    transform: 'scale(0.75)',
-  })
-})
+    transformOrigin: "center bottom",
+    transform: "scale(0.75)",
+  });
+});
 
 async function handleLeave(page: Component, show: boolean) {
-  if (!canvasDom.value)
-    return
+  if (!canvasDom.value) return;
 
   Object.assign(canvasDom.value.style, {
-    transformOrigin: '',
-    transform: '',
-  })
+    transformOrigin: "",
+    transform: "",
+  });
 
-  await sleep(200)
+  await sleep(200);
 
-  $model.startRecord()
+  $model.startRecord();
 
-  changeModelPage(page, show)
+  changeModelPage(page, show);
 }
 
-const { alpha, beta, gamma } = useDeviceOrientation()
+const { alpha, beta, gamma } = useDeviceOrientation();
 // 监听这三个参数 如果用户横屏
 watchEffect(() => {
-  if (+alpha.value > 0 || +beta.value > 0 || +gamma.value > 0)
-    orienated.value = true
-  else
-    orienated.value = false
-})
+  if (+alpha.value > 0 || +beta.value > 0 || +gamma.value > 0) orienated.value = true;
+  else orienated.value = false;
+});
 
-const visible = ref(false)
+const visible = ref(false);
 
 function handleChange(dates: [string, string]) {
+  date.value = dates;
 
-  date.value = dates
-
-  console.log("changed", dates)
+  console.log("changed", dates);
 }
 </script>
-
 
 <template>
   <div class="WordCloudPage" :class="{ orienated }">
     <div class="WordCloudPage-Date">
       <p class="day">
-        <span mr-2>{{ userStore.days || 0 }}</span>天
+        <span mr-2>{{ userStore.days || 0 }}</span
+        >天
       </p>
-      <p class="desc">
-        今天是{{ userStore.name }}与你相随
-      </p>
+      <p class="desc">今天是{{ userStore.name }}与你相随</p>
     </div>
 
     <div class="WordCloudPage-Title">
       <div class="WordCloudPage-FingerPrint" @click="handleLeave(MainPage, true)">
         <IconSvgFingerPrint />
       </div>
-      <input @click="visible = true" @focus="visible = true"
-        class="absolute right-0 w-[80%] border-r-[0px] border-[#755BCE] rounded-bl-[4px] rounded-tl-[4px] text-white !outline-none" border bg-transparent
-        p-2 placeholder="请选择日期"
-      >
+      <input
+        class="absolute right-0 w-[80%] border-r-[0px] border-[#755BCE] rounded-bl-[4px] rounded-tl-[4px] text-white !outline-none"
+        border
+        bg-transparent
+        p-2
+        placeholder="请选择日期"
+        @click="visible = true"
+        @focus="visible = true"
+      />
     </div>
-
 
     <div class="WordCloudPage-Content">
       <div class="transition-cubic">
@@ -98,7 +104,7 @@ function handleChange(dates: [string, string]) {
       <IconSvgPlanedSvg @click="handleLeave(PropertyPage, true)" />
     </div>
 
-     <DateSelector @change="handleChange" v-model="visible" />
+    <DateSelector v-model="visible" @change="handleChange" />
   </div>
 </template>
 
@@ -116,8 +122,8 @@ function handleChange(dates: [string, string]) {
   line-height: normal;
   letter-spacing: 0em;
 
-  font-variation-settings: 'opsz' auto;
-  font-feature-settings: 'kern' on;
+  font-variation-settings: "opsz" auto;
+  font-feature-settings: "kern" on;
   color: #c5c5c5;
 }
 
@@ -181,7 +187,7 @@ function handleChange(dates: [string, string]) {
         font-family: Source Han Sans;
         font-weight: 400;
         font-size: 36px;
-        font-variation-settings: 'opsz' auto;
+        font-variation-settings: "opsz" auto;
       }
 
       color: #aeb3be;
@@ -189,7 +195,7 @@ function handleChange(dates: [string, string]) {
       font-family: Source Han Sans;
       font-weight: 400;
       font-size: 20px;
-      font-variation-settings: 'opsz' auto;
+      font-variation-settings: "opsz" auto;
     }
 
     .desc {
@@ -200,8 +206,8 @@ function handleChange(dates: [string, string]) {
       text-align: center;
       letter-spacing: 0px;
 
-      font-variation-settings: 'opsz' auto;
-      font-feature-settings: 'kern' on;
+      font-variation-settings: "opsz" auto;
+      font-feature-settings: "kern" on;
       color: #9e9e9e;
     }
 
@@ -212,8 +218,8 @@ function handleChange(dates: [string, string]) {
     text-align: center;
     letter-spacing: 0px;
 
-    font-variation-settings: 'opsz' auto;
-    font-feature-settings: 'kern' on;
+    font-variation-settings: "opsz" auto;
+    font-feature-settings: "kern" on;
   }
 }
 
