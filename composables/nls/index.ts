@@ -66,6 +66,7 @@ export class SpeechNls {
   // audioStream: MediaStream | undefined
 
   cacheSentence: string = ''
+  error: string = ''
 
   status: SpeechStatus = SpeechStatus.DISCONNECTED
   statusBus = useEventBus<SpeechStatus>('ON_STATUS_UPDATED')
@@ -79,10 +80,10 @@ export class SpeechNls {
   }
 
   async connect() {
+    this.error = ''
     this.updateStatus(SpeechStatus.CONNECTING)
 
     const socketUrl = `${END_URL}?token=${TOKEN}`
-
     const websocket = this.ws = new WebSocket(socketUrl)
 
     websocket.onopen = () => {
@@ -108,21 +109,16 @@ export class SpeechNls {
       websocket.send(JSON.stringify(startTranscriptionMessage))
     }
 
-    const tiptap = createTapTip()
-
     websocket.onmessage = (event) => {
-      console.log(`服务端: ${event.data}`)
-
       const message = JSON.parse(event.data) as RootObject
-
       this.dataBus.emit(message)
 
-      if (message.header.name === 'TranscriptionStarted') { this.updateStatus(SpeechStatus.Ready) }
+      if (message.header.name === 'TranscriptionStarted') {
+        this.updateStatus(SpeechStatus.Ready)
+      }
       else if (message.header.name === 'SentenceBegin') {
         this.cacheSentence = ''
         this.sentenceCacheBus.emit(message.payload)
-
-        tiptap.setLoading(true).setType(TipType.INFO).setMessage('识别中...').setStay(-1).show()
       }
       else if (message.header.name === 'TranscriptionResultChanged') {
         this.cacheSentence = message.payload.result
@@ -131,41 +127,18 @@ export class SpeechNls {
       else if (message.header.name === 'SentenceEnd') {
         this.cacheSentence = message.payload.result
         this.sentenceCacheBus.emit(message.payload)
-
         this.sentenceBus.emit(message.payload)
-
-        tiptap.setLoading(false).setType(TipType.SUCCESS).setMessage('识别完成').setStay(2200).show()
       }
       else if (message.header.name === 'TaskFailed') {
+        this.error = '无法完成识别'
         console.error('Task failed:', message.payload)
-
-        tiptap.setLoading(false).setType(TipType.ERROR).setMessage('无法完成识别').setStay(3000).show()
       }
     }
 
     websocket.onerror = (event) => {
+      this.error = '无法连接至远程服务器'
       this.updateStatus(SpeechStatus.Error)
-
       console.error('WebSocket error observed:', event)
-
-      forWikiDialogTip('语音连接已断开', '无法连接至远程服务器', [{
-        content: '重新链接',
-        type: TipType.INFO,
-        onClick: async () => {
-          this.disconnect()
-          await this.connect()
-
-          return true
-        },
-      }, {
-        content: '关闭',
-        type: TipType.INFO,
-        onClick: async () => {
-          this.disconnect()
-
-          return true
-        },
-      }])
     }
 
     websocket.onclose = () => {
