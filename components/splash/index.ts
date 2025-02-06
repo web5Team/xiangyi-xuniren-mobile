@@ -11,7 +11,7 @@ export function useDownloadModel(url: string, abort: AbortSignal) {
       isDownloading.value = true
       error.value = null
 
-      const response = await fetch(`${url}?t=${Date.now()}`, { signal: abort })
+      const response = await fetch(`${url}?v=1`, { signal: abort })
 
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`)
