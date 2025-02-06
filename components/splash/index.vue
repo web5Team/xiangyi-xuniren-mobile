@@ -2,7 +2,7 @@
 import { useDownloadModel, useDownloadModels } from ".";
 import Copyright from "~/components/chore/Copyright.vue";
 
-const actionList = Object.keys(import.meta.glob("~/composables/model/daily/**/*.fbx"));
+const actionList = Object.keys(import.meta.glob("~/composables/model/daily/*.fbx"));
 const modelList = ["/xyfemale.vrm", "/xymale.vrm"];
 const totalList = [...actionList, ...modelList];
 

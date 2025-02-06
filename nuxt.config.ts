@@ -98,4 +98,8 @@ export default defineNuxtConfig({
   },
 
   ssr: false,
+
+  vite: {
+    assetsInclude: ['**/*.fbx'],
+  },
 })
