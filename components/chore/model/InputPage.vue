@@ -1,81 +1,88 @@
 <script setup lang="ts">
-import GhostPage from './GhostPage.vue'
-import MainPage from './MainPage.vue'
-import { $model } from './model-manager'
-import WordCloudPage from './WordCloudPage.vue'
-import { getAIGCCompletionStream } from '~/composables/api/base/v1/aigc/completion'
+import GhostPage from "./GhostPage.vue";
+import MainPage from "./MainPage.vue";
+import { $model } from "./model-manager";
+import WordCloudPage from "./WordCloudPage.vue";
+import { getAIGCCompletionStream } from "~/composables/api/base/v1/aigc/completion";
 
-const shareDialog: any = inject('shareDialog')
-const changeModelPage: any = inject('changeModelPage')
-const options: any = inject('options') as unknown as any
-const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
+import IconSvgGhostSvg from "~/components/icon/svg/GhostSvg.vue";
+import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
+import IconSvgShareSvg from "~/components/icon/svg/ShareSvg.vue";
+import IconSvgPlanedSvg from "~/components/icon/svg/PlanedSvg.vue";
+import IconSvgButterflyFilledSvg from "~/components/icon/svg/ButterflyFilledSvg.vue";
+
+const shareDialog: any = inject("shareDialog");
+const changeModelPage: any = inject("changeModelPage");
+const options: any = (inject("options") as unknown) as any;
+const canvasDom: Ref<HTMLElement> = (inject("canvasDom") as unknown) as any;
 
 onMounted(() => {
-  $model.stopRecord()
-  options.voiceEnable = false
+  $model.stopRecord();
+  options.voiceEnable = false;
 
   Object.assign(canvasDom.value!.style, {
-    transformOrigin: 'center bottom',
-    transform: 'scale(0.75)',
-  })
-})
+    transformOrigin: "center bottom",
+    transform: "scale(0.75)",
+  });
+});
 
 async function handleLeave(page: Component, show: boolean) {
-  if (!canvasDom.value)
-    return
+  if (!canvasDom.value) return;
 
   Object.assign(canvasDom.value.style, {
-    transformOrigin: '',
-    transform: '',
-  })
+    transformOrigin: "",
+    transform: "",
+  });
 
-  await sleep(200)
+  await sleep(200);
 
-  $model.startRecord()
-  options.voiceEnable = true
+  $model.startRecord();
+  options.voiceEnable = true;
 
-  changeModelPage(page, show)
+  changeModelPage(page, show);
 }
 
 function handleGhost() {
-  handleLeave(GhostPage, false)
+  handleLeave(GhostPage, false);
 }
 
 function handleWordCloud() {
-  handleLeave(WordCloudPage, true)
+  handleLeave(WordCloudPage, true);
 }
 
-let lastSignal: any
+let lastSignal: any;
 const display = reactive({
-  input: '',
-  result: '',
-})
+  input: "",
+  result: "",
+});
 
 async function handleConversationStart(sentence: string) {
-  if (!display.input)
-    return
+  if (!display.input) return;
 
-  document.body.blur()
+  document.body.blur();
 
-  display.result = ''
+  display.result = "";
 
-  lastSignal?.abort?.()
+  lastSignal?.abort?.();
 
-  lastSignal = getAIGCCompletionStream(sentence, (message: any) => {
-    const { event, data } = message
-    if (event !== 'conversation.message.delta')
-      return
+  lastSignal = getAIGCCompletionStream(
+    sentence,
+    (message: any) => {
+      const { event, data } = message;
+      if (event !== "conversation.message.delta") return;
 
-    const { content, type } = data
-    if (type !== 'answer')
-      return
+      const { content, type } = data;
+      if (type !== "answer") return;
 
-    display.result += (content)
-  }, (error: any) => {
-    console.warn(error)
-  }, () => {
-    console.warn('======= COMPLETED =======')
-  })
+      display.result += content;
+    },
+    (error: any) => {
+      console.warn(error);
+    },
+    () => {
+      console.warn("======= COMPLETED =======");
+    }
+  );
 }
 </script>
 
@@ -83,20 +90,26 @@ async function handleConversationStart(sentence: string) {
   <div class="ModelInputPage">
     <div class="ModelInputPage-Date">
       <p class="day">
-        <span mr-2>{{ userStore.days || 0 }}</span>天
+        <span mr-2>{{ userStore.days || 0 }}</span
+        >天
       </p>
-      <p class="desc">
-        今天是{{ userStore.name }}与你相随
-      </p>
+      <p class="desc">今天是{{ userStore.name }}与你相随</p>
     </div>
 
     <div class="ModelInputPage-Display">
-      <div :class="{ hide: !display.result }" class="ModelInputPage-Display-Show transition-cubic">
+      <div
+        :class="{ hide: !display.result }"
+        class="ModelInputPage-Display-Show transition-cubic"
+      >
         {{ display.result }}
       </div>
-      <div class="ModelInputPage-Display-Input" @keydown.enter="handleConversationStart(display.input)">
+      <div
+        class="ModelInputPage-Display-Input"
+        @keydown.enter="handleConversationStart(display.input)"
+      >
         <textarea
-          v-model="display.input" placeholder="欢迎来到相一科技
+          v-model="display.input"
+          placeholder="欢迎来到相一科技
 在这里
 聊你所想
 ..."
@@ -142,8 +155,8 @@ async function handleConversationStart(sentence: string) {
     letter-spacing: 0em;
 
     overflow-y: scroll;
-    font-variation-settings: 'opsz' auto;
-    font-feature-settings: 'kern' on;
+    font-variation-settings: "opsz" auto;
+    font-feature-settings: "kern" on;
     color: #151515;
   }
 
@@ -168,8 +181,8 @@ async function handleConversationStart(sentence: string) {
       text-align: center;
       letter-spacing: 0em;
 
-      font-variation-settings: 'opsz' auto;
-      font-feature-settings: 'kern' on;
+      font-variation-settings: "opsz" auto;
+      font-feature-settings: "kern" on;
       color: #151515;
     }
 
@@ -216,7 +229,7 @@ async function handleConversationStart(sentence: string) {
         font-family: Source Han Sans;
         font-weight: 400;
         font-size: 36px;
-        font-variation-settings: 'opsz' auto;
+        font-variation-settings: "opsz" auto;
       }
 
       color: #aeb3be;
@@ -224,7 +237,7 @@ async function handleConversationStart(sentence: string) {
       font-family: Source Han Sans;
       font-weight: 400;
       font-size: 20px;
-      font-variation-settings: 'opsz' auto;
+      font-variation-settings: "opsz" auto;
     }
 
     .desc {
@@ -235,8 +248,8 @@ async function handleConversationStart(sentence: string) {
       text-align: center;
       letter-spacing: 0px;
 
-      font-variation-settings: 'opsz' auto;
-      font-feature-settings: 'kern' on;
+      font-variation-settings: "opsz" auto;
+      font-feature-settings: "kern" on;
       color: #9e9e9e;
     }
 
@@ -247,8 +260,8 @@ async function handleConversationStart(sentence: string) {
     text-align: center;
     letter-spacing: 0px;
 
-    font-variation-settings: 'opsz' auto;
-    font-feature-settings: 'kern' on;
+    font-variation-settings: "opsz" auto;
+    font-feature-settings: "kern" on;
   }
 }
 

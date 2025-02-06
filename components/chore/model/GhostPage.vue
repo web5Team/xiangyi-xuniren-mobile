@@ -1,24 +1,29 @@
 <script setup lang="ts">
-import InputPage from './InputPage.vue'
-import MainPage from './MainPage.vue'
-import { $model } from './model-manager'
-import WordCloudPage from './WordCloudPage.vue'
+import InputPage from "./InputPage.vue";
+import MainPage from "./MainPage.vue";
+import { $model } from "./model-manager";
+import WordCloudPage from "./WordCloudPage.vue";
 
-const shareDialog: any = inject('shareDialog')
-const changeModelPage: any = inject('changeModelPage')
+import IconSvgGhostFilledSvg from "~/components/icon/svg/GhostFilledSvg.vue";
+import IconSvgButterflySvg from "~/components/icon/svg/ButterflySvg.vue";
+import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
+import IconSvgShareSvg from "~/components/icon/svg/ShareSvg.vue";
+import IconSvgPlanedSvg from "~/components/icon/svg/PlanedSvg.vue";
 
-const stream = computed(() => $model.stream.value)
+const shareDialog: any = inject("shareDialog");
+const changeModelPage: any = inject("changeModelPage");
+
+const stream = computed(() => $model.stream.value);
 </script>
 
 <template>
   <div class="ModelGhostPage">
     <div class="ModelGhostPage-Date">
       <p class="day">
-        <span mr-2>{{ userStore.days || 0 }}</span>天
+        <span mr-2>{{ userStore.days || 0 }}</span
+        >天
       </p>
-      <p class="desc">
-        今天是{{ userStore.name }}与你相随
-      </p>
+      <p class="desc">今天是{{ userStore.name }}与你相随</p>
     </div>
 
     <div class="ModelGhostPage-Content">
@@ -64,7 +69,7 @@ const stream = computed(() => $model.stream.value)
         font-family: Source Han Sans;
         font-weight: 400;
         font-size: 36px;
-        font-variation-settings: 'opsz' auto;
+        font-variation-settings: "opsz" auto;
       }
 
       color: #aeb3be;
@@ -72,7 +77,7 @@ const stream = computed(() => $model.stream.value)
       font-family: Source Han Sans;
       font-weight: 400;
       font-size: 20px;
-      font-variation-settings: 'opsz' auto;
+      font-variation-settings: "opsz" auto;
     }
 
     .desc {
@@ -83,8 +88,8 @@ const stream = computed(() => $model.stream.value)
       text-align: center;
       letter-spacing: 0px;
 
-      font-variation-settings: 'opsz' auto;
-      font-feature-settings: 'kern' on;
+      font-variation-settings: "opsz" auto;
+      font-feature-settings: "kern" on;
       color: #9e9e9e;
     }
 
@@ -95,8 +100,8 @@ const stream = computed(() => $model.stream.value)
     text-align: center;
     letter-spacing: 0px;
 
-    font-variation-settings: 'opsz' auto;
-    font-feature-settings: 'kern' on;
+    font-variation-settings: "opsz" auto;
+    font-feature-settings: "kern" on;
   }
 }
 

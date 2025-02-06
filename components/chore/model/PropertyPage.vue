@@ -1,17 +1,23 @@
 <script setup lang="ts">
-import { $model } from './model-manager'
-import MainPage from './MainPage.vue'
-import QuestionarePage from './QuestionarePage.vue'
-import GhostPage from './GhostPage.vue'
-import WordCloudPage from './WordCloudPage.vue'
-import type { Viewer } from '~/composables/model/vrmViewer/viewer'
-import { $endApi } from '~/composables/api/base'
-// loginState.data.dialogVisible = true
-const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
-const viewer: Viewer = inject('viewer') as unknown as any
+import { $model } from "./model-manager";
+import MainPage from "./MainPage.vue";
+import QuestionarePage from "./QuestionarePage.vue";
+import GhostPage from "./GhostPage.vue";
+import WordCloudPage from "./WordCloudPage.vue";
+import type { Viewer } from "~/composables/model/vrmViewer/viewer";
+import { $endApi } from "~/composables/api/base";
 
-const changeModelPage: Function = inject('changeModelPage') as unknown as any
-const shareDialog: any = inject('shareDialog')
+import IconSvgGhostSvg from "~/components/icon/svg/GhostSvg.vue";
+import IconSvgButterflySvg from "~/components/icon/svg/ButterflySvg.vue";
+import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
+import IconSvgShareSvg from "~/components/icon/svg/ShareSvg.vue";
+import IconSvgPlanedSvg from "~/components/icon/svg/PlanedSvg.vue";
+
+const canvasDom: Ref<HTMLElement> = (inject("canvasDom") as unknown) as any;
+const viewer: Viewer = (inject("viewer") as unknown) as any;
+
+const changeModelPage: Function = (inject("changeModelPage") as unknown) as any;
+const shareDialog: any = inject("shareDialog");
 
 const property = reactive({
   profession: 1,
@@ -19,65 +25,64 @@ const property = reactive({
   memory: 3,
   consciousness: -1,
   humor: -2,
-})
+});
 
 onMounted(async () => {
   $endApi.v1.initial.modelInfo().then((res) => {
-    const { code, data } = res
-    if ( code === 1 ) {
-      const list = data.bot
+    const { code, data } = res;
+    if (code === 1) {
+      const list = data.bot;
 
       list.forEach((item: any) => {
-        property[item.key] = item.num
-      })
+        property[item.key] = item.num;
+      });
     }
-  })
-
+  });
 
   setTimeout(() => {
     Object.assign(canvasDom.value!.style, {
-      transformOrigin: 'top center',
-      transform: 'scale(0.85) translateY(5%)',
-    })
-  }, 300)
+      transformOrigin: "top center",
+      transform: "scale(0.85) translateY(5%)",
+    });
+  }, 100);
 
-  viewer.model?.loadFBX('standing_greeting')
-})
+  viewer.model?.loadFBX("standing_greeting");
+});
 
 async function handleLeave(page: Component, show: boolean) {
-  if (!canvasDom.value)
-    return
+  if (!canvasDom.value) return;
 
   Object.assign(canvasDom.value.style, {
-    transformOrigin: '',
-    transform: '',
-  })
+    transformOrigin: "",
+    transform: "",
+  });
 
-  await sleep(200)
+  await sleep(200);
 
-  changeModelPage(page, show)
+  changeModelPage(page, show);
 }
 
 function handleGhost() {
-  handleLeave(GhostPage, false)
+  handleLeave(GhostPage, false);
 }
 
 function handleWordCloud() {
-  handleLeave(WordCloudPage, true)
+  handleLeave(WordCloudPage, true);
 }
 
 onBeforeMount(() => {
-  $endApi.v1.initial.saveModelStats({
-    ...property,
-  }).then((res) => {
-    console.log(res)
-  })
-})
+  $endApi.v1.initial
+    .saveModelStats({
+      ...property,
+    })
+    .then((res) => {
+      console.log(res);
+    });
+});
 </script>
 
 <template>
   <div class="ModelPropertyPage">
-
     <div class="ModelPropertyPage-Mask" />
     <div class="ModelPropertyPage-MaskStroke" />
 
@@ -101,36 +106,61 @@ onBeforeMount(() => {
       <div class="ModelPropertyPage-Main-Inner">
         <div class="ModelPropertyPage-Main-InnerItem">
           <el-slider
-            v-model="property.humor" :class="{ hide: property.humor < -2 }" :min="-3" :max="3" :step="1"
-            vertical height="200px"
+            v-model="property.humor"
+            :class="{ hide: property.humor < -2 }"
+            :min="-3"
+            :max="3"
+            :step="1"
+            vertical
+            height="200px"
           />
           <span>幽默感</span>
         </div>
         <div class="ModelPropertyPage-Main-InnerItem">
           <el-slider
-            v-model="property.profession" :class="{ hide: property.profession < -2 }" :min="-3" :max="3"
-            :step="1" vertical height="200px"
+            v-model="property.profession"
+            :class="{ hide: property.profession < -2 }"
+            :min="-3"
+            :max="3"
+            :step="1"
+            vertical
+            height="200px"
           />
           <span>专业化</span>
         </div>
         <div class="ModelPropertyPage-Main-InnerItem">
           <el-slider
-            v-model="property.impromptu" :class="{ hide: property.impromptu < -2 }" :min="-3" :max="3"
-            :step="1" vertical height="200px"
+            v-model="property.impromptu"
+            :class="{ hide: property.impromptu < -2 }"
+            :min="-3"
+            :max="3"
+            :step="1"
+            vertical
+            height="200px"
           />
           <span>即兴度</span>
         </div>
         <div class="ModelPropertyPage-Main-InnerItem">
           <el-slider
-            v-model="property.memory" :class="{ hide: property.memory < -2 }" :min="-3" :max="3" :step="1"
-            vertical height="200px"
+            v-model="property.memory"
+            :class="{ hide: property.memory < -2 }"
+            :min="-3"
+            :max="3"
+            :step="1"
+            vertical
+            height="200px"
           />
           <span>记忆度</span>
         </div>
         <div class="ModelPropertyPage-Main-InnerItem">
           <el-slider
-            v-model="property.consciousness" :class="{ hide: property.consciousness < -2 }" :min="-3" :max="3"
-            :step="1" vertical height="200px"
+            v-model="property.consciousness"
+            :class="{ hide: property.consciousness < -2 }"
+            :min="-3"
+            :max="3"
+            :step="1"
+            vertical
+            height="200px"
           />
           <span>自我意识</span>
         </div>
@@ -172,7 +202,7 @@ onBeforeMount(() => {
       }
 
       &::after {
-        content: '';
+        content: "";
         position: absolute;
 
         bottom: 1px;
@@ -218,8 +248,8 @@ onBeforeMount(() => {
       text-align: center;
       letter-spacing: 0px;
 
-      font-variation-settings: 'opsz' auto;
-      font-feature-settings: 'kern' on;
+      font-variation-settings: "opsz" auto;
+      font-feature-settings: "kern" on;
       color: #737373;
     }
 
@@ -265,11 +295,7 @@ onBeforeMount(() => {
   opacity: 0.1;
 
   // mask 正中间镂空的圆形
-  background-image: radial-gradient(
-    circle at 50% 25%,
-    #8e6ff7 96px,
-    #0000 96px
-  );
+  background-image: radial-gradient(circle at 50% 25%, #8e6ff7 96px, #0000 96px);
 }
 
 .ModelPropertyPage {
@@ -282,7 +308,7 @@ onBeforeMount(() => {
 
       color: #fff;
       font-size: 16px;
-      font-variation-settings: 'opsz' auto;
+      font-variation-settings: "opsz" auto;
 
       border-radius: 28px;
       background: #8e6ff7;
@@ -327,7 +353,7 @@ onBeforeMount(() => {
         text-align: center;
         letter-spacing: 0px;
 
-        font-variation-settings: 'opsz' auto;
+        font-variation-settings: "opsz" auto;
         color: #ffffff;
 
         border-radius: 13px;
@@ -343,7 +369,7 @@ onBeforeMount(() => {
     text-align: center;
     letter-spacing: 0px;
 
-    font-variation-settings: 'opsz' auto;
+    font-variation-settings: "opsz" auto;
 
     position: absolute;
     padding: 1rem 0;
@@ -364,8 +390,7 @@ onBeforeMount(() => {
 
     transform: translateY(120%);
 
-    animation: popFadeIn 0.25s 0.125s cubic-bezier(0.215, 0.61, 0.355, 1)
-      forwards;
+    animation: popFadeIn 0.25s 0.125s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
   }
 
   position: absolute;

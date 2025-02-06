@@ -1,30 +1,35 @@
 <script setup lang="ts">
-import GhostPage from './GhostPage.vue'
-import InputPage from './InputPage.vue'
-import PropertyPage from './PropertyPage.vue'
-import WordCloudPage from './WordCloudPage.vue'
+import GhostPage from "./GhostPage.vue";
+import InputPage from "./InputPage.vue";
+import PropertyPage from "./PropertyPage.vue";
+import WordCloudPage from "./WordCloudPage.vue";
 
-const shareDialog: any = inject('shareDialog')
-const changeModelPage: any = inject('changeModelPage')
+import IconSvgGhostSvg from "~/components/icon/svg/GhostSvg.vue";
+import IconSvgButterflySvg from "~/components/icon/svg/ButterflySvg.vue";
+import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
+import IconSvgShareSvg from "~/components/icon/svg/ShareSvg.vue";
+import IconSvgPlanedSvg from "~/components/icon/svg/PlanedSvg.vue";
+
+const shareDialog: any = inject("shareDialog");
+const changeModelPage: any = inject("changeModelPage");
 
 function handleGhost() {
-  changeModelPage(GhostPage, false)
+  changeModelPage(GhostPage, false);
 }
 
 function handleWordCloud() {
-  changeModelPage(WordCloudPage, true)
+  changeModelPage(WordCloudPage, true);
 }
 </script>
 
 <template>
-  <div class="ModelMainPage">
+  <div class="ModelMainPage absolute-layout">
     <div class="ModelMainPage-Date">
       <p class="day">
-        <span mr-2>{{ userStore.days || 0 }}</span>天
+        <span mr-2>{{ userStore.days || 0 }}</span
+        >天
       </p>
-      <p class="desc">
-        今天是{{ userStore.name }}与你相随
-      </p>
+      <p class="desc">今天是{{ userStore.name }}与你相随</p>
     </div>
 
     <div class="ModelMainPage-FingerPrint">
@@ -54,7 +59,7 @@ function handleWordCloud() {
         font-family: Source Han Sans;
         font-weight: 400;
         font-size: 36px;
-        font-variation-settings: 'opsz' auto;
+        font-variation-settings: "opsz" auto;
       }
 
       color: #aeb3be;
@@ -62,7 +67,7 @@ function handleWordCloud() {
       font-family: Source Han Sans;
       font-weight: 400;
       font-size: 20px;
-      font-variation-settings: 'opsz' auto;
+      font-variation-settings: "opsz" auto;
     }
 
     .desc {
@@ -73,8 +78,8 @@ function handleWordCloud() {
       text-align: center;
       letter-spacing: 0px;
 
-      font-variation-settings: 'opsz' auto;
-      font-feature-settings: 'kern' on;
+      font-variation-settings: "opsz" auto;
+      font-feature-settings: "kern" on;
       color: #9e9e9e;
     }
 
@@ -85,8 +90,8 @@ function handleWordCloud() {
     text-align: center;
     letter-spacing: 0px;
 
-    font-variation-settings: 'opsz' auto;
-    font-feature-settings: 'kern' on;
+    font-variation-settings: "opsz" auto;
+    font-feature-settings: "kern" on;
   }
 }
 
