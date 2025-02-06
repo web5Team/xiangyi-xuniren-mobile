@@ -8,6 +8,9 @@ const shareDialog: any = inject('shareDialog')
 const changeModelPage: any = inject('changeModelPage')
 const canvasDom: Ref<HTMLElement> = inject('canvasDom') as unknown as any
 
+const value1 = ref('')
+const value2 = ref('')
+
 const orienated = ref(false)
 
 onMounted(() => {
@@ -66,6 +69,17 @@ watchEffect(() => {
       >
     </div>
 
+    <div class="WordCloudPage-DateModal absolute-layout z-10">
+    <el-date-picker
+        v-model="value1"
+        type="daterange"
+        range-separator="To"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+      />
+    </div>
+
+
     <div class="WordCloudPage-Content">
       <div class="transition-cubic">
         <ClientOnly>
@@ -88,6 +102,13 @@ watchEffect(() => {
 </template>
 
 <style lang="scss" scoped>
+.WordCloudPage-DateModal {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+}
+
 .WordCloudPage-Orienation {
   z-index: 1;
   position: absolute;
