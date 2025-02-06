@@ -15,7 +15,6 @@
  */
 
 import axios, { type AxiosResponse, type CreateAxiosDefaults } from 'axios'
-import { $event } from '../events'
 import type { IStandardResponse } from './base/index.type'
 
 const refreshOptions: {
@@ -83,7 +82,7 @@ export function genAxios(options: CreateAxiosDefaults) {
   )
 
   async function timeoutLogout() {
-    $event.emit('USER_LOGOUT_SUCCESS', LogoutType.TOKEN_EXPIRED)
+    console.error('timeoutLogout')
   }
 
   $http.interceptors.response.use(
@@ -94,47 +93,7 @@ export function genAxios(options: CreateAxiosDefaults) {
       if ((res.data.code === 1101 || res.data?.code === 401)) {
         if (!userStore.value.isLogin)
           return timeoutLogout()
-
-        // refresh
-        const { config } = res
-
-        // url不包含 renew_token
-        if (!config.url?.includes('renew_token')) {
-          if (!refreshOptions.pending) {
-            refreshOptions.pending = true
-
-            console.log('refresh new token', userStore.value.token, userStore.value.token?.refreshToken)
-
-            const res: any = await $http({
-              method: 'GET',
-              url: 'auth/renew_token',
-              params: {
-                refresh_token: userStore.value.token?.refreshToken,
-              },
-            })
-
-            refreshOptions.pending = false
-            if (res.code === 200) {
-              userStore.value.token = res.data
-
-              return $http(config)
-            }
-            else {
-              return timeoutLogout()
-            }
-          }
-          else {
-            return new Promise((resolve, reject) => {
-              refreshOptions.queue.push({ resolve, reject, reqConfig: config })
-            })
-          }
-        }
-        else {
-          return timeoutLogout()
-        }
       }
-
-      console.log(res.data)
 
       return res.data
     },

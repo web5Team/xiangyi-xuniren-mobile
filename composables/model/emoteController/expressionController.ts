@@ -33,6 +33,10 @@ export class ExpressionController {
     }
   }
 
+  getAutoLookAt() {
+    return this._autoLookAt
+  }
+
   public playEmotion(preset: VRMExpressionPresetName) {
     if (this._currentEmotion != 'neutral')
       this._expressionManager?.setValue(this._currentEmotion, 0)

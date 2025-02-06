@@ -26,7 +26,7 @@ const emits = defineEmits(["retry"]);
         :stroke-width="10"
         type="circle"
         :percentage="percentage"
-        :format="() => `${Math.round(percentage)}%`"
+        :format="() => `${Math.round(percentage ?? 0)}%`"
       >
         <template v-if="error">
           <div font-b5ld flex items-center justify-center font-size-10 text-red-500>

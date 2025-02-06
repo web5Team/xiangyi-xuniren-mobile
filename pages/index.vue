@@ -1,9 +1,8 @@
 <script setup lang="ts">
+import { ElMessage } from "element-plus";
 import { userStore } from "../composables/user";
-import PropertyPage from "../components/chore/model/PropertyPage.vue";
 import QuestionarePage from "~/components/chore/model/QuestionarePage.vue";
 import LoginPage from "~/components/chore/login/LoginPage.vue";
-import TouchDialog from "~/components/dialog/TouchDialog.vue";
 import MainPage from "~/components/chore/model/MainPage.vue";
 import { Viewer } from "~/composables/model/vrmViewer/viewer";
 import model from "/xyfemale.vrm";
@@ -21,12 +20,13 @@ import {
   getAIGCCompletionStream,
 } from "~/composables/api/base/v1/aigc/completion";
 import { $endApi } from "~/composables/api/base";
-import { forWikiDialogTip } from "~/composables/tip";
+import { ActionManager } from "~/composables/model/action-manager";
 
 const dom = ref<HTMLElement>();
 const container = ref<HTMLElement>();
 const { x, y } = useMouse();
 const shareDialog = ref(false);
+const actionManager = shallowRef<ActionManager>();
 
 const { share, isSupported } = useShare();
 
@@ -34,7 +34,7 @@ watch(
   () => shareDialog.value,
   (val) => {
     if (!isSupported) {
-      forWikiDialogTip("无法创建分享", "当前设备不支持分享");
+      ElMessage.error("当前设备不支持分享");
       return;
     }
 
@@ -57,28 +57,6 @@ const options = reactive({
   voiceEnable: true,
   actionEnable: true,
 });
-const actions = [
-  "idle_01",
-  "idle_02",
-  "idle_03",
-  "idle_01",
-  "idle_02",
-  "idle_03",
-  "sitting",
-  "standing_greeting",
-  "idel_happy_01",
-];
-const emotions = [
-  "happy",
-  "neutral",
-  "blinkLeft",
-  "blinkRight",
-  "blink",
-  "neutral",
-  "relaxed",
-  "sad",
-  "surprised",
-];
 
 function recordGranted() {
   if (permissionGranted.value) return;
@@ -104,26 +82,6 @@ function recordGranted() {
   );
 }
 
-function actionToggle() {
-  useIntervalFn(() => {
-    if (!options.actionEnable) return;
-
-    const action = actions[Math.floor(Math.random() * actions.length)];
-    const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-
-    viewer.model?.loadFBX(action);
-    viewer.model?.emote(emotion as any);
-  }, 15000);
-}
-
-function handleToggle() {
-  const action = actions[Math.floor(Math.random() * actions.length)];
-  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-
-  viewer.model?.loadFBX(action);
-  viewer.model?.emote(emotion as any);
-}
-
 onMounted(() => {
   const canvas = dom.value!.querySelector("canvas") as HTMLCanvasElement;
 
@@ -137,9 +95,6 @@ onMounted(() => {
 
   promise
     .then(() => {
-      // go action
-      setTimeout(() => actionToggle(), 1000);
-
       if (!userStore.value.isLogin) {
         changeModelPage(IndexPage, true);
       } else {
@@ -152,15 +107,27 @@ onMounted(() => {
         });
 
         recordGranted();
+
+        actionManager.value = new ActionManager(viewer);
+        actionManager.value.startToggle();
       }
 
       dom.value?.attributes.removeNamedItem("op-0");
+
       container.value?.attributes.removeNamedItem("op-0");
     })
     .catch(() => {
-      forWikiDialogTip("加载模型失败", "请检查网络连接，或刷新重试...");
+      ElMessage.error("请检查网络连接，或刷新重试...");
     });
 });
+
+watch(
+  () => options.actionEnable,
+  (val) => {
+    if (val) actionManager.value?.startToggle();
+    else actionManager.value?.endToggle();
+  }
+);
 
 onBeforeUnmount(() => {
   $model.stopRecord();
@@ -182,13 +149,13 @@ async function changeModelPage(targetComponent: Component, modelShow: boolean = 
 
   el.style.opacity = "0";
 
-  await sleep(300);
+  await sleep(200);
 
   if (dom.value) dom.value!.style.opacity = modelShow ? "1" : "0";
 
   modelComponent.value = targetComponent;
 
-  await sleep(300);
+  await sleep(200);
 
   el.style.opacity = "1";
 }
@@ -256,7 +223,7 @@ async function handleConversationStart(sentence: string) {
 </script>
 
 <template>
-  <div class="ModelPage" @click.stop="handleToggle">
+  <div class="ModelPage">
     <div ref="dom" op-0 class="ModelPage-Model transition-cubic">
       <canvas />
     </div>
@@ -277,14 +244,6 @@ async function handleConversationStart(sentence: string) {
         >
           <LoginPage v-if="loginState.data.dialogVisible" />
         </div>
-
-        <!-- <div class="QuestionareWrapper transition-cubic" :class="{ visible: !userStore.completeQuestion }">
-          <QuestionarePage v-if="!userStore.completeQuestion" />
-        </div> -->
-
-        <!-- <TouchDialog v-model="shareDialog" :slider="false">
-          <ChoreModelSharePage />
-        </TouchDialog> -->
       </teleport>
     </client-only>
   </div>

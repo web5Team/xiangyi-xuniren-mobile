@@ -35,7 +35,7 @@ export function useDownloadModel(url: string, abort: AbortSignal) {
         receivedLength += value.length
 
         // 计算下载进度
-        progress.value = (receivedLength / contentLength) * 100
+        progress.value = Math.max((receivedLength / contentLength) * 100, 100)
       }
 
       // 合并数据块

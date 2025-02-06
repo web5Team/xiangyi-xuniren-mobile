@@ -222,6 +222,9 @@ export class Viewer {
     if (!vrm)
       return
 
+    if (!this.isReady)
+      return
+
     const { ndcX, ndcY } = getNormalizedMousePosition({ x, y }, this._renderer!.domElement)
     const { yaw, pitch } = calculateYawPitch(ndcX, ndcY, this._camera!.fov, this._camera!.aspect)
 
@@ -240,10 +243,6 @@ export class Viewer {
         animateFn(this.model.vrm, this._clock)
     }
 
-    // if (this._renderer && this._camera) {
-    //     this._renderer.render(this._scene, this._camera);
-    // }
-
     if (this._renderer && this._camera && this.model?.vrm) {
       this._renderer.render(this._scene, this._camera)
 
@@ -253,7 +252,7 @@ export class Viewer {
 
       // 计算相对变换矩阵
       const relativeMatrix = modelMatrix.clone().multiply(cameraMatrixInverse)
-      const relativeRotation = new THREE.Euler().setFromRotationMatrix(relativeMatrix)
+      const _relativeRotation = new THREE.Euler().setFromRotationMatrix(relativeMatrix)
 
       // 打印相对旋转值
       // console.log('Relative Rotation X:', relativeRotation.x, 'Y:', relativeRotation.y, 'Z:', relativeRotation.z);
