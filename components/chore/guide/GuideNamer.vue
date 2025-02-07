@@ -1,25 +1,25 @@
 <script setup>
-import { useLoginState } from '../login'
-import GuideAuth from './GuideAuth.vue'
+import { useLoginState } from "../login";
+import GuideAuth from "./GuideAuth.vue";
+import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
 
-const name = ref('')
-const loginState = useLoginState()
-const nextGuide = inject('nextGuide')
+const name = ref("");
+const loginState = useLoginState();
+const nextGuide = inject("nextGuide");
 
 function handleNext() {
-  if (!name.value)
-    return
+  if (!name.value) return;
 
-  nextGuide(GuideAuth, 150)
+  nextGuide(GuideAuth, 150);
 
-  loginState.data.name = name.value
+  loginState.data.name = name.value;
 }
 </script>
 
 <template>
   <div class="GuideNamer flex items-center">
     <div class="GuideNamer-Input" mt-4>
-      <input v-model="name" autofocus>
+      <input v-model="name" autofocus />
       <div
         :style="`${name?.length ? 'opacity: 0' : ''}`"
         class="GuideNamer-Input-Placeholder transition-cubic pointer-events-none"
@@ -28,7 +28,12 @@ function handleNext() {
         <span>|</span>
       </div>
     </div>
-    <IconSvgFingerPrint :class="{ fade: !name }" class="transition-cubic" mx-auto @click="handleNext" />
+    <IconSvgFingerPrint
+      :class="{ fade: !name }"
+      class="transition-cubic"
+      mx-auto
+      @click="handleNext"
+    />
   </div>
 </template>
 
@@ -87,8 +92,8 @@ function handleNext() {
   text-align: center;
   letter-spacing: 0px;
 
-  font-variation-settings: 'opsz' auto;
-  font-feature-settings: 'kern' on;
+  font-variation-settings: "opsz" auto;
+  font-feature-settings: "kern" on;
   color: #696969;
 }
 </style>

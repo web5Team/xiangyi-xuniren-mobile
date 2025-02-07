@@ -1,10 +1,11 @@
 <script setup>
-import GuideNamer from './GuideNamer.vue'
+import GuideNamer from "./GuideNamer.vue";
+import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
 
-const nextGuide = inject('nextGuide')
+const nextGuide = inject("nextGuide");
 
 function handleClick() {
-  nextGuide(GuideNamer, 100)
+  nextGuide(GuideNamer, 100);
 }
 </script>
 
@@ -12,9 +13,7 @@ function handleClick() {
   <div class="GuideIntroduction">
     <IconSvgFingerPrint mx-auto @click="handleClick" />
 
-    <p mt-4>
-      理解你、记住你、帮助你
-    </p>
+    <p mt-4>理解你、记住你、帮助你</p>
     <p>也是你</p>
 
     <p class="desc">
@@ -37,8 +36,8 @@ function handleClick() {
     text-align: center;
     letter-spacing: 0px;
 
-    font-variation-settings: 'opsz' auto;
-    font-feature-settings: 'kern' on;
+    font-variation-settings: "opsz" auto;
+    font-feature-settings: "kern" on;
     color: #696969;
   }
 
@@ -49,8 +48,8 @@ function handleClick() {
   text-align: center;
   letter-spacing: 0px;
 
-  font-variation-settings: 'opsz' auto;
-  font-feature-settings: 'kern' on;
+  font-variation-settings: "opsz" auto;
+  font-feature-settings: "kern" on;
   color: #696969;
 }
 </style>
