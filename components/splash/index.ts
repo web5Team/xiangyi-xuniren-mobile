@@ -71,6 +71,7 @@ export function useDownloadModels(urls: string[], maxConcurrency: number) {
   const isDownloading = ref(false)
   const error = ref<string | null>(null)
   const abortController = new AbortController()
+  const activeTask = ref<string[]>([])
 
   const download = async () => {
     if (urls.length === 0)
@@ -100,10 +101,15 @@ export function useDownloadModels(urls: string[], maxConcurrency: number) {
           const downloader = useDownloadModel(url, abortController.signal)
 
           // 监听单个下载进度并更新总进度
-          watch(downloader.progress, (newProgress) => {
+          const unwatch = watch(downloader.progress, (newProgress) => {
             progressArray[index] = newProgress
             progress.value = progressArray.reduce((a: number, b: number) => a + b, 0) / urls.length
+
+            if (progress.value >= 100)
+              unwatch()
           })
+
+          activeTask.value.push(url)
 
           try {
             const result = await downloader.download()
@@ -113,6 +119,9 @@ export function useDownloadModels(urls: string[], maxConcurrency: number) {
             error.value = e instanceof Error ? e.message : '下载失败'
             abortController.abort()
             throw e
+          }
+          finally {
+            activeTask.value = activeTask.value.filter(item => item !== url)
           }
         }
       }
@@ -135,9 +144,10 @@ export function useDownloadModels(urls: string[], maxConcurrency: number) {
   }
 
   return {
-    progress,
-    isDownloading,
     error,
+    progress,
+    activeTask,
+    isDownloading,
     download,
     abort: () => abortController.abort(),
   }

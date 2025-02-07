@@ -1,80 +1,84 @@
 <script lang="ts" setup>
-import { useDownloadModel, useDownloadModels } from '.'
-import Copyright from '~/components/chore/Copyright.vue'
+import { useDownloadModel, useDownloadModels } from ".";
+import Copyright from "~/components/chore/Copyright.vue";
 
-const actionList = Object.keys(import.meta.glob('~/composables/model/daily/*.fbx'))
-const modelList = ['/xyfemale.vrm', '/xymale.vrm']
-const totalList = [...actionList, ...modelList]
+const actionList = Object.keys(import.meta.glob("~/composables/model/daily/*.fbx"));
+const modelList = ["/xyfemale.vrm", "/xymale.vrm"];
+const totalList = [...actionList, ...modelList];
 
-const globalProgress = ref(0)
+const globalProgress = ref(0);
 
-const globalError = ref(false)
-const loading = ref(!false)
-const visible = ref(false)
+const globalError = ref(!false);
+const loading = ref(false);
+const visible = ref(false);
+
+const { progress, isDownloading, error, download, abort, activeTask } = useDownloadModels(
+  totalList,
+  1
+);
 
 async function handleDownloadModel() {
-  loading.value = true
+  if (activeTask.value.length > 0) return;
 
-  globalProgress.value = 0
-  globalError.value = false
+  loading.value = true;
 
-  const { progress, isDownloading, error, download, abort } = useDownloadModels(
-    totalList,
-    1,
-  )
+  globalProgress.value = 0;
+  globalError.value = false;
 
-  const scope = effectScope()
+  const scope = effectScope();
 
   scope.run(() => {
     watch(progress, (val) => {
-      globalProgress.value = val
-    })
+      globalProgress.value = val;
+    });
 
     watch(isDownloading, (val) => {
-      if (val)
-        loading.value = val
+      if (val) loading.value = val;
 
       if (val === false) {
-        nextTick(async () => {
-          if (globalProgress.value === 100 && !globalError.value) {
-            scope.stop()
+        if (globalProgress.value >= 100 && !globalError.value) {
+          nextTick(async () => {
+            scope.stop();
 
-            await sleep(500)
+            await sleep(3000);
 
-            loading.value = false
+            loading.value = false;
 
-            await sleep(500)
+            await sleep(200);
 
-            visible.value = true
-          }
-        })
+            visible.value = true;
+          });
+        }
       }
-    })
+    });
 
     watch(error, (val) => {
       if (val) {
-        globalError.value = true
+        globalError.value = true;
 
-        abort?.()
+        activeTask.value = [];
+
+        abort?.();
       }
-    })
-  })
+    });
+  });
 
-  download()
+  download();
 }
 
-onMounted(handleDownloadModel)
+onMounted(handleDownloadModel);
 </script>
 
 <template>
   <div :class="{ visible, loading }" class="SplashModule absolute-layout z-10">
-    <div class="SplashModule-Content absolute-layout">
+    <div class="SplashModule-Content transition-cubic absolute-layout">
       <slot />
     </div>
-    <div class="SplashModule-Loading absolute-layout z-10">
+    <div class="SplashModule-Loading transition-cubic absolute-layout z-10">
       <SplashLoading
         :error="globalError"
         :percentage="globalProgress"
+        :tasks="activeTask"
         @retry="handleDownloadModel"
       />
     </div>
