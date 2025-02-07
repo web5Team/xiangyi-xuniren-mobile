@@ -31,7 +31,9 @@ const text = computed(() => {
     :class="{ error }"
     class="SplashLoading absolute-layout flex items-center justify-center"
   >
-    <div class="SplashLoading-Content transition-cubic">
+    <div
+      class="SplashLoading-Content transition-cubic flex flex-col items-center justify-center"
+    >
       <el-progress
         color="#8E6FF7"
         :stroke-width="10"

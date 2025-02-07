@@ -8,7 +8,7 @@ const totalList = [...actionList, ...modelList];
 
 const globalProgress = ref(0);
 
-const globalError = ref(!false);
+const globalError = ref(false);
 const loading = ref(false);
 const visible = ref(false);
 
@@ -77,7 +77,7 @@ onMounted(handleDownloadModel);
     <div class="SplashModule-Loading transition-cubic absolute-layout z-10">
       <SplashLoading
         :error="globalError"
-        :percentage="globalProgress"
+        :percentage="Math.min(globalProgress, 100)"
         :tasks="activeTask"
         @retry="handleDownloadModel"
       />
