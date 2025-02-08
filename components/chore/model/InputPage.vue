@@ -103,17 +103,13 @@ async function handleConversationStart(sentence: string) {
       >
         {{ display.result }}
       </div>
-      <div
-        class="ModelInputPage-Display-Input"
-        @keydown.enter="handleConversationStart(display.input)"
-      >
-        <textarea
-          v-model="display.input"
-          placeholder="欢迎来到相一科技
-在这里
-聊你所想
-..."
-        />
+      <div class="ModelInputPage-Display-InputWrapper">
+        <div class="ModelInputPage-Display-Input">
+          <textarea v-model="display.input" placeholder="点击这里输入文字内容" />
+        </div>
+        <el-button text plain @click="handleConversationStart(display.input)">
+          发送
+        </el-button>
       </div>
     </div>
 
@@ -160,6 +156,25 @@ async function handleConversationStart(sentence: string) {
     color: #151515;
   }
 
+  &-InputWrapper {
+    padding: 0.25rem;
+    display: flex;
+
+    width: 100%;
+    height: 30%;
+
+    gap: 0.5rem;
+    flex-shrink: 0;
+    align-items: flex-end;
+
+    button {
+      flex-shrink: 0;
+
+      border-radius: 8px;
+      background-color: #f6f6f6;
+    }
+  }
+
   &-Input {
     textarea {
       position: absolute;
@@ -187,13 +202,11 @@ async function handleConversationStart(sentence: string) {
     }
 
     position: relative;
-    padding: 0.25rem;
 
     width: 100%;
-    height: 30%;
+    height: 100%;
 
-    flex-shrink: 0;
-
+    flex: 1;
     border-radius: 8px;
     background-color: #f6f6f6;
   }
@@ -204,7 +217,7 @@ async function handleConversationStart(sentence: string) {
   top: 5%;
   left: 50%;
 
-  width: 40%;
+  width: 45%;
   height: 30%;
 
   gap: 0.5rem;
