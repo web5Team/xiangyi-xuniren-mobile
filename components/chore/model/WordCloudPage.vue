@@ -12,13 +12,18 @@ import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
 import IconSvgShareSvg from "~/components/icon/svg/ShareSvg.vue";
 import IconSvgPlanedSvg from "~/components/icon/svg/PlanedSvg.vue";
 import IconSvgOrienationSvg from "~/components/icon/svg/OrienationSvg.vue";
+import {
+  useDeviceOrientationDirection,
+  useRotateElement,
+} from "~/composables/orienation-resize";
 
 const shareDialog: any = inject("shareDialog");
 const changeModelPage: any = inject("changeModelPage");
 const canvasDom: Ref<HTMLElement> = (inject("canvasDom") as unknown) as any;
+const contentDom = ref<HTMLElement | null>(null);
 
 const date = ref(["", ""]);
-const orienated = ref(false);
+const { width } = useWindowSize();
 
 onMounted(() => {
   $model.stopRecord();
@@ -44,11 +49,11 @@ async function handleLeave(page: Component, show: boolean) {
   changeModelPage(page, show);
 }
 
-const { alpha, beta, gamma } = useDeviceOrientation();
-// 监听这三个参数 如果用户横屏
-watchEffect(() => {
-  if (+alpha.value > 0 || +beta.value > 0 || +gamma.value > 0) orienated.value = true;
-  else orienated.value = false;
+const direction = useDeviceOrientationDirection();
+// useRotateElement(contentDom, direction);
+
+watch(direction, () => {
+  console.log({ direction: direction.value });
 });
 
 const visible = ref(false);
@@ -61,7 +66,7 @@ function handleChange(dates: [string, string]) {
 </script>
 
 <template>
-  <div class="WordCloudPage" :class="{ orienated }">
+  <div class="WordCloudPage" :class="{ orienated: direction !== 'flat' }">
     <div class="WordCloudPage-Date">
       <p class="day">
         <span mr-2>{{ userStore.days || 0 }}</span
@@ -85,8 +90,8 @@ function handleChange(dates: [string, string]) {
       />
     </div>
 
-    <div class="WordCloudPage-Content">
-      <div class="transition-cubic">
+    <div :class="[direction]" :style="`--w: ${width}px`" class="WordCloudPage-Content">
+      <div ref="contentDom" class="transition-cubic">
         <ClientOnly>
           <ChartWordCloud />
         </ClientOnly>
@@ -127,32 +132,48 @@ function handleChange(dates: [string, string]) {
   color: #c5c5c5;
 }
 
-.orienated .WordCloudPage-Content {
-  & > div {
-    z-index: 2;
-    position: absolute;
+// .orienated .WordCloudPage-Content {
+//   & > div {
+//     z-index: 2;
+//     position: absolute;
 
-    bottom: 0%;
-    height: 100vw;
-    width: 100vh;
+//     bottom: 0%;
+//     height: 100vw;
+//     width: 100vh;
 
-    transform: rotateZ(90deg);
-  }
-}
+//     transform: rotateZ(90deg);
+//   }
+// }
 
 .WordCloudPage-Content {
-  & > div {
-    position: absolute;
-
-    bottom: 0%;
-    height: 80%;
-    width: 100%;
+  &.left {
+    & > div {
+      transform: rotateZ(90deg);
+    }
   }
 
+  &.right {
+    & > div {
+      transform: rotateZ(-90deg);
+    }
+  }
+
+  & > div {
+    position: relative;
+
+    margin: auto;
+
+    height: var(--w, 0);
+    width: var(--w, 0);
+  }
   position: absolute;
+  display: flex;
 
   width: 100%;
   height: 100%;
+
+  justify-content: center;
+  align-items: center;
 
   background-color: #100c2a;
 }
