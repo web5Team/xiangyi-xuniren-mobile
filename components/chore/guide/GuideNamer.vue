@@ -19,7 +19,7 @@ function handleNext() {
 <template>
   <div class="GuideNamer flex items-center">
     <div class="GuideNamer-Input" mt-4>
-      <input v-model="name" autofocus />
+      <input v-model="name" maxlength="10" autofocus />
       <div
         :style="`${name?.length ? 'opacity: 0' : ''}`"
         class="GuideNamer-Input-Placeholder transition-cubic pointer-events-none"

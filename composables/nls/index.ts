@@ -1,6 +1,6 @@
 const END_URL = 'wss://nls-gateway.cn-shanghai.aliyuncs.com/ws/v1'
 const APPKEY = 'ckxnZMvhbPN4jD6g' // 获取Appkey请前往控制台：https://nls-portal.console.aliyun.com/applist
-const TOKEN = '3f1584737c62452ab3ecb7b23a9fc55b' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
+const TOKEN = '0341203deee1471f917ad084866b1fb7' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
 
 export enum SpeechStatus {
   CONNECTING = 'Connecting',

@@ -3,6 +3,7 @@ import InputPage from "./InputPage.vue";
 import MainPage from "./MainPage.vue";
 import { $model } from "./model-manager";
 import WordCloudPage from "./WordCloudPage.vue";
+import ChoreWavingRecorder from "~/components/chore/WavingRecorder.vue";
 
 import IconSvgGhostFilledSvg from "~/components/icon/svg/GhostFilledSvg.vue";
 import IconSvgButterflySvg from "~/components/icon/svg/ButterflySvg.vue";

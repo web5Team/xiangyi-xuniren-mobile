@@ -4,6 +4,7 @@ import MainPage from "./MainPage.vue";
 import QuestionarePage from "./QuestionarePage.vue";
 import GhostPage from "./GhostPage.vue";
 import WordCloudPage from "./WordCloudPage.vue";
+import InputPage from "./InputPage.vue";
 import type { Viewer } from "~/composables/model/vrmViewer/viewer";
 import { $endApi } from "~/composables/api/base";
 
@@ -90,10 +91,10 @@ onBeforeMount(() => {
       <IconSvgFingerPrint />
     </div>
 
-    <div class="ModelPropertyPage-Nav">
+    <div class="ModelPropertyPage-Nav z-10">
       <IconSvgGhostSvg @click="handleGhost" />
-      <IconSvgButterflySvg @click="handleWordCloud" />
-      <IconSvgPlanedSvg />
+      <IconSvgButterflySvg @click="handleLeave(InputPage, true)" />
+      <IconSvgPlanedSvg @click="handleWordCloud" />
       <IconSvgShareSvg @click="shareDialog = true" />
     </div>
 
