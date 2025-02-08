@@ -1,83 +1,99 @@
 <script setup lang="ts">
-import { useLoginState } from '..'
-import CreateAccount from '../CreateAccount.vue'
-import QuickRegister from '../QuickRegister.vue'
-import Success from '../Success.vue'
-import { $endApi } from '~/composables/api/base'
+import { useLoginState } from "..";
+import CreateAccount from "../CreateAccount.vue";
+import QuickRegister from "../QuickRegister.vue";
+import Success from "../Success.vue";
+import { $endApi } from "~/composables/api/base";
 
-const router = useRouter()
-const input = ref<HTMLElement>()
-const loginState = useLoginState()
-const nextComp: any = inject('nextComp')
-const prevComp: any = inject('prevComp')
+const router = useRouter();
+const input = ref<HTMLElement>();
+const loginState = useLoginState();
+const nextComp: any = inject("nextComp");
+const prevComp: any = inject("prevComp");
 
 const options = reactive({
   loading: false,
-  code: '',
+  code: "",
   step: 2,
-})
+});
 
-const valid = computed(() => `${options.code}`.length === 5)
+const valid = computed(() => `${options.code}`.length === 5);
 
 async function handleSmsLogin() {
-  if (!valid.value)
-    return
+  if (!valid.value) return;
 
-  options.loading = true
+  options.loading = true;
 
-  const res = await $endApi.v1.auth.loginOrRegister(loginState.data.identifier, options.code)
+  const res = await $endApi.v1.auth.loginOrRegister(
+    loginState.data.identifier,
+    options.code
+  );
 
-  options.loading = false
+  options.loading = false;
 
-  if (loginState.data.mode === 'register') {
-    if (responseMessage(res, {
-      success: '',
-      triggerOnDataNull: false,
-    })) {
-      loginState.data.stashedToken = res.data.token
-      userStore.value.completeQuestion = !!res.data.complete_question
+  if (loginState.data.mode === "register") {
+    if (
+      responseMessage(res, {
+        success: "",
+        triggerOnDataNull: false,
+      })
+    ) {
+      loginState.data.stashedToken = res.data.token;
+      userStore.value.completeQuestion = !!res.data.complete_question;
+
+      // save name
+      const result = await $endApi.v1.initial.saveModelName(loginState.data.name);
+      if (
+        responseMessage(result, {
+          success: "",
+          triggerOnDataNull: false,
+        })
+      )
+        userStore.value.name = loginState.data.name;
 
       nextComp(QuickRegister, {
-        title: '创建密码 3/3',
+        title: "创建密码 3/3",
         canBack: true,
-      })
-    }
-    else {
-      options.code = ''
+      });
+    } else {
+      options.code = "";
     }
 
-    return
+    return;
   }
 
-  if (responseMessage(res, {
-    success: '登录成功',
-    triggerOnDataNull: false,
-  })) {
-    userStore.value.token = { accessToken: res.data.token, refreshToken: '' }
-    userStore.value.completeQuestion = !!res.data.complete_question
+  if (
+    responseMessage(res, {
+      success: "登录成功",
+      triggerOnDataNull: false,
+    })
+  ) {
+    userStore.value.token = { accessToken: res.data.token, refreshToken: "" };
+    userStore.value.completeQuestion = !!res.data.complete_question;
 
-    await router.push('/')
+    await router.push("/");
 
     nextComp(Success, {
-      title: '',
+      title: "",
       canBack: false,
-    })
-  }
-  else {
-    options.code = ''
+    });
+  } else {
+    options.code = "";
   }
 }
 
 onStartTyping(() => {
-  input.value?.focus()
-})
+  input.value?.focus();
+});
 </script>
 
 <template>
   <div class="SmsLoginValidate">
     <div class="SmsLoginValidate-Header">
       <div
-        v-for="step in 3" :key="step" :class="{ active: step <= options.step }"
+        v-for="step in 3"
+        :key="step"
+        :class="{ active: step <= options.step }"
         class="SmsLoginValidate-Header-Step"
       />
     </div>
@@ -88,26 +104,36 @@ onStartTyping(() => {
         <p>{{ loginState.data.identifier }}, 在下面输入:</p>
       </div>
 
-      <p my-2 text-start>
-        验证码
-      </p>
+      <p my-2 text-start>验证码</p>
       <div flex items-center class="SmsLoginValidate-Input">
         <div
-          v-for="i in 5" :key="i" :class="{ active: i - 1 === `${options.code}`.length }"
-          class="SmsLoginValidate-InputDisp" v-text="[...(`${options.code}`)]?.[i - 1]"
+          v-for="i in 5"
+          :key="i"
+          :class="{ active: i - 1 === `${options.code}`.length }"
+          class="SmsLoginValidate-InputDisp"
+          v-text="[...`${options.code}`]?.[i - 1]"
         />
       </div>
-      <input ref="input" v-model.number="options.code" :maxlength="5" op-0 class="major-input" size="large">
+      <input
+        ref="input"
+        v-model.number="options.code"
+        :maxlength="5"
+        op-0
+        class="major-input"
+        size="large"
+      />
       <el-button
-        v-loading="options.loading" v-wave :class="{ valid }" class="major-button" size="large"
+        v-loading="options.loading"
+        v-wave
+        :class="{ valid }"
+        class="major-button"
+        size="large"
         @click="handleSmsLogin"
       >
         验证手机
       </el-button>
 
-      <p mt-4>
-        错误手机号？<span font-bold @click="prevComp">发送至另一个</span>
-      </p>
+      <p mt-4>错误手机号？<span font-bold @click="prevComp">发送至另一个</span></p>
     </div>
   </div>
 </template>

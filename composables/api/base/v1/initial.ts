@@ -16,6 +16,9 @@ export default {
   modelInfo() {
     return endHttp.get('user/info') as Promise<IDataResponse<any>>
   },
+  saveModelName(name: string) {
+    return endHttp.post('user/save', { name }) as Promise<IDataResponse<any>>
+  },
   saveModelStats({
     humor,
     profession,
