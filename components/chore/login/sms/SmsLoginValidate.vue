@@ -41,16 +41,6 @@ async function handleSmsLogin() {
       loginState.data.stashedToken = res.data.token;
       userStore.value.completeQuestion = !!res.data.complete_question;
 
-      // save name
-      const result = await $endApi.v1.initial.saveModelName(loginState.data.name);
-      if (
-        responseMessage(result, {
-          success: "",
-          triggerOnDataNull: false,
-        })
-      )
-        userStore.value.name = loginState.data.name;
-
       nextComp(QuickRegister, {
         title: "创建密码 3/3",
         canBack: true,

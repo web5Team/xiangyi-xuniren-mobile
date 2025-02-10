@@ -12,11 +12,15 @@ export default {
       code,
     })
   },
+  loginByTourist() {
+    return endHttp.post('user/loginByTourist')
+  },
   setPassword(password: string) {
     return endHttp.post('user/setPassword', {
       password,
     })
   },
+
   renewToken() {
     return endHttp.get('auth/renew_token') as Promise<IDataResponse<ILoginToken>>
   },

@@ -1,33 +1,63 @@
 <script setup>
-import { useLoginState } from '~/components/chore/login/index'
+import { useLoginState } from "~/components/chore/login/index";
+import { $endApi } from "~/composables/api/base";
 
-const nextGuide = inject('nextGuide')
-const loginState = useLoginState()
+const nextGuide = inject("nextGuide");
+const loginState = useLoginState();
 
 function handleRegister() {
-  loginState.data.mode = 'register'
+  loginState.data.mode = "register";
 
-  nextGuide()
+  nextGuide();
 }
 
 function handleLogin() {
-  loginState.data.mode = 'login'
+  loginState.data.mode = "login";
 
-  nextGuide()
+  nextGuide();
+}
+
+async function handleTourist() {
+  loginState.data.mode = "tourist";
+
+  const res = await $endApi.v1.auth.loginByTourist();
+  if (
+    responseMessage(res, {
+      success: "",
+      triggerOnDataNull: false,
+    })
+  ) {
+    userStore.value.token = {
+      accessToken: res.data.token,
+      refreshToken: "",
+    };
+    userStore.value.completeQuestion = !!res.data.complete_question;
+
+    await router.push("/");
+
+    nextComp(Success, {
+      title: "",
+      canBack: false,
+    });
+  }
+
+  // save name
+  const result = await $endApi.v1.initial.saveModelName(loginState.data.name);
+  if (
+    responseMessage(result, {
+      success: "",
+      triggerOnDataNull: false,
+    })
+  )
+    userStore.value.name = loginState.data.name;
 }
 </script>
 
 <template>
   <div class="GuideAuth flex items-center gap-4">
-    <button v-wave @click="handleRegister">
-      注册
-    </button>
-    <button v-wave @click="handleLogin">
-      登录
-    </button>
-    <p v-wave>
-      游客进入
-    </p>
+    <button v-wave @click="handleRegister">注册</button>
+    <button v-wave @click="handleLogin">登录</button>
+    <p v-wave @click="handleTourist">游客进入</p>
   </div>
 </template>
 

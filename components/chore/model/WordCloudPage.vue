@@ -1,67 +1,68 @@
 <script setup lang="ts">
-import GhostPage from "./GhostPage.vue";
-import MainPage from "./MainPage.vue";
-import { $model } from "./model-manager";
-import PropertyPage from "./PropertyPage.vue";
-import DateSelector from "~/components/selector/DateSelector.vue";
+import GhostPage from './GhostPage.vue'
+import MainPage from './MainPage.vue'
+import { $model } from './model-manager'
+import PropertyPage from './PropertyPage.vue'
+import DateSelector from '~/components/selector/DateSelector.vue'
 
-import ChartWordCloud from "~/components/chart/WordCloud.vue";
+import ChartWordCloud from '~/components/chart/WordCloud.vue'
 
-import IconSvgGhostSvg from "~/components/icon/svg/GhostSvg.vue";
-import IconSvgFingerPrint from "~/components/icon/svg/FingerPrint.vue";
-import IconSvgShareSvg from "~/components/icon/svg/ShareSvg.vue";
-import IconSvgPlanedSvg from "~/components/icon/svg/PlanedSvg.vue";
-import IconSvgOrienationSvg from "~/components/icon/svg/OrienationSvg.vue";
+import IconSvgGhostSvg from '~/components/icon/svg/GhostSvg.vue'
+import IconSvgFingerPrint from '~/components/icon/svg/FingerPrint.vue'
+import IconSvgShareSvg from '~/components/icon/svg/ShareSvg.vue'
+import IconSvgPlanedSvg from '~/components/icon/svg/PlanedSvg.vue'
+import IconSvgOrienationSvg from '~/components/icon/svg/OrienationSvg.vue'
 import {
   useDeviceOrientationDirection,
   useRotateElement,
-} from "~/composables/orienation-resize";
+} from '~/composables/orienation-resize'
 
-const shareDialog: any = inject("shareDialog");
-const changeModelPage: any = inject("changeModelPage");
-const canvasDom: Ref<HTMLElement> = (inject("canvasDom") as unknown) as any;
-const contentDom = ref<HTMLElement | null>(null);
+const shareDialog: any = inject('shareDialog')
+const changeModelPage: any = inject('changeModelPage')
+const canvasDom: Ref<HTMLElement> = (inject('canvasDom') as unknown) as any
+const contentDom = ref<HTMLElement | null>(null)
 
-const date = ref(["", ""]);
-const { width } = useWindowSize();
+const date = ref(['', ''])
+const { width } = useWindowSize()
 
 onMounted(() => {
-  $model.stopRecord();
+  $model.stopRecord()
 
   Object.assign(canvasDom.value!.style, {
-    transformOrigin: "center bottom",
-    transform: "scale(0.75)",
-  });
-});
+    transformOrigin: 'center bottom',
+    transform: 'scale(0.75)',
+  })
+})
 
 async function handleLeave(page: Component, show: boolean) {
-  if (!canvasDom.value) return;
+  if (!canvasDom.value)
+    return
 
   Object.assign(canvasDom.value.style, {
-    transformOrigin: "",
-    transform: "",
-  });
+    transformOrigin: '',
+    transform: '',
+  })
 
-  await sleep(200);
+  await sleep(200)
 
-  $model.startRecord();
+  $model.startRecord()
 
-  changeModelPage(page, show);
+  changeModelPage(page, show)
 }
 
-const direction = useDeviceOrientationDirection();
+const direction = useDeviceOrientationDirection()
 // useRotateElement(contentDom, direction);
 
 watch(direction, () => {
-  console.log({ direction: direction.value });
-});
+  console.log({ direction: direction.value })
+})
 
-const visible = ref(false);
+const visible = ref(false)
 
 function handleChange(dates: [string, string]) {
-  date.value = dates;
+  date.value = dates
 
-  console.log("changed", dates);
+  console.log('changed', dates)
 }
 </script>
 
@@ -69,10 +70,11 @@ function handleChange(dates: [string, string]) {
   <div class="WordCloudPage" :class="{ orienated: direction !== 'flat' }">
     <div class="WordCloudPage-Date">
       <p class="day">
-        <span mr-2>{{ userStore.days || 0 }}</span
-        >天
+        <span mr-2>{{ userStore.days || 0 }}</span>天
       </p>
-      <p class="desc">今天是{{ userStore.name }}与你相随</p>
+      <p class="desc">
+        今天是{{ userStore.name }}与你相随
+      </p>
     </div>
 
     <div class="WordCloudPage-Title">
@@ -87,7 +89,7 @@ function handleChange(dates: [string, string]) {
         placeholder="请选择日期"
         @click="visible = true"
         @focus="visible = true"
-      />
+      >
     </div>
 
     <div :class="[direction]" :style="`--w: ${width}px`" class="WordCloudPage-Content">
@@ -127,8 +129,8 @@ function handleChange(dates: [string, string]) {
   line-height: normal;
   letter-spacing: 0em;
 
-  font-variation-settings: "opsz" auto;
-  font-feature-settings: "kern" on;
+  font-variation-settings: 'opsz' auto;
+  font-feature-settings: 'kern' on;
   color: #c5c5c5;
 }
 
@@ -208,7 +210,7 @@ function handleChange(dates: [string, string]) {
         font-family: Source Han Sans;
         font-weight: 400;
         font-size: 36px;
-        font-variation-settings: "opsz" auto;
+        font-variation-settings: 'opsz' auto;
       }
 
       color: #aeb3be;
@@ -216,7 +218,7 @@ function handleChange(dates: [string, string]) {
       font-family: Source Han Sans;
       font-weight: 400;
       font-size: 20px;
-      font-variation-settings: "opsz" auto;
+      font-variation-settings: 'opsz' auto;
     }
 
     .desc {
@@ -227,8 +229,8 @@ function handleChange(dates: [string, string]) {
       text-align: center;
       letter-spacing: 0px;
 
-      font-variation-settings: "opsz" auto;
-      font-feature-settings: "kern" on;
+      font-variation-settings: 'opsz' auto;
+      font-feature-settings: 'kern' on;
       color: #9e9e9e;
     }
 
@@ -239,8 +241,8 @@ function handleChange(dates: [string, string]) {
     text-align: center;
     letter-spacing: 0px;
 
-    font-variation-settings: "opsz" auto;
-    font-feature-settings: "kern" on;
+    font-variation-settings: 'opsz' auto;
+    font-feature-settings: 'kern' on;
   }
 }
 

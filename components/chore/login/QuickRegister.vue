@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import Success from './Success.vue'
-import { useLoginState } from './'
-import { $endApi } from '~/composables/api/base'
+import Success from "./Success.vue";
+import { useLoginState } from "./";
+import { $endApi } from "~/composables/api/base";
 
-const loginState = useLoginState()
-const nextComp: any = inject('nextComp')
+const loginState = useLoginState();
+const nextComp: any = inject("nextComp");
 
-const router = useRouter()
+const router = useRouter();
 const options = reactive({
-  type: 'password',
+  type: "password",
   loading: false,
-  certificate: loginState.data.certificate || '',
+  certificate: loginState.data.certificate || "",
   step: 1,
-})
+});
 
 /**
  * 验证函数
@@ -22,89 +22,110 @@ const options = reactive({
  * 3.至少1个字母
  */
 const valid = computed(() => {
-  let amo = 0
-  if (options.certificate.length >= 8)
-    amo++
+  let amo = 0;
+  if (options.certificate.length >= 8) amo++;
 
-  if (/[0-9]/.test(options.certificate))
-    amo++
+  if (/[0-9]/.test(options.certificate)) amo++;
 
-  if (/[a-zA-Z]/.test(options.certificate))
-    amo++
+  if (/[a-zA-Z]/.test(options.certificate)) amo++;
 
-  return amo
-})
+  return amo;
+});
 
 async function handleSmsCertificate() {
-  if (valid.value < 3)
-    return
+  if (valid.value < 3) return;
 
-  loginState.data.certificate = options.certificate
+  loginState.data.certificate = options.certificate;
 
-  options.loading = true
+  options.loading = true;
 
-  userStore.value.token = { accessToken: loginState.data.stashedToken, refreshToken: '' }
-  const res = await $endApi.v1.auth.setPassword(options.certificate)
+  userStore.value.token = { accessToken: loginState.data.stashedToken, refreshToken: "" };
+  const res = await $endApi.v1.auth.setPassword(options.certificate);
 
-  options.loading = false
+  // save name
+  const result = await $endApi.v1.initial.saveModelName(loginState.data.name);
+  if (
+    responseMessage(result, {
+      success: "",
+      triggerOnDataNull: false,
+    })
+  )
+    userStore.value.name = loginState.data.name;
 
-  if (responseMessage(res, {
-    success: '设置成功',
-    triggerOnDataNull: false,
-  })) {
-    await router.push('/')
+  options.loading = false;
+
+  if (
+    responseMessage(res, {
+      success: "设置成功",
+      triggerOnDataNull: false,
+    })
+  ) {
+    await router.push("/");
 
     nextComp(Success, {
-      title: '',
+      title: "",
       canBack: false,
-    })
-  }
-  else {
-    userStore.value.token = { accessToken: '', refreshToken: '' }
+    });
+  } else {
+    userStore.value.token = { accessToken: "", refreshToken: "" };
   }
 }
 
 const progress = computed(() => {
-  return valid.value * 33.34
-})
+  return valid.value * 33.34;
+});
 
 const color = computed(() => {
-  if (valid.value === 1)
-    return '#D62C01'
-  if (valid.value === 2)
-    return '#FAAE16'
-  if (valid.value === 3)
-    return '#498200'
-  return '#9d9aa4'
-})
+  if (valid.value === 1) return "#D62C01";
+  if (valid.value === 2) return "#FAAE16";
+  if (valid.value === 3) return "#498200";
+  return "#9d9aa4";
+});
 </script>
 
 <template>
   <div class="SmsCertificate">
     <div class="SmsCertificate-Header">
-      <div v-for="step in 3" :key="step" :class="{ active: step <= options.step }" class="SmsCertificate-Header-Step" />
+      <div
+        v-for="step in 3"
+        :key="step"
+        :class="{ active: step <= options.step }"
+        class="SmsCertificate-Header-Step"
+      />
     </div>
 
     <div class="SmsCertificate-Main">
-      <p text-start>
-        密码
-      </p>
+      <p text-start>密码</p>
       <div class="major-input" flex items-center>
         <input
-          v-model="options.certificate" autofocus flex-1 size="large" :type="options.type"
+          v-model="options.certificate"
+          autofocus
+          flex-1
+          size="large"
+          :type="options.type"
           placeholder="输入密码"
-        >
+        />
         <div block>
           <div
-            v-if="options.type === 'password'" class="h-[16px] w-[16px]" i-carbon:view-off-filled
+            v-if="options.type === 'password'"
+            class="h-[16px] w-[16px]"
+            i-carbon:view-off-filled
             @click="options.type = ''"
           />
-          <div v-else class="h-[16px] w-[16px]" i-carbon:view-filled @click="options.type = 'password'" />
+          <div
+            v-else
+            class="h-[16px] w-[16px]"
+            i-carbon:view-filled
+            @click="options.type = 'password'"
+          />
         </div>
       </div>
       <div class="major-info">
         <div class="major-progress">
-          <div class="major-progress-inner transition-cubic" :style="`width: ${progress}%;background-color: ${color}`" />
+          <div
+            class="major-progress-inner transition-cubic"
+            :style="`width: ${progress}%;background-color: ${color}`"
+          />
         </div>
 
         <div class="major-list">
@@ -122,7 +143,11 @@ const color = computed(() => {
         </div>
       </div>
       <el-button
-        v-loading="options.loading" v-wave :class="{ valid: valid >= 3 }" class="major-button" size="large"
+        v-loading="options.loading"
+        v-wave
+        :class="{ valid: valid >= 3 }"
+        class="major-button"
+        size="large"
         @click="handleSmsCertificate"
       >
         继续

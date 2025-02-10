@@ -1,81 +1,144 @@
 <script setup>
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { GraphChart } from 'echarts/charts'
-import {
-  LegendComponent,
-  TitleComponent,
-  TooltipComponent,
-} from 'echarts/components'
-import VChart, { THEME_KEY } from 'vue-echarts'
-import { provide, ref } from 'vue'
-import graph from './graph.json'
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { GraphChart } from "echarts/charts";
+import { LegendComponent, TitleComponent, TooltipComponent } from "echarts/components";
+import VChart, { THEME_KEY } from "vue-echarts";
+import { provide, ref } from "vue";
+import graph from "./graph.json";
 
-use([
-  CanvasRenderer,
-  GraphChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-])
+use([CanvasRenderer, GraphChart, TitleComponent, TooltipComponent, LegendComponent]);
 
-provide(THEME_KEY, 'dark')
+provide(THEME_KEY, "dark");
 
-console.log({ graph })
+console.log({ graph });
 
 // const graph = JSON.parse(graphText)
 
 graph.nodes.forEach((node) => {
   node.label = {
     show: node.symbolSize > 30,
-  }
-})
+  };
+});
 
+// const option = ref({
+//   title: {
+//     text: 'Les Miserables',
+//     subtext: 'Default layout',
+//     top: 'bottom',
+//     left: 'right',
+//   },
+//   tooltip: {},
+//   legend: [
+//     {
+//       // selectedMode: 'single',
+//       data: graph.categories.map((a) => {
+//         return a.name
+//       }),
+//     },
+//   ],
+//   animationDuration: 1500,
+//   animationEasingUpdate: 'quinticInOut',
+//   series: [
+//     {
+//       name: 'Les Miserables',
+//       type: 'graph',
+//       legendHoverLink: false,
+//       layout: 'none',
+//       data: graph.nodes,
+//       links: graph.links,
+//       categories: graph.categories,
+//       roam: true,
+//       label: {
+//         position: 'right',
+//         formatter: '{b}',
+//       },
+//       lineStyle: {
+//         color: 'source',
+//         curveness: 0.3,
+//       },
+//       emphasis: {
+//         focus: 'adjacency',
+//         lineStyle: {
+//           width: 10,
+//         },
+//       },
+//     },
+//   ],
+// })
 const option = ref({
   title: {
-    text: 'Les Miserables',
-    subtext: 'Default layout',
-    top: 'bottom',
-    left: 'right',
+    text: "Les Miserables",
+    subtext: "Default layout",
+    top: "bottom",
+    left: "right",
   },
   tooltip: {},
   legend: [
     {
       // selectedMode: 'single',
       data: graph.categories.map((a) => {
-        return a.name
+        return a.name;
       }),
     },
   ],
   animationDuration: 1500,
-  animationEasingUpdate: 'quinticInOut',
+  animationEasingUpdate: "quinticInOut",
   series: [
     {
-      name: 'Les Miserables',
-      type: 'graph',
+      name: "Les Miserables",
+      type: "graph",
       legendHoverLink: false,
-      layout: 'none',
-      data: graph.nodes,
-      links: graph.links,
-      categories: graph.categories,
+      layout: "none",
+      data: [
+        {
+          id: "0",
+          name: "吃饭",
+          symbolSize: 30,
+          category: 1,
+          x: 227.01522719741797,
+          y: -166.20618887758692,
+        },
+      ],
+      links: [],
+      categories: [
+        {
+          name: "ourselves",
+        },
+        {
+          name: "relations",
+        },
+        {
+          name: "values",
+        },
+        {
+          name: "emotions",
+        },
+        {
+          name: "environment",
+        },
+        {
+          name: "knowledge",
+        },
+      ],
       roam: true,
       label: {
-        position: 'right',
-        formatter: '{b}',
+        position: "right",
+        formatter: "{b}",
       },
       lineStyle: {
-        color: 'source',
+        color: "source",
         curveness: 0.3,
       },
       emphasis: {
-        focus: 'adjacency',
+        focus: "adjacency",
         lineStyle: {
           width: 10,
         },
       },
     },
   ],
-})
+});
 </script>
 
 <template>
