@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { useDownloadModel, useDownloadModels } from ".";
+import { useDownloadModels } from ".";
 import Copyright from "~/components/chore/Copyright.vue";
 
-const actionList = Object.keys(import.meta.glob("~/composables/model/daily/*.fbx"));
+const actionList = Object.keys(import.meta.glob("/public/model/daily/*.fbx"));
 const modelList = ["/xyfemale.vrm", "/xymale.vrm"];
 const totalList = [...actionList, ...modelList];
 
@@ -40,7 +40,7 @@ async function handleDownloadModel() {
           nextTick(async () => {
             scope.stop();
 
-            await sleep(3000);
+            await sleep(1000);
 
             loading.value = false;
 
