@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import IndexPage from '../model/IndexPage.vue'
+import Success from './Success.vue'
 import { type INextCompOptions, useLoginState } from '.'
-import QuickRegister from '~/components/chore/login/QuickRegister.vue'
 import CreateAccount from '~/components/chore/login/CreateAccount.vue'
 
+const router = useRouter()
+const loginState = useLoginState()
 const changeModelPage: any = inject('changeModelPage')
 
 interface IDispComp {
@@ -23,6 +25,18 @@ const options = reactive<{
     comp: CreateAccount,
   },
   stack: [],
+})
+
+onMounted(async () => {
+  if (loginState.data.mode !== 'tourist')
+    return
+
+  await router.push('/')
+
+  nextComp(Success, {
+    title: '',
+    canBack: false,
+  })
 })
 
 const mainDom = ref<HTMLElement>()
@@ -118,7 +132,6 @@ async function prevComp() {
   })
 }
 
-const loginState = useLoginState()
 async function backToGuide() {
   changeModelPage(IndexPage, true)
 
@@ -134,17 +147,25 @@ provide('prevComp', prevComp)
 <template>
   <div class="LoginPage">
     <div ref="mainDom" class="LoginPage-Content transition-cubic">
-      <div relative w-full flex items-center justify-center class="LoginPage-Content-Header">
+      <div
+        relative
+        w-full
+        flex
+        items-center
+        justify-center
+        class="LoginPage-Content-Header"
+      >
         <div
-          v-if="options.stack.length > 0 && options.current.options.canBack" absolute left-0 active:op-50
-          class="arrow-icon" @click="prevComp"
+          v-if="options.stack.length > 0 && options.current.options.canBack"
+          absolute
+          left-0
+          active:op-50
+          class="arrow-icon"
+          @click="prevComp"
         >
           <div i-carbon-arrow-left />
         </div>
-        <div
-          v-else absolute left-0 active:op-50
-          class="arrow-icon" @click="backToGuide"
-        >
+        <div v-else absolute left-0 active:op-50 class="arrow-icon" @click="backToGuide">
           <div i-carbon-arrow-left />
         </div>
         <p>
@@ -158,7 +179,9 @@ provide('prevComp', prevComp)
     </div>
 
     <div class="LoginPage-Footer">
-      使用相一服务，代表你同意<br><span font-bold>条款</span>和<span font-bold>隐私政策</span>
+      使用相一服务，代表你同意<br /><span font-bold>条款</span>和<span font-bold
+        >隐私政策</span
+      >
     </div>
   </div>
 </template>

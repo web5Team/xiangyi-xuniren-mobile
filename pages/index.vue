@@ -1,191 +1,197 @@
 <script setup lang="ts">
-import { ElMessage } from "element-plus";
-import { userStore } from "../composables/user";
-import QuestionarePage from "~/components/chore/model/QuestionarePage.vue";
-import LoginPage from "~/components/chore/login/LoginPage.vue";
-import MainPage from "~/components/chore/model/MainPage.vue";
-import { Viewer } from "~/composables/model/vrmViewer/viewer";
-import model from "/xyfemale.vrm";
-import { useLoginState } from "~/components/chore/login";
+import { ElMessage } from 'element-plus'
+import { userStore } from '../composables/user'
+import QuestionarePage from '~/components/chore/model/QuestionarePage.vue'
+import LoginPage from '~/components/chore/login/LoginPage.vue'
+import MainPage from '~/components/chore/model/MainPage.vue'
+import { Viewer } from '~/composables/model/vrmViewer/viewer'
+import model from '/xyfemale.vrm'
+import { useLoginState } from '~/components/chore/login'
 import {
   $model,
   ensurePermissions,
   permissionGranted,
   speechNls,
-} from "~/components/chore/model/model-manager";
-import IndexPage from "~/components/chore/model/IndexPage.vue";
+} from '~/components/chore/model/model-manager'
+import IndexPage from '~/components/chore/model/IndexPage.vue'
 import {
   TextAggregator,
   VoiceSynthesizer,
   getAIGCCompletionStream,
-} from "~/composables/api/base/v1/aigc/completion";
-import { $endApi } from "~/composables/api/base";
-import { ActionManager } from "~/composables/model/action-manager";
-import { $aigc } from "~/composables/aigc";
+} from '~/composables/api/base/v1/aigc/completion'
+import { $endApi } from '~/composables/api/base'
+import { ActionManager } from '~/composables/model/action-manager'
+import { $aigc } from '~/composables/aigc'
 
-const dom = ref<HTMLElement>();
-const container = ref<HTMLElement>();
-const { x, y } = useMouse();
-const shareDialog = ref(false);
-const actionManager = shallowRef<ActionManager>();
+const dom = ref<HTMLElement>()
+const container = ref<HTMLElement>()
+const { x, y } = useMouse()
+const shareDialog = ref(false)
+const actionManager = shallowRef<ActionManager>()
 
-const { share, isSupported } = useShare();
+const { share, isSupported } = useShare()
 
 watch(
   () => shareDialog.value,
   (val) => {
     if (!isSupported) {
-      ElMessage.error("当前设备不支持分享");
-      return;
+      ElMessage.error('当前设备不支持分享')
+      return
     }
 
     if (val) {
       share({
-        title: "相一APP",
-        text: "XiangYi",
+        title: '相一APP',
+        text: 'XiangYi',
         url: location.href,
-      });
+      })
 
-      shareDialog.value = false;
+      shareDialog.value = false
     }
-  }
-);
+  },
+)
 
-const viewer = new Viewer();
-const loginState = useLoginState();
+const viewer = new Viewer()
+const loginState = useLoginState()
 
 const options = reactive({
   init: false,
   voiceEnable: true,
   actionEnable: true,
-});
+})
 
 function handleInit() {
-  if (options.init) return;
+  if (options.init)
+    return
 
-  options.init = true;
-  speechNls.connect();
-  $model.startRecord();
+  options.init = true
+  speechNls.connect()
+  $model.startRecord()
 }
 
 function recordGranted() {
   if (permissionGranted.value) {
-    handleInit();
-    return;
+    handleInit()
+    return
   }
 
   const cb = whenever(
     () => loginState.data.dialogVisible === false && userStore.value.completeQuestion,
     async () => {
       setTimeout(() => {
-        cb();
-      });
+        cb()
+      })
 
       // granted
-      await ensurePermissions();
+      await ensurePermissions()
       if (permissionGranted.value) {
-        handleInit();
-      } else {
+        handleInit()
+      }
+      else {
         // Exit page
-        location.reload();
+        location.reload()
       }
     },
-    { immediate: true }
-  );
+    { immediate: true },
+  )
 }
 
 onMounted(() => {
-  const canvas = dom.value!.querySelector("canvas") as HTMLCanvasElement;
+  const canvas = dom.value!.querySelector('canvas') as HTMLCanvasElement
 
-  viewer.setup(canvas);
+  viewer.setup(canvas)
 
-  const promise = viewer.loadVrm(model);
+  const promise = viewer.loadVrm(model)
 
   viewer._animationList.push(() => {
-    viewer.updateEye(x.value, y.value);
-  });
+    viewer.updateEye(x.value, y.value)
+  })
 
   promise
     .then(() => {
       if (!userStore.value.isLogin) {
-        changeModelPage(IndexPage, true);
-      } else {
+        changeModelPage(IndexPage, true)
+      }
+      else {
         setTimeout(async () => {
-          const res = await $endApi.v1.initial.modelInfo();
+          const res = await $endApi.v1.initial.modelInfo()
 
-          if (res.code === 1) Object.assign(userStore.value, res.data);
+          if (res.code === 1)
+            Object.assign(userStore.value, res.data)
 
-          if (!userStore.value.completeQuestion) changeModelPage(QuestionarePage, true);
-        });
+          if (!userStore.value.completeQuestion)
+            changeModelPage(QuestionarePage, true)
+        })
 
-        recordGranted();
+        recordGranted()
 
-        actionManager.value = new ActionManager(viewer);
-        actionManager.value.startToggle();
+        actionManager.value = new ActionManager(viewer)
+        actionManager.value.startToggle()
       }
 
-      dom.value?.attributes.removeNamedItem("op-0");
+      dom.value?.attributes.removeNamedItem('op-0')
 
-      container.value?.attributes.removeNamedItem("op-0");
+      container.value?.attributes.removeNamedItem('op-0')
     })
     .catch(() => {
-      ElMessage.error("请检查网络连接，或刷新重试...");
-    });
-});
+      ElMessage.error('请检查网络连接，或刷新重试...')
+    })
+})
 
 watch(
   () => options.actionEnable,
   (val) => {
-    if (val) actionManager.value?.startToggle();
-    else actionManager.value?.endToggle();
-  }
-);
+    if (val)
+      actionManager.value?.startToggle()
+    else actionManager.value?.endToggle()
+  },
+)
 
 onBeforeUnmount(() => {
-  $model.stopRecord();
+  $model.stopRecord()
 
-  speechNls.disconnect();
+  speechNls.disconnect()
 
-  viewer._animationList.length = 0;
-  viewer.unloadVRM();
-});
+  viewer._animationList.length = 0
+  viewer.unloadVRM()
+})
 
-const modelComponent = shallowRef<Component>(MainPage);
+const modelComponent = shallowRef<Component>(MainPage)
 
 async function changeModelPage(targetComponent: Component, modelShow: boolean = true) {
-  const el = container.value;
+  const el = container.value
   if (!el) {
-    modelComponent.value = targetComponent;
-    return;
+    modelComponent.value = targetComponent
+    return
   }
 
-  el.style.opacity = "0";
+  el.style.opacity = '0'
 
-  await sleep(200);
+  await sleep(200)
 
-  if (dom.value) dom.value!.style.opacity = modelShow ? "1" : "0";
+  if (dom.value)
+    dom.value!.style.opacity = modelShow ? '1' : '0'
 
-  modelComponent.value = targetComponent;
+  modelComponent.value = targetComponent
 
-  await sleep(200);
+  await sleep(200)
 
-  el.style.opacity = "1";
+  el.style.opacity = '1'
 }
 
-provide("changeModelPage", changeModelPage);
-provide("shareDialog", shareDialog);
-provide("canvasDom", dom);
-provide("viewer", viewer);
-provide("recordGranted", recordGranted);
-provide("options", options);
-provide("handleConversationStart", handleConversationStart);
+provide('changeModelPage', changeModelPage)
+provide('shareDialog', shareDialog)
+provide('canvasDom', dom)
+provide('viewer', viewer)
+provide('recordGranted', recordGranted)
+provide('options', options)
+provide('handleConversationStart', handleConversationStart)
 
 speechNls.sentenceBus.on((payload) => {
-  handleConversationStart(payload.result);
-});
+  handleConversationStart(payload.result)
+})
 
-let lastSignal: any;
-const sentence = ref("");
+const sentence = ref('')
 
 speechNls.sentenceCacheBus.on((payload) => {
   // if (!speechNls.cacheSentence) {
@@ -193,17 +199,17 @@ speechNls.sentenceCacheBus.on((payload) => {
 
   //   lastSignal?.abort?.()
   // }
-  sentence.value = payload.result;
-});
+  sentence.value = payload.result
+})
 
 // const voiceSynthesizer = new VoiceSynthesizer();
 
 async function handleConversationStart(sentence: string) {
-  $aigc.startConversation(sentence, true);
+  $aigc.startConversation(sentence, true)
 }
 
-window.$handleConversationStart = handleConversationStart;
-window.$mockConversation = $aigc.mockConversation;
+window.$handleConversationStart = handleConversationStart
+window.$mockConversation = $aigc.mockConversation
 </script>
 
 <template>

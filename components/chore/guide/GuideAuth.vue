@@ -27,18 +27,14 @@ async function handleTourist() {
       triggerOnDataNull: false,
     })
   ) {
+    loginState.data.stashedToken = res.data.token;
     userStore.value.token = {
       accessToken: res.data.token,
       refreshToken: "",
     };
     userStore.value.completeQuestion = !!res.data.complete_question;
 
-    await router.push("/");
-
-    nextComp(Success, {
-      title: "",
-      canBack: false,
-    });
+    nextGuide();
   }
 
   // save name
