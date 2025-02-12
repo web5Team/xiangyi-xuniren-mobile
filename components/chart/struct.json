@@ -1,0 +1,87 @@
+{
+  "title": {
+    "text": "\u5386\u53f2\u661f\u4e91",
+    "subtext": "Default layout",
+    "top": "bottom",
+    "left": "right"
+  },
+  "tooltip": {},
+  "legend": [
+    {
+      "data": "graph.categories.map(function (a) { return a.name; })"
+    }
+  ],
+  "animationDuration": 1500,
+  "animationEasingUpdate": "quinticInOut",
+  "series": [
+    {
+      "name": "\u5386\u53f2\u661f\u4e91",
+      "type": "graph",
+      "legendHoverLink": false,
+      "layout": "none",
+      "data": [
+        {
+          "id": "0",
+          "name": "\u5403\u996d",
+          "symbolSize": 34.80178656303566,
+          "category": 1,
+          "x": 304.0334930870964,
+          "y": -178.43596572048588
+        },
+        {
+          "id": "1",
+          "name": "\u5988\u5988",
+          "symbolSize": 9.445622206093336,
+          "category": 2,
+          "x": -488.1496448104774,
+          "y": -367.3896462673118
+        }
+      ],
+      "links": [
+        {
+          "source": 1,
+          "target": 0
+        },
+        {
+          "source": 1,
+          "target": 0
+        }
+      ],
+      "categories": [
+        {
+          "name": "ourselves"
+        },
+        {
+          "name": "relations"
+        },
+        {
+          "name": "values"
+        },
+        {
+          "name": "emotions"
+        },
+        {
+          "name": "environment"
+        },
+        {
+          "name": "knowledge"
+        }
+      ],
+      "roam": true,
+      "label": {
+        "position": "right",
+        "formatter": "{b}"
+      },
+      "lineStyle": {
+        "color": "source",
+        "curveness": 0.3
+      },
+      "emphasis": {
+        "focus": "adjacency",
+        "lineStyle": {
+          "width": 10
+        }
+      }
+    }
+  ]
+}

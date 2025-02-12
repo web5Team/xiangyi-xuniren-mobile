@@ -14,11 +14,6 @@ import {
   speechNls,
 } from '~/components/chore/model/model-manager'
 import IndexPage from '~/components/chore/model/IndexPage.vue'
-import {
-  TextAggregator,
-  VoiceSynthesizer,
-  getAIGCCompletionStream,
-} from '~/composables/api/base/v1/aigc/completion'
 import { $endApi } from '~/composables/api/base'
 import { ActionManager } from '~/composables/model/action-manager'
 import { $aigc } from '~/composables/aigc'
@@ -60,13 +55,25 @@ const options = reactive({
   actionEnable: true,
 })
 
-function handleInit() {
+async function handleInit() {
   if (options.init)
     return
 
-  options.init = true
-  speechNls.connect()
-  $model.startRecord()
+  if (!userStore.value.isLogin)
+    return
+
+  const res = await $endApi.v1.auth.getNlsToken()
+
+  if (
+    responseMessage(res, {
+      success: '',
+      triggerOnDataNull: false,
+    })
+  ) {
+    options.init = true
+    speechNls.connect(res.data.token)
+    $model.startRecord()
+  }
 }
 
 function recordGranted() {

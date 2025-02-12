@@ -1,6 +1,6 @@
 const END_URL = 'wss://nls-gateway.cn-shanghai.aliyuncs.com/ws/v1'
 const APPKEY = 'ckxnZMvhbPN4jD6g' // 获取Appkey请前往控制台：https://nls-portal.console.aliyun.com/applist
-const TOKEN = '4e4f6992681d4ad4bfa21d477bd13bd5' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
+// DEPRECATED const TOKEN = '5068bcef6c304c00aad17769f3944751' // 获取Token具体操作，请参见：https://help.aliyun.com/document_detail/450514.html
 
 export enum SpeechStatus {
   CONNECTING = 'Connecting',
@@ -77,11 +77,11 @@ export class SpeechNls {
     this.statusBus.emit(status)
   }
 
-  async connect() {
+  async connect(token: string) {
     this.error = ''
     this.updateStatus(SpeechStatus.CONNECTING)
 
-    const socketUrl = `${END_URL}?token=${TOKEN}`
+    const socketUrl = `${END_URL}?token=${token}`
     const websocket = this.ws = new WebSocket(socketUrl)
 
     websocket.onopen = () => {
@@ -130,6 +130,12 @@ export class SpeechNls {
       else if (message.header.name === 'TaskFailed') {
         this.error = '无法完成识别'
         console.error('Task failed:', message.payload)
+
+        this.disconnect()
+
+        setTimeout(() => {
+          this.connect(token)
+        }, 1200)
       }
     }
 

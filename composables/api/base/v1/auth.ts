@@ -20,7 +20,9 @@ export default {
       password,
     })
   },
-
+  getNlsToken() {
+    return endHttp.get('bot/ttsToken')
+  },
   renewToken() {
     return endHttp.get('auth/renew_token') as Promise<IDataResponse<ILoginToken>>
   },
