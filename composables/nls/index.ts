@@ -89,15 +89,15 @@ export class SpeechNls {
 
   private isSpeaking: boolean = false
   private silenceTimer: NodeJS.Timeout | null = null
-  private readonly MAX_SILENCE_DURATION = 8000 // 8秒无声自动断开
+  private readonly MAX_SILENCE_DURATION = 4000 // 4秒无声自动断开
   private lastSpeechTime: number = Date.now()
 
   private speakingBus = useEventBus<boolean>('ON_SPEAKING_STATUS')
   private lastSpeakingState: boolean = false
   private isMonitoring: boolean = false
 
-  // 添加新的配置参数
-  private readonly SPEECH_THRESHOLD = 0.018 // 声音检测阈值
+  // 配置参数
+  private readonly SPEECH_THRESHOLD = 0.008 // 声音检测阈值
   private volumeLevel: number = 0
 
   private animationFrameId: number | null = null
@@ -111,8 +111,14 @@ export class SpeechNls {
   private audioBuffer: Float32Array[] = [] // 存储音频数据的缓冲区
   private canSendAudio: boolean = false // 控制是否可以发送音频的标志
   private speakingStartTime: number = 0 // 开始说话的时间戳
-  private readonly BUFFER_MAX_LENGTH = 100 // 限制缓冲区大小
+  private readonly BUFFER_MAX_LENGTH = 2560 // 限制缓冲区大小
   private readonly MIN_SPEAKING_DURATION = 2000 // 最小说话持续时间（2秒）
+
+  private currentUUID: string = ''
+
+  getSpeakingStartTime() {
+    return this.speakingStartTime
+  }
 
   updateStatus(status: SpeechStatus) {
     this.status = status
@@ -125,7 +131,7 @@ export class SpeechNls {
     this.updateStatus(SpeechStatus.CONNECTING)
     this.isMonitoring = true
     this.lastSpeechTime = Date.now()
-    await this.startConnection()
+    this.startConnection()
   }
 
   private reconnect() {
@@ -144,6 +150,8 @@ export class SpeechNls {
 
     if (this.isConnecting)
       return
+
+    this.currentUUID = generateUUID()
 
     this.isConnecting = true
 
@@ -215,6 +223,7 @@ export class SpeechNls {
     websocket.onclose = () => {
       log('[NLS] WebSocket连接已关闭', 'warning')
       this.updateStatus(SpeechStatus.DISCONNECTED)
+      this.currentUUID = ''
       this.hasStartedTranscription = false // 重置状态
     }
   }
@@ -228,8 +237,8 @@ export class SpeechNls {
         appkey: APPKEY,
         namespace: 'SpeechTranscriber',
         name: 'StartTranscription',
-        task_id: generateUUID(),
-        message_id: generateUUID(),
+        task_id: this.currentUUID,
+        message_id: this.currentUUID,
       },
       payload: {
         format: 'pcm',
@@ -253,16 +262,19 @@ export class SpeechNls {
           appkey: APPKEY,
           namespace: 'SpeechTranscriber',
           name: 'StopTranscription',
-          task_id: generateUUID(),
-          message_id: generateUUID(),
+          task_id: this.currentUUID,
+          message_id: this.currentUUID,
         },
       }
       this.ws.send(JSON.stringify(stopTranscriptionMessage))
       this.hasStartedTranscription = false // 重置状态
       log('[NLS] 停止识别指令已发送', 'info')
 
-      this.ws?.close()
-      log('[NLS] WebSocket连接已关闭', 'info')
+      // 给一个2s处理时间
+      setTimeout(() => {
+        this.ws?.close()
+        log('[NLS] WebSocket连接已关闭', 'info')
+      }, 2000)
     }
   }
 
@@ -446,7 +458,7 @@ export class SpeechNls {
     }
   }
 
-  // 添加新方法用于完全停止音频监测
+  // 完全停止音频监测
   async stopAudioMonitoring() {
     this.isMonitoring = false
     this.isProcessingAudio = false
@@ -494,6 +506,22 @@ export class SpeechNls {
     }
 
     this.audioBuffer = [] // 清空缓冲区
+  }
+
+  /**
+   * 判断当前是否满足打断条件
+   * @returns boolean 是否满足打断条件
+   */
+  public checkInterruption(): boolean {
+    // 必须满足条件：
+    // 1. 当前正在进行语音合成
+    // 2. 当前音量超过阈值(正在说话)
+    // 3. 持续说话超过2秒
+    const speakingDuration = this.isSpeaking ? Date.now() - this.speakingStartTime : 0
+    const volumeAboveThreshold = this.volumeLevel > this.SPEECH_THRESHOLD
+
+    return volumeAboveThreshold
+      && speakingDuration >= 200
   }
 }
 

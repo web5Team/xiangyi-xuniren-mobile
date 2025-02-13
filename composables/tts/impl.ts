@@ -13,6 +13,10 @@ class AudioStreamPlayer {
   private audioBufs: any[] = []
   private lastPausedTime: number = 0 // 新增：记录暂停时的时间点
 
+  getIsPlaying() {
+    return this.isPlaying
+  }
+
   constructor() {
     this.audioContext = new AudioContext()
 
@@ -69,7 +73,6 @@ class AudioStreamPlayer {
     this.isPlaying = false
   }
 
-  // 修改暂停方法
   public pause() {
     if (!this.isPaused) {
       this.isPaused = true
@@ -78,7 +81,6 @@ class AudioStreamPlayer {
     }
   }
 
-  // 修改恢复播放方法
   public resume() {
     if (this.isPaused) {
       this.isPaused = false
@@ -90,7 +92,6 @@ class AudioStreamPlayer {
     }
   }
 
-  // 修改清空方法
   public clear() {
     this.isPaused = false
     this.isPlaying = false

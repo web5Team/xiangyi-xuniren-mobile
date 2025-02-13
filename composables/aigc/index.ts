@@ -39,35 +39,41 @@ export class AIGCConversationManager {
   }
 
   public async startConversation(sentence: string, useVoice = false) {
-    this.model.stopRecord()
-    this.lastSignal?.abort?.()
+    return new Promise((resolve) => {
+      // this.model.stopRecord()
+      this.lastSignal?.abort?.()
 
-    const aggregator = new TextAggregator((wholeSentence: string) => {
-      if (useVoice)
-        startAudioStream(wholeSentence)
-    })
-
-    this.lastSignal = await getAIGCCompletionStream(
-      sentence,
-      (message: any) => {
-        const { event, data } = message
-        if (event !== 'conversation.message.delta')
-          return
-
-        const { content, type } = data
-        if (type !== 'answer')
-          return
-
-        aggregator.appendText(content)
-      },
-      (error: any) => {
-        console.warn('Conversation error:', error)
-      },
-      () => {
+      const aggregator = new TextAggregator((wholeSentence: string) => {
         if (useVoice)
-          this.model.startRecord()
-      },
-    )
+          startAudioStream(wholeSentence)
+      })
+
+      setTimeout(async () => {
+        this.lastSignal = await getAIGCCompletionStream(
+          sentence,
+          (message: any) => {
+            const { event, data } = message
+            if (event !== 'conversation.message.delta')
+              return
+
+            const { content, type } = data
+            if (type !== 'answer')
+              return
+
+            aggregator.appendText(content)
+          },
+          (error: any) => {
+            console.warn('Conversation error:', error)
+          },
+          () => {
+            // if (useVoice)
+            //   this.model.startRecord()
+
+            resolve(true)
+          },
+        )
+      })
+    })
   }
 
   public stopConversation() {
