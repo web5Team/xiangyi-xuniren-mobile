@@ -1,17 +1,19 @@
 import type { SpeechNls } from '../nls'
+import { composer } from '../aigc'
+import type { AudioComposer } from './composer'
 import type AudioStreamPlayer from './impl'
-
 /**
  * 本文件是作为语音模块适配器存在
  *
  * 主要支持打断，只要检测到发言就会强行停止语音模块
  */
-export async function useTTSAdapter(nls: SpeechNls, tts: AudioStreamPlayer) {
+export async function useTTSAdapter(nls: SpeechNls, tts: AudioStreamPlayer, composer: AudioComposer) {
   // let lastStatus = false
 
   nls.newConnectionStartBus.on((payload) => {
     console.log(`%c新连接开始 / 打断说话`, 'color: #03C078;font-weight: bold')
     tts.clear()
+    composer.clear()
   })
 
   // function checker() {

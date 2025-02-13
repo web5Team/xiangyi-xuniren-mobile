@@ -1,6 +1,7 @@
 import { SpeechNls } from '~/composables/nls'
 import { useTTSAdapter } from '~/composables/tts/adapter'
 import { audioStreamPlayer } from '~/composables/tts'
+import { composer } from '~/composables/tts/composer'
 
 export const {
   ensurePermissions,
@@ -9,7 +10,7 @@ export const {
 } = useDevicesList()
 
 export const speechNls = new SpeechNls()
-useTTSAdapter(speechNls, audioStreamPlayer)
+useTTSAdapter(speechNls, audioStreamPlayer, composer)
 
 export class ModelManager {
   stream: Ref<MediaStream | undefined>

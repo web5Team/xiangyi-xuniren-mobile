@@ -2,18 +2,20 @@ import { TextAggregator, getAIGCCompletionStream } from '../api/base/v1/aigc/com
 
 import * as TTS from '../tts/core'
 import { getTextToSpeechStream } from '../tts/network'
+import { AudioComposer, composer } from '../tts/composer'
 import { getMockResponse } from './mock'
 import { $model, type ModelManager } from '~/components/chore/model/model-manager'
 
-async function startAudioStream(sentence: string) {
-  console.log('startAudioStream', sentence)
+// async function startAudioStream(sentence: string) {
+//   console.log('startAudioStream', sentence)
 
-  const stream = await getTextToSpeechStream({
-    text: sentence,
-  })
+//   composer.appendText(sentence)
+//   // const stream = await getTextToSpeechStream({
+//   //   text: sentence,
+//   // })
 
-  TTS.audioStreamPlayer.appendReadableAudio(stream)
-}
+//   // TTS.audioStreamPlayer.appendReadableAudio(stream)
+// }
 
 export class AIGCConversationManager {
   private model: ModelManager
@@ -29,7 +31,7 @@ export class AIGCConversationManager {
   public async mockConversation(useVoice = false) {
     const aggregator = new TextAggregator((wholeSentence: string) => {
       if (useVoice)
-        startAudioStream(wholeSentence)
+        composer.appendText(wholeSentence)
     })
 
     getMockResponse((chunk) => {
@@ -45,7 +47,7 @@ export class AIGCConversationManager {
 
       const aggregator = new TextAggregator((wholeSentence: string) => {
         if (useVoice)
-          startAudioStream(wholeSentence)
+          composer.appendText(wholeSentence)
       })
 
       setTimeout(async () => {

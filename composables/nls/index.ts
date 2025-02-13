@@ -113,7 +113,7 @@ export class SpeechNls {
   private canSendAudio: boolean = false // 控制是否可以发送音频的标志
   private speakingStartTime: number = 0 // 开始说话的时间戳
   private readonly BUFFER_MAX_LENGTH = 2560 // 限制缓冲区大小
-  private readonly MIN_SPEAKING_DURATION = 2000 // 最小说话持续时间（2秒）
+  private readonly MIN_SPEAKING_DURATION = 1000 // 最小说话持续时间（2秒）
 
   private currentUUID: string = ''
 

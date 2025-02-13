@@ -1,6 +1,7 @@
 import Recorder from 'recorder-core'
 import 'recorder-core/src/engine/mp3-engine'
 import 'recorder-core/src/extensions/waveview'
+import { Logger } from '../utils/logger'
 
 // 可选的插件支持项，把需要的插件按需引入进来即可
 
@@ -11,18 +12,28 @@ class AudioStreamPlayer {
   private audioContext: AudioContext
   private playStartTime: number = 0
   private audioBufs: any[] = []
-  private lastPausedTime: number = 0 // 新增：记录暂停时的时间点
-  private synthesisQueue: Array<() => Promise<void>> = [] // 新增：合成请求队列
-  private isProcessingQueue: boolean = false // 新增：是否正在处理队列
-  private lastSynthesisTime: number = 0 // 新增：上次合成的时间戳
-  private abortController: AbortController | null = null // 新增：用于取消请求
+  private lastPausedTime: number = 0 // 记录暂停时的时间点
+  private isDestroyed: boolean = false // 新增：标记是否已销毁
+  private logger: Logger
+  private activeSource: AudioBufferSourceNode | null = null // 新增：跟踪当前播放的音频源
 
   getIsPlaying() {
     return this.isPlaying
   }
 
   constructor() {
+    this.logger = new Logger('AudioStreamPlayer')
     this.audioContext = new AudioContext()
+
+    // 添加状态检查
+    this.logger.info('AudioContext state:', this.audioContext.state)
+
+    // 尝试恢复 AudioContext
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume().then(() => {
+        this.logger.info('AudioContext resumed successfully')
+      })
+    }
 
     // 初始化 recorder
     this.recorder = Recorder({
@@ -35,46 +46,77 @@ class AudioStreamPlayer {
     })
   }
 
-  // 修改 appendAudio 方法，移除暂停检查
   public appendAudio(audioData: ArrayBuffer) {
-    // 将音频数据添加到缓冲区，无论是否暂停都接收
+    if (!audioData || audioData.byteLength === 0 || this.isDestroyed)
+      return
+
+    this.logger.info('收到音频数据，大小:', audioData.byteLength)
+
     this.audioBufs.push({
       data: audioData,
       time: Date.now(),
     })
 
-    // 只有在播放状态且未暂停时才进行解码播放
+    // 如果当前没有在播放且没有暂停，开始播放
     if (!this.isPlaying && !this.isPaused)
       this.decodeAndPlay()
   }
 
   private async decodeAndPlay() {
+    // 如果已经在播放或已销毁，则不执行
+    if (this.isDestroyed)
+      return
+
     this.isPlaying = true
 
-    while (this.audioBufs.length > 0) {
+    this.logger.info('开始解码和播放，缓冲区长度:', this.audioBufs.length)
+
+    while (this.audioBufs.length > 0 && !this.isDestroyed) {
       const buf = this.audioBufs[0]
 
       try {
         const audioBuffer = await this.audioContext.decodeAudioData(buf.data)
+        this.logger.info('音频解码成功，时长:', audioBuffer.duration)
+
         const source = this.audioContext.createBufferSource()
+        this.activeSource = source // 保存当前音频源的引用
         source.buffer = audioBuffer
         source.connect(this.audioContext.destination)
 
         if (this.playStartTime === 0)
           this.playStartTime = this.audioContext.currentTime
 
+        source.onended = () => {
+          // 当前片段播放结束
+          if (!this.isDestroyed && !this.isPaused) {
+            // 继续检查并播放队列中的下一个
+            setTimeout(() => {
+              this.checkAndPlay()
+            }, 100)
+          }
+        }
+
+        this.logger.info('开始播放片段，当前时间:', this.playStartTime)
         source.start(this.playStartTime)
         this.playStartTime += audioBuffer.duration
 
         this.audioBufs.shift()
       }
       catch (e) {
-        console.error('解码音频失败:', e)
+        this.logger.error('解码音频失败:', e)
         this.audioBufs.shift()
       }
     }
 
     this.isPlaying = false
+    // 检查是否还有新的音频需要播放
+    this.checkAndPlay()
+  }
+
+  // 新增：检查并播放方法
+  private checkAndPlay() {
+    if (!this.isDestroyed && !this.isPaused && this.audioBufs.length > 0 && !this.isPlaying)
+      this.decodeAndPlay()
   }
 
   public pause() {
@@ -101,19 +143,23 @@ class AudioStreamPlayer {
     this.isPlaying = false
     this.playStartTime = 0
     this.lastPausedTime = 0
-    this.audioBufs = []
-    this.audioContext.suspend()
-    // 新增：清除合成队列和终止当前请求
-    this.synthesisQueue = []
-    this.isProcessingQueue = false
-    if (this.abortController) {
-      this.abortController.abort()
-      this.abortController = null
+
+    // 立即停止当前正在播放的音频
+    if (this.activeSource) {
+      try {
+        this.activeSource.stop()
+      }
+      catch (e) {
+        this.logger.error('停止当前音频源时出错:', e)
+      }
+      this.activeSource = null
     }
+
+    this.audioBufs = []
   }
 
-  // 销毁实例
   public destroy() {
+    this.isDestroyed = true
     this.clear()
     this.recorder.close()
     this.audioContext.close()
@@ -122,32 +168,18 @@ class AudioStreamPlayer {
   // 修改 appendReadableAudio 方法
   public async appendReadableAudio(stream: ReadableStream<Uint8Array>) {
     return new Promise<void>((resolve, reject) => {
-      // 将新的合成请求添加到队列
-      this.synthesisQueue.push(async () => {
-        // 确保合成间隔至少1秒
-        const now = Date.now()
-        const timeSinceLastSynthesis = now - this.lastSynthesisTime
-        if (timeSinceLastSynthesis < 1000)
-          await new Promise(resolve => setTimeout(resolve, 1000 - timeSinceLastSynthesis))
-
-        this.abortController = new AbortController()
+      setTimeout(async () => {
         const reader = stream.getReader()
 
         try {
           while (true) {
-            // 检查是否被取消
-            if (this.abortController.signal.aborted) {
-              reader.releaseLock()
-              throw new Error('Synthesis cancelled')
-            }
-
             const { done, value } = await reader.read()
             if (done)
               break
 
             this.appendAudio(value.buffer as ArrayBuffer)
           }
-          this.lastSynthesisTime = Date.now()
+
           resolve()
         }
         catch (error: any) {
@@ -159,33 +191,20 @@ class AudioStreamPlayer {
         finally {
           reader.releaseLock()
         }
-      })
-
-      // 如果队列没有在处理，开始处理
-      if (!this.isProcessingQueue)
-        this.processQueue()
+      }, 50)
     })
   }
 
-  // 新增：处理合成队列的方法
-  private async processQueue() {
-    if (this.isProcessingQueue)
-      return
-
-    this.isProcessingQueue = true
-
-    while (this.synthesisQueue.length > 0) {
-      const synthesisTask = this.synthesisQueue[0]
-      try {
-        await synthesisTask()
-      }
-      catch (error) {
-        console.error('合成任务执行失败:', error)
-      }
-      this.synthesisQueue.shift()
+  public async initialize() {
+    try {
+      await this.audioContext.resume()
+      this.logger.info('AudioContext 已就绪:', this.audioContext.state)
+      return true
     }
-
-    this.isProcessingQueue = false
+    catch (error) {
+      this.logger.error('AudioContext 初始化失败:', error)
+      return false
+    }
   }
 }
 
