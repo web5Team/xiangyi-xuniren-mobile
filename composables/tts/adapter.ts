@@ -9,34 +9,39 @@ import type AudioStreamPlayer from './impl'
 export async function useTTSAdapter(nls: SpeechNls, tts: AudioStreamPlayer) {
   // let lastStatus = false
 
-  function checker() {
-    setTimeout(checker, 160)
-    // const isSpeaking = nls.getIsSpeaking()
+  nls.newConnectionStartBus.on((payload) => {
+    console.log(`%c新连接开始 / 打断说话`, 'color: #03C078;font-weight: bold')
+    tts.clear()
+  })
 
-    if (nls.checkInterruption()) {
-      if (!tts.getIsPlaying()) {
-        // console.log(`%c用户正在发言，但是未处于合成状态，取消打断。`, 'color: #03C078;font-weight: bold')
-      }
-      else {
-        tts.clear()
+  // function checker() {
+  //   setTimeout(checker, 160)
+  //   // const isSpeaking = nls.getIsSpeaking()
 
-        console.log(`%c打断说话`, 'color: #F56C6C;font-weight: bold')
-      }
-    }
+  //   if (nls.checkInterruption()) {
+  //     if (!tts.getIsPlaying()) {
+  //       // console.log(`%c用户正在发言，但是未处于合成状态，取消打断。`, 'color: #03C078;font-weight: bold')
+  //     }
+  //     else {
+  //       tts.clear()
 
-    // if (isSpeaking && !lastStatus) {
-    //   const startTime = nls.getSpeakingStartTime()
-    //   const diff = Date.now() - startTime
+  //       console.log(`%c打断说话`, 'color: #F56C6C;font-weight: bold')
+  //     }
+  //   }
 
-    //   console.log(isSpeaking, lastStatus, diff)
+  //   // if (isSpeaking && !lastStatus) {
+  //   //   const startTime = nls.getSpeakingStartTime()
+  //   //   const diff = Date.now() - startTime
 
-    //   if (diff > 2000) {
-    //     tts.clear()
+  //   //   console.log(isSpeaking, lastStatus, diff)
 
-    //     console.log(`%c打断说话`, 'color: #F56C6C;font-weight: bold')
-    //   }
-    // }
-  }
+  //   //   if (diff > 2000) {
+  //   //     tts.clear()
 
-  checker()
+  //   //     console.log(`%c打断说话`, 'color: #F56C6C;font-weight: bold')
+  //   //   }
+  //   // }
+  // }
+
+  // checker()
 }

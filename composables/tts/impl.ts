@@ -12,6 +12,10 @@ class AudioStreamPlayer {
   private playStartTime: number = 0
   private audioBufs: any[] = []
   private lastPausedTime: number = 0 // 新增：记录暂停时的时间点
+  private synthesisQueue: Array<() => Promise<void>> = [] // 新增：合成请求队列
+  private isProcessingQueue: boolean = false // 新增：是否正在处理队列
+  private lastSynthesisTime: number = 0 // 新增：上次合成的时间戳
+  private abortController: AbortController | null = null // 新增：用于取消请求
 
   getIsPlaying() {
     return this.isPlaying
@@ -99,6 +103,13 @@ class AudioStreamPlayer {
     this.lastPausedTime = 0
     this.audioBufs = []
     this.audioContext.suspend()
+    // 新增：清除合成队列和终止当前请求
+    this.synthesisQueue = []
+    this.isProcessingQueue = false
+    if (this.abortController) {
+      this.abortController.abort()
+      this.abortController = null
+    }
   }
 
   // 销毁实例
@@ -108,26 +119,73 @@ class AudioStreamPlayer {
     this.audioContext.close()
   }
 
-  // 添加新方法处理 ReadableStream
+  // 修改 appendReadableAudio 方法
   public async appendReadableAudio(stream: ReadableStream<Uint8Array>) {
-    const reader = stream.getReader()
+    return new Promise<void>((resolve, reject) => {
+      // 将新的合成请求添加到队列
+      this.synthesisQueue.push(async () => {
+        // 确保合成间隔至少1秒
+        const now = Date.now()
+        const timeSinceLastSynthesis = now - this.lastSynthesisTime
+        if (timeSinceLastSynthesis < 1000)
+          await new Promise(resolve => setTimeout(resolve, 1000 - timeSinceLastSynthesis))
 
-    try {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done)
-          break
+        this.abortController = new AbortController()
+        const reader = stream.getReader()
 
-        // 将 Uint8Array 转换为 ArrayBuffer 并添加到播放队列
-        this.appendAudio(value.buffer as ArrayBuffer)
+        try {
+          while (true) {
+            // 检查是否被取消
+            if (this.abortController.signal.aborted) {
+              reader.releaseLock()
+              throw new Error('Synthesis cancelled')
+            }
+
+            const { done, value } = await reader.read()
+            if (done)
+              break
+
+            this.appendAudio(value.buffer as ArrayBuffer)
+          }
+          this.lastSynthesisTime = Date.now()
+          resolve()
+        }
+        catch (error: any) {
+          if (error.message === 'Synthesis cancelled')
+            resolve() // 如果是主动取消，则正常结束
+          else
+            reject(error)
+        }
+        finally {
+          reader.releaseLock()
+        }
+      })
+
+      // 如果队列没有在处理，开始处理
+      if (!this.isProcessingQueue)
+        this.processQueue()
+    })
+  }
+
+  // 新增：处理合成队列的方法
+  private async processQueue() {
+    if (this.isProcessingQueue)
+      return
+
+    this.isProcessingQueue = true
+
+    while (this.synthesisQueue.length > 0) {
+      const synthesisTask = this.synthesisQueue[0]
+      try {
+        await synthesisTask()
       }
+      catch (error) {
+        console.error('合成任务执行失败:', error)
+      }
+      this.synthesisQueue.shift()
     }
-    catch (error) {
-      console.error('读取音频流失败:', error)
-    }
-    finally {
-      reader.releaseLock()
-    }
+
+    this.isProcessingQueue = false
   }
 }
 

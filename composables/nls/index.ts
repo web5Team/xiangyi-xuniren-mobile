@@ -86,6 +86,7 @@ export class SpeechNls {
   sentenceBus = useEventBus<Payload>('ON_SENTENCE')
   sentenceCacheBus = useEventBus<Payload>('ON_SENTENCE_CACHE')
   dataBus = useEventBus<RootObject>('ON_DATA')
+  newConnectionStartBus = useEventBus<boolean>('ON_NEW_CONNECTION_START')
 
   private isSpeaking: boolean = false
   private silenceTimer: NodeJS.Timeout | null = null
@@ -179,6 +180,7 @@ export class SpeechNls {
         case 'TranscriptionStarted':
           log('[NLS] 🎯 开始语音识别', 'success')
           this.updateStatus(SpeechStatus.Ready)
+          this.newConnectionStartBus.emit(true)
           break
         case 'SentenceBegin':
           log('[NLS] 📝 开始新句子', 'info')
