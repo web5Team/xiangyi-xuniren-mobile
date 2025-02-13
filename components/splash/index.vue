@@ -4,7 +4,7 @@ import Copyright from "~/components/chore/Copyright.vue";
 
 const actionList = Object.keys(import.meta.glob("/public/model/daily/*.fbx"));
 const modelList = ["/xyfemale.vrm", "/xymale.vrm"];
-const totalList = [...modelList];
+const totalList = [...actionList, ...modelList];
 
 const globalProgress = ref(0);
 
