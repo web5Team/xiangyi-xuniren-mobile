@@ -105,7 +105,8 @@ export class SpeechNls {
   private lastLogTime: number = 0
   private isProcessingAudio: boolean = false
 
-  private hasStartedTranscription: boolean = false // 添加新状态跟踪是否已发送识别指令
+  private hasStartedTranscription: boolean = false
+  private isConnecting: boolean = false
 
   private audioBuffer: Float32Array[] = [] // 存储音频数据的缓冲区
   private canSendAudio: boolean = false // 控制是否可以发送音频的标志
@@ -137,9 +138,14 @@ export class SpeechNls {
     }
   }
 
-  async startConnection() {
+  startConnection() {
     if (!this.token)
       throw new Error('Token is not set')
+
+    if (this.isConnecting)
+      return
+
+    this.isConnecting = true
 
     log('[NLS] 开始建立WebSocket连接...', 'highlight')
     const socketUrl = `${END_URL}?token=${this.token}`
@@ -151,7 +157,9 @@ export class SpeechNls {
       log('[NLS] ✅ WebSocket连接已建立', 'success')
       this.updateStatus(SpeechStatus.CONNECTED)
       this.startSilenceDetection()
-      this.sendStartTranscription() // 移到单独的方法中
+      this.sendStartTranscription()
+
+      this.isConnecting = false
     }
 
     websocket.onmessage = (event) => {
@@ -310,6 +318,10 @@ export class SpeechNls {
         if (this.isSpeaking) {
           this.lastSpeechTime = Date.now()
 
+          // 只要开始说话 要确保连接到服务器
+          if (this.ws?.readyState !== WebSocket.OPEN)
+            this.startConnection()
+
           // 存储音频数据
           this.audioBuffer.push(new Float32Array(inputData))
           if (this.audioBuffer.length > this.BUFFER_MAX_LENGTH)
@@ -323,7 +335,8 @@ export class SpeechNls {
           }
 
           // 如果可以发送，且WebSocket连接正常
-          if (this.canSendAudio && this.ws?.readyState === WebSocket.OPEN) {
+          // this.canSendAudio &&
+          if (this.ws?.readyState === WebSocket.OPEN) {
             const inputData16 = new Int16Array(inputData.length)
             for (let i = 0; i < inputData.length; ++i)
               inputData16[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF
