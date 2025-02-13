@@ -107,6 +107,12 @@ export class SpeechNls {
 
   private hasStartedTranscription: boolean = false // 添加新状态跟踪是否已发送识别指令
 
+  private audioBuffer: Float32Array[] = [] // 存储音频数据的缓冲区
+  private canSendAudio: boolean = false // 控制是否可以发送音频的标志
+  private speakingStartTime: number = 0 // 开始说话的时间戳
+  private readonly BUFFER_MAX_LENGTH = 100 // 限制缓冲区大小
+  private readonly MIN_SPEAKING_DURATION = 2000 // 最小说话持续时间（2秒）
+
   updateStatus(status: SpeechStatus) {
     this.status = status
     this.statusBus.emit(status)
@@ -287,33 +293,42 @@ export class SpeechNls {
         const wasSpeaking = this.isSpeaking
         this.isSpeaking = rms > this.SPEECH_THRESHOLD
 
-        // 检测到说话时，确保已发送识别指令
-        if (this.isSpeaking && !wasSpeaking)
-          this.sendStartTranscription()
+        // 检测说话状态变化
+        if (this.isSpeaking && !wasSpeaking) {
+          this.speakingStartTime = Date.now()
+          this.canSendAudio = false
+          this.audioBuffer = [] // 清空缓冲区
+        }
 
-        // 只在状态改变时输出音量日志
+        // 更新说话状态
         if (this.isSpeaking !== wasSpeaking) {
           const status = this.isSpeaking ? '开始说话' : '停止说话'
           log(`[NLS] 🎤 ${status} - 音量: ${rms.toFixed(6)}`, this.isSpeaking ? 'success' : 'warning')
           this.speakingBus.emit(this.isSpeaking)
         }
 
-        if (this.isSpeaking)
+        if (this.isSpeaking) {
           this.lastSpeechTime = Date.now()
 
-        // 说话时，连接存在就发送音频数据
-        if (this.ws?.readyState === WebSocket.OPEN) {
-          // let inputData16: Int16Array | null = null
+          // 存储音频数据
+          this.audioBuffer.push(new Float32Array(inputData))
+          if (this.audioBuffer.length > this.BUFFER_MAX_LENGTH)
+            this.audioBuffer.shift() // 移除最旧的数据
 
-          if (this.isSpeaking) {
+          // 检查是否已经说话超过2秒
+          if (!this.canSendAudio && Date.now() - this.speakingStartTime >= this.MIN_SPEAKING_DURATION) {
+            this.canSendAudio = true
+            // 发送缓冲区中的所有数据
+            this.sendBufferedAudio()
+          }
+
+          // 如果可以发送，且WebSocket连接正常
+          if (this.canSendAudio && this.ws?.readyState === WebSocket.OPEN) {
             const inputData16 = new Int16Array(inputData.length)
-
             for (let i = 0; i < inputData.length; ++i)
               inputData16[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7FFF
 
             this.ws.send(inputData16.buffer)
-
-            // log(`[NLS] 📊 发送音频数据 - 音量: ${rms.toFixed(6)}, 数据长度: ${inputData16.length}`, 'info')
           }
         }
       }
@@ -448,6 +463,24 @@ export class SpeechNls {
   // 获取当前是否有人在说话的状态
   public getIsSpeaking(): boolean {
     return this.isSpeaking
+  }
+
+  // 新增：发送缓冲区中的音频数据
+  private sendBufferedAudio() {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN)
+      return
+
+    log('[NLS] 开始发送缓存的音频数据', 'info')
+
+    for (const audioData of this.audioBuffer) {
+      const inputData16 = new Int16Array(audioData.length)
+      for (let i = 0; i < audioData.length; ++i)
+        inputData16[i] = Math.max(-1, Math.min(1, audioData[i])) * 0x7FFF
+
+      this.ws.send(inputData16.buffer)
+    }
+
+    this.audioBuffer = [] // 清空缓冲区
   }
 }
 
