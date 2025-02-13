@@ -73,8 +73,6 @@ export function useDownloadModels(urls: string[], maxConcurrency: number) {
   const abortController = new AbortController()
   const activeTask = ref<string[]>([])
 
-  console.log('total task', urls)
-
   const download = async () => {
     if (urls.length === 0)
       return []
@@ -106,8 +104,6 @@ export function useDownloadModels(urls: string[], maxConcurrency: number) {
           const unwatch = watch(downloader.progress, (newProgress) => {
             progressArray[index] = newProgress
             progress.value = progressArray.reduce((a: number, b: number) => a + b, 0) / urls.length
-
-            console.log('progress', progress.value, progressArray)
 
             if (progress.value >= 100)
               unwatch()

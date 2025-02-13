@@ -21,7 +21,12 @@ export class ModelManager {
     const result = useUserMedia({
       constraints: reactive({
         video: false,
-        audio: { deviceId: currentMicrophone },
+        audio: {
+          echoCancellation: true,
+          noiseCancellation: true,
+          autoGainControl: true,
+          deviceId: currentMicrophone,
+        },
       }),
     })
 

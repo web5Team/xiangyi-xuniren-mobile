@@ -64,7 +64,7 @@ export class AIGCConversationManager {
         console.warn('Conversation error:', error)
       },
       () => {
-        if (!useVoice)
+        if (useVoice)
           this.model.startRecord()
       },
     )

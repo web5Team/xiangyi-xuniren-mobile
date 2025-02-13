@@ -16,8 +16,8 @@ export const INNER_EMOTIONS = [
   'neutral',
   'blinkLeft',
   'blinkRight',
-  'blink',
-  'neutral',
+  // 'blink',
+  // 'neutral',
   'relaxed',
   'sad',
   'surprised',
@@ -64,7 +64,14 @@ export class ActionManager {
     const action = INNER_ACTIONS[Math.floor(Math.random() * INNER_ACTIONS.length)]
     const emotion = INNER_EMOTIONS[Math.floor(Math.random() * INNER_EMOTIONS.length)]
 
-    this._viewer.model?.loadFBX(action)
-    this._viewer.model?.emote(emotion as any)
+    console.log('[ACTION] action', action, emotion)
+
+    try {
+      this._viewer.model?.loadFBX(action)
+      this._viewer.model?.emote(emotion as any)
+    }
+    catch (_ignored) {
+
+    }
   }
 }

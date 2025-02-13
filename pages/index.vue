@@ -71,7 +71,7 @@ async function handleInit() {
     })
   ) {
     options.init = true
-    speechNls.connect(res.data.token)
+    await speechNls.connect(res.data.token)
     $model.startRecord()
   }
 }
