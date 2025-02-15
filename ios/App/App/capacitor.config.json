@@ -1,0 +1,6 @@
+{
+	"appId": "com.demohub.xiangyi",
+	"appName": "xiangyi-app",
+	"webDir": ".output/public",
+	"packageClassList": []
+}
