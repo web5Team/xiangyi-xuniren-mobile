@@ -1,1 +1,0 @@
-import{_ as t,c as n,b as o,o as c,bx as a}from"./CuGJDCs3.js";const _={},s={class:"DefaultTemplate-Container"};function r(f,l){const e=a;return c(),n("main",s,[o(e)])}const p=t(_,[["render",r]]);export{p as default};
